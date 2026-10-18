@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>TI-Nspire CX II CAS</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="nspire">
+<div id="app" class="app">
+  <header class="bar">
+    <button class="icon-btn" id="btn-menu" aria-label="Calculator menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <button class="icon-btn" id="btn-type" aria-label="Type with phone keyboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7.5 14h9"/></svg>
+    </button>
+  </header>
+
+  <section class="lcd-wrap" id="lcd-wrap">
+    <div class="lcd ns" id="lcd">
+      <canvas id="screen" width="320" height="240" aria-label="Calculator screen"></canvas>
+      <div class="ns-busy" id="busy" hidden><div class="ns-bar"><i id="busy-bar"></i></div><span id="busy-text">Starting…</span></div>
+    </div>
+  </section>
+
+  <section class="pad ns-pad" id="pad" aria-label="Keypad">
+    <div class="ns-top">
+      <div class="ns-side" id="ns-left"></div>
+      <div class="ns-touch" id="touch" role="application" aria-label="Touchpad: tap the edge for arrows, the centre to click, drag to move the pointer">
+        <span class="tp-arrow up">▲</span><span class="tp-arrow down">▼</span><span class="tp-arrow left">◀</span><span class="tp-arrow right">▶</span>
+        <span class="tp-centre"></span>
+      </div>
+      <div class="ns-side" id="ns-right"></div>
+    </div>
+    <div class="ns-main" id="ns-main"></div>
+    <div class="ns-alpha" id="ns-alpha"></div>
+  </section>
+</div>
+
+<!-- first run: the calculator's own firmware -->
+<div class="setup" id="setup" hidden>
+  <div class="setup-card">
+    <h1>TI-Nspire CX II CAS</h1>
+    <p>Runs the real TI-Nspire OS on the Firebird emulator. It needs the system files dumped from your own calculator (PolyDumper + eMMUlate) and the OS file from TI. Load them once; they stay on this phone.</p>
+    <ul class="ns-files" id="ns-files"></ul>
+    <button class="primary" id="btn-files">Choose files</button>
+    <button class="primary" id="btn-install" hidden>Install the OS</button>
+    <button class="linkbtn" id="btn-other" hidden>A different calculator…</button>
+    <p class="fine">You can select all the files at once. Names don’t matter; each file is recognised by its contents. The OS loader (osldr) isn’t needed. Setup takes about a minute and the emulator runs the TI installer, just like the real calculator.</p>
+    <p class="err" id="setup-err" hidden></p>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="sheet" id="sheet-type" role="dialog" aria-label="Type" hidden>
+  <div class="grab"></div>
+  <div class="type-row">
+    <input id="type-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="solve(x^2=4,x)">
+    <button class="primary small" id="type-send">Enter</button>
+  </div>
+  <div class="type-opts"><label><input type="checkbox" id="type-autoenter" checked> Press enter after typing</label></div>
+  <p class="type-opts">Typed text is pressed as keys: letters, digits, + − * / ^ ( ) [ ] { } , . = and space.</p>
+</div>
+
+<div class="sheet tall" id="sheet-menu" role="dialog" aria-label="Menu" hidden>
+  <div class="grab"></div>
+  <div class="menu">
+    <h2>Files</h2>
+    <button class="row" id="m-send"><span>Send documents</span><small>.tns files to My Documents</small></button>
+    <button class="row" id="m-shot"><span>Save screenshot</span></button>
+    <h2>Calculator</h2>
+    <button class="row" id="m-save"><span>Save state now</span><small>The calculator resumes exactly here next time</small></button>
+    <button class="row" id="m-reset"><span>Restart calculator</span><small>Like the reset button; documents are kept</small></button>
+    <button class="row" id="m-os"><span>Replace OS or change calculator</span><small>Send a newer OS file, or pick another model</small></button>
+    <button class="row danger" id="m-erase"><span>Erase this calculator</span><small>Removes its flash, state and firmware from the phone</small></button>
+    <h2>Speed</h2>
+    <div class="seg" id="s-speed" role="radiogroup" aria-label="Speed">
+      <button data-v="1">Real speed</button><button data-v="0">As fast as possible</button>
+    </div>
+    <p class="about" id="about">TI-Nspire emulation: Firebird (GPL-3.0). The TI firmware is your own and is not part of this app. TI-Nspire is a trademark of Texas Instruments.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="file-fw" multiple hidden>
+<input type="file" id="file-os" hidden>
+<input type="file" id="file-send" accept=".tns,.tnc,.tco,.tcc" multiple hidden>
+
+<script src="js/memwasi.js"></script>
+<script src="js/nscore.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

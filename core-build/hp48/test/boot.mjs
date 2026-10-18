@@ -1,0 +1,21 @@
+import fs from 'node:fs'; import { createRequire } from 'node:module';
+const { MemFS, MemWASI } = createRequire(import.meta.url)('../../../app/www/hp/js/memwasi.js');
+const [,, romPath, type, cls, out] = process.argv;
+const wasi = new MemWASI(new MemFS(), {});
+const inst = await WebAssembly.instantiate(await WebAssembly.compile(fs.readFileSync(new URL('../hp48.wasm', import.meta.url))), { wasi_snapshot_preview1: wasi.imports });
+const X = inst.exports, mem = X.memory; wasi.memory = mem; if (X._initialize) X._initialize();
+X.hp_init(); X.hp_set_clock(Date.now(), 0);
+const rom = fs.readFileSync(romPath); const p = X.hp_alloc(rom.length * 2); new Uint8Array(mem.buffer, p, rom.length).set(rom);
+console.log('rom nibbles', X.hp_rom(p, rom.length, type.charCodeAt(0), +cls));
+console.log('new', X.hp_new());
+const rows = X.hp_lcd_rows();
+const shot = (name) => { const q = X.hp_lcd(); const px = new Uint8Array(mem.buffer, q, 144 * 80); const b = Buffer.alloc(15 + 131 * rows * 3); b.write('P6 131 ' + rows + ' 255\n'); let o = b.indexOf(10) + 1; for (let y = 0; y < rows; y++) for (let x = 0; x < 131; x++) { const v = px[y * 144 + x] ? 0 : 200; b[o++] = v; b[o++] = v; b[o++] = v; } fs.writeFileSync(out + '_' + name + '.ppm', b.subarray(0, o)); };
+const run = (ms) => { const t = performance.now(); let busy = 0; for (let i = 0; i < ms / 10; i++) busy += X.hp_run(10000); return [Math.round(performance.now() - t), busy]; };
+const key = (o, i, ms = 120) => { X.hp_key(o, i, 1); run(ms); X.hp_key(o, i, 0); run(200); };
+console.log('boot 4s:', run(4000), 'pc', X.hp_pc().toString(16), 'sleep', X.hp_sleeping(), 'lcdon', X.hp_lcd_on(), 'annun', X.hp_annun());
+shot('boot');
+const K = JSON.parse(process.env.KEYS || '[]');
+let n=0; for (const [o, i] of K) { key(o, i, 150); run(400); shot('k'+(n++)); }
+run(1500); shot('keys');
+console.log('after keys pc', X.hp_pc().toString(16), 'vt', X.hp_vtime() / 1e6);
+const t0 = performance.now(); const r = run(10000); console.log('10s idle run', r);

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>HP 48 / 49</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app" class="app">
+  <header class="bar">
+    <button class="icon-btn" id="btn-menu" aria-label="Calculator menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <button class="icon-btn" id="btn-type" aria-label="Type with phone keyboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7.5 14h9"/></svg>
+    </button>
+  </header>
+  <section class="lcd-wrap">
+    <div class="lcd hp48" id="lcd">
+      <div class="ann" id="ann"></div>
+      <canvas id="screen" width="131" height="64" aria-label="Calculator display"></canvas>
+      <div class="lcd-off" id="lcd-off" hidden>Press ON</div>
+    </div>
+  </section>
+  <section class="pad hp" id="pad" aria-label="Keypad"></section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet-type" role="dialog" aria-label="Type" hidden>
+  <div class="grab"></div>
+  <div class="type-row">
+    <input id="type-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="1 2 +">
+    <button class="primary small" id="type-send">Type</button>
+  </div>
+  <div class="type-opts"><label><input type="checkbox" id="type-autoenter" checked> Press ENTER after typing</label></div>
+  <button class="row" id="type-string"><span>Put it on the stack as text</span><small>As a string object, instead of pressing keys</small></button>
+  <p class="type-opts">Each character is pressed as a key: letters use alpha lock, and ( [ { " « are typed with the shift keys.</p>
+</div>
+<div class="sheet tall" id="sheet-menu" role="dialog" aria-label="Menu" hidden>
+  <div class="grab"></div>
+  <div class="menu">
+    <h2>Files</h2>
+    <button class="row" id="m-load"><span>Load an object</span><small>.hp, .lib or text files go on stack level 1</small></button>
+    <button class="row" id="m-shot"><span>Save screenshot</span></button>
+    <h2>Calculator</h2>
+    <button class="row" id="m-save"><span>Save now</span><small>Memory is also saved every 20 seconds and when you leave</small></button>
+    <button class="row" id="m-reset"><span>Restart</span><small>Like ON+C on the real calculator; memory is kept</small></button>
+    <button class="row danger" id="m-clear"><span>Memory clear</span><small>Erase everything on this calculator</small></button>
+    <h2>Speed</h2>
+    <div class="seg" id="s-speed" role="radiogroup" aria-label="Speed">
+      <button data-v="1">Real</button><button data-v="2">2×</button><button data-v="4">4×</button><button data-v="0">Max</button>
+    </div>
+    <h2>Display</h2>
+    <div class="seg" id="s-lcd" role="radiogroup" aria-label="Screen style">
+      <button data-v="stn">Classic</button><button data-v="paper">Paper</button><button data-v="night">Night</button>
+    </div>
+    <p class="about" id="about"></p>
+  </div>
+</div>
+<div class="pop" id="pop" hidden></div>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="file-obj" accept=".hp,.lib,.txt,.48,.49,application/octet-stream,text/plain" multiple hidden>
+
+<script src="js/memwasi.js"></script>
+<script src="js/layouts.js"></script>
+<script src="js/hpcore.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

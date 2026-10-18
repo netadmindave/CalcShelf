@@ -1,0 +1,31 @@
+# signing — never commit keys
+*.keystore
+*.jks
+signed/
+out-unsigned.apk
+CalcShelf.apk
+# build output
+apk/assets/
+apk/build/
+core-build/**/obj/
+core-build/**/wobj*/
+core-build/**/nobj/
+core-build/hp48/core/
+core-build/nsp/core/
+*.o
+# your own calculator files — never commit TI firmware, ROM dumps or Nspire system files
+firmware/
+tests/firmware/
+*.89u
+*.9xu
+*.v2u
+*.tcc2
+*.tco2
+*.tct2
+*.tns
+# test output
+tests/out/*
+!tests/out/.gitkeep
+__pycache__/
+node_modules/
+.DS_Store

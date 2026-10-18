@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Classic Calculator</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app" class="app">
+  <header class="bar">
+    <button class="icon-btn" id="btn-menu" aria-label="Calculator menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <button class="icon-btn" id="btn-type" aria-label="Type with phone keyboard">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7.5 14h9"/></svg>
+    </button>
+  </header>
+
+  <section class="lcd-wrap" id="lcd-wrap">
+    <div class="lcd" id="lcd">
+      <canvas id="screen" width="96" height="64" aria-label="Calculator screen"></canvas>
+      <div class="lcd-off" id="lcd-off">Press on</div>
+    </div>
+  </section>
+
+  <section class="pad" id="pad" aria-label="Keypad">
+    <div class="frow" id="frow"></div>
+    <div class="cluster">
+      <div class="cgrid" id="cgrid"></div>
+      <div class="dpad" id="dpad" aria-label="Arrow keys">
+        <button class="dk up" data-k="4" aria-label="Up"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+        <button class="dk left" data-k="2" aria-label="Left"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button class="dk right" data-k="3" aria-label="Right"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button class="dk down" data-k="1" aria-label="Down"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="dhub"></div>
+      </div>
+    </div>
+    <div class="kgrid" id="kgrid"></div>
+  </section>
+</div>
+
+<!-- first run: load firmware for this model -->
+<div class="setup" id="setup" hidden>
+  <div class="setup-card">
+    <h1 id="setup-title">Classic calculator</h1>
+    <p id="setup-text"></p>
+    <div class="models" id="models"></div>
+    <button class="primary" id="btn-load-os">Choose file</button>
+    <button class="linkbtn" id="btn-other" hidden>Other calculators (TI-89, TI-92, HP)…</button>
+    <p class="fine" id="setup-fine"></p>
+    <p class="err" id="setup-err" hidden></p>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="sheet" id="sheet-type" role="dialog" aria-label="Type" hidden>
+  <div class="grab"></div>
+  <div class="type-row">
+    <input id="type-input" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="send" placeholder="2+3*SIN(30)">
+    <button class="primary small" id="type-send">Enter</button>
+  </div>
+  <div class="type-opts">
+    <label><input type="checkbox" id="type-autoenter" checked> Press enter after typing</label>
+  </div>
+  <p class="type-opts" id="type-help"></p>
+  <div class="hist" id="type-hist"></div>
+</div>
+
+<div class="sheet tall" id="sheet-menu" role="dialog" aria-label="Menu" hidden>
+  <div class="grab"></div>
+  <div class="menu">
+    <h2>Files</h2>
+    <button class="row" id="m-send"><span>Send programs, variables or apps</span><small id="m-send-info"></small></button>
+    <button class="row" id="m-shot"><span>Save screenshot</span></button>
+    <h2>Calculator</h2>
+    <button class="row" id="m-save"><span>Save snapshot</span><small>Everything on the calculator, as it is now</small></button>
+    <button class="row" id="m-restore"><span>Restore snapshot</span></button>
+    <button class="row" id="m-reset"><span>Restart calculator</span><small>Like pulling the batteries</small></button>
+    <button class="row danger" id="m-os"><span>Replace ROM or OS</span><small>Erases this calculator’s memory</small></button>
+    <h2>Display</h2>
+    <div class="seg" id="s-lcd" role="radiogroup" aria-label="Screen style">
+      <button data-v="stn">Classic</button><button data-v="paper">Paper</button><button data-v="night">Night</button>
+    </div>
+    <label class="toggle"><span>Pixel grid</span><input type="checkbox" id="s-grid"></label>
+    <label class="toggle"><span>Auto contrast (ignore the calculator’s contrast setting)</span><input type="checkbox" id="s-auto"></label>
+    <h2>Speed</h2>
+    <div class="seg" id="s-speed" role="radiogroup" aria-label="Speed">
+      <button data-v="1">Real</button><button data-v="2">2×</button><button data-v="4">4×</button>
+    </div>
+    <p class="about" id="about"></p>
+  </div>
+</div>
+
+<div class="pop" id="pop" hidden></div>
+<div class="toast" id="toast" hidden></div>
+<input type="file" id="file-os" hidden>
+<input type="file" id="file-send" multiple hidden>
+
+<script src="js/memwasi.js"></script>
+<script src="js/z80core.js"></script>
+<script src="js/layouts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

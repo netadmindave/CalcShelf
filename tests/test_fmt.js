@@ -1,0 +1,6 @@
+const F=require('../app/www/js/giacfmt.js');
+const T=['(x-1)*(x+1)','1/2*x-1/4*sin(2*x)','c_0*cos(x)+c_1*sin(x)','list[1/6*pi,5/6*pi]','[[1,2],[3,4]]','27.7777777778_(m*s^-1.0)','3.2_m','10_(m*s)','(x-√2)*(x+√2)','√pi','1/6*pi^2','((x>0)? 1 : -1)','((x>0) and (3>x))','(x)->x^2+1','exp(1)','2*i','-1/2*x^3+x','0.333333333333','1.23456789e-12','6.02214076e+23','x^5+5*x^4+10*x^3+10*x^2+5*x+1','-x/(x^2+1)','sin(x)^2','asin(1/2)','"hello"','true','undef','infinity','-infinity','x-1/6*x^3+1/120*x^5','e^x','exp(x)*ln(x)','surd(8,3)','abs(x)','piecewise(x<0,-x,x)','diff(f(x),x)','2*x/(x^2-1)','1/2/(x-1)-1/2/(x+1)','set[1,2]','[]','x_1+y_2','theta^2','10000000000000000000000000000000000000000000','2+3*i','-2+3*i','sqrt(2)/2','x^(1/3)','(-x)^2','-(x^2)','(a+b)^2','a^(b+c)','2^-1'];
+for(const s of T){ let r; try{r=F.giacToTex(s)}catch(e){r='EXC '+e.message} console.log(s.padEnd(36),'→',r); }
+console.log(F.giacToTex('list[-2,2]',{solveVar:'x'}), '|', F.giacToTex('list[[2,1]]',{solveVar:'x',solveVars:['x','y']}), '|', F.giacToTex('[]',{solveVar:'x'}));
+const f=F.compile('x^(1/3)+sin(x)*exp(-x)+piecewise(x<0,-x,x)'); console.log(f(-8), f(1));
+console.log(F.compile('(x-√2)*(x+√2)')(3), F.compile('surd(x,3)')(-27), F.compile('abs(x)/(2*pi)')(-Math.PI));
