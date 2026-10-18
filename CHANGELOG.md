@@ -2,6 +2,12 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## 2.7.2
+
+- **Conversion tool, Units:** the From and To units are now dropdowns listing the units of the chosen quantity. *Other unit…* still takes any typed unit, including compound ones such as W/(m·K).
+- **Conversion tool, Optics** (it was *Light & photons*): converts a linewidth or bandwidth between Δλ and Δν at a centre wavelength or frequency. For example, 0.02 nm at 1550 nm is 2495.7 MHz. Pick the result's unit (fm to µm, Hz to THz, 1/cm, µeV to eV or rad/s). The result also shows Δλ, Δν, Δν̃, Δω and ΔE, the fractional width, Q, the coherence length and time, and the transform-limited pulse lengths. The photon equivalents of the centre are still listed below.
+- **Formulas:** new *Linewidth conversion (centre frequency)*, Δλ = cΔν/ν².
+
 ## 2.7.1 — CalcShelf
 
 - **New name: CalcShelf** (it was CAS Touch, and TI-89 Touch before that). The app ID stays `com.ti89touch`, so it installs as an update and keeps your data.

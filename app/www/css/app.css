@@ -169,6 +169,8 @@ body.nokeys #kp, body.nokeys #strip { display: none; }
 select.cv-in { font-family: inherit; padding: 10px 10px; appearance: auto; }
 .cv-units { display: flex; gap: 8px; align-items: flex-end; margin: 8px 0; }
 .cv-units .ib { margin-bottom: 4px; }
+.cv-stack { display: flex; flex-direction: column; gap: 2px; margin: 8px 0; }
+.cv-swap { display: flex; justify-content: center; }
 .cv-h { font-size: 13.5px; font-weight: 700; color: var(--ink2); margin: 16px 2px 4px; }
 .cv-row { display: flex; align-items: center; gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--line); }
 .cv-row.main { background: var(--card); border-radius: 12px; padding: 12px; border: 0; margin: 4px 0; }

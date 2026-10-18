@@ -1,6 +1,6 @@
 /*
  * converter.js — Conversion tool: units of any quantity (including compound units typed freely),
- * photon/spectroscopy equivalents with linewidths, number bases, and decibels.
+ * optics (linewidth Δν ↔ Δλ at a centre wavelength or frequency, photon equivalents), number bases, and decibels.
  * Used as a page and inside the Constants & formulas sheet. Part of CalcShelf, GPL-3.0-or-later.
  */
 (function (root) {
@@ -56,7 +56,7 @@
     build(b, app, opts = {}) {
       this.app = app; this.sheet = !!opts.sheet;
       const seg = el('div', { class: 'seg', style: { marginBottom: '10px' } });
-      for (const [k, l] of [['units', 'Units'], ['photon', 'Light & photons'], ['base', 'Number base'], ['db', 'Decibels']]) {
+      for (const [k, l] of [['units', 'Units'], ['photon', 'Optics'], ['base', 'Number base'], ['db', 'Decibels']]) {
         const x = el('button', { text: l, class: this.tab === k ? 'on' : '' });
         x.onclick = () => { this.tab = k; seg.querySelectorAll('button').forEach((y) => y.classList.toggle('on', y === x)); body.innerHTML = ''; this[k](body); };
         seg.append(x);
@@ -69,29 +69,54 @@
     /* ---------------- units ---------------- */
     units(b) {
       const app = this.app;
+      const OTHER = '…other';
       const q = el('input', { class: 'search', type: 'search', placeholder: 'Find a quantity or unit (e.g. psi, viscosity, kWh)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
       const chips = el('div', { class: 'chips' });
+      const valI = el('input', { class: 'search cv-in', value: this.val, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Value' });
+      const fromS = el('select', { class: 'search cv-in', 'aria-label': 'From unit' });
+      const toS = el('select', { class: 'search cv-in', 'aria-label': 'To unit' });
+      const mkOther = (lbl) => el('input', { class: 'search cv-in', hidden: true, placeholder: 'Type a unit, e.g. W/(m·K)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': lbl, style: { marginTop: '6px' } });
+      const fromI = mkOther('Other from unit'), toI = mkOther('Other to unit');
+      /** units offered for the current quantity (or for a typed unit with no named quantity) */
+      const unitList = () => {
+        let L = [];
+        try { const d = Units.parse(this.from).d; const qq = Units.quantityOf(d); L = qq ? qq[2].slice() : Units.alternatives(this.from, 1); } catch (e) {
+          const qq = Units.QUANTITIES.find((x) => x[0] === this.qty); L = qq ? qq[2].slice() : [];
+        }
+        for (const u of [this.from, this.to]) if (u && !L.includes(u)) { try { if (!L.length || Units.compatible(L[0], u)) L.push(u); } catch (e) { /* skip */ } }
+        return L;
+      };
+      const optText = (u) => { const n = (Units.lookup(u) || {}).name; return n && n !== u ? u + '  —  ' + n : u; };
+      const fill = () => {
+        const L = unitList();
+        if (L.length && !L.includes(this.to)) this.to = L.find((u) => u !== this.from) || L[0];
+        for (const [S, I, cur] of [[fromS, fromI, this.from], [toS, toI, this.to]]) {
+          S.innerHTML = '';
+          for (const u of L) S.append(el('option', { value: u, text: optText(u) }));
+          S.append(el('option', { value: OTHER, text: 'Other unit…' }));
+          if (L.includes(cur)) { S.value = cur; I.hidden = true; } else { S.value = OTHER; I.hidden = false; I.value = cur || ''; }
+        }
+      };
       const drawChips = () => {
         chips.innerHTML = ''; const s = q.value.trim().toLowerCase();
         for (const [name, , list] of Units.QUANTITIES) {
           if (s && !(name.toLowerCase().includes(s) || list.some((u) => u.toLowerCase() === s || (Units.lookup(u) || {}).name?.toLowerCase().includes(s)))) continue;
           const c = el('button', { class: 'chip' + (name === this.qty ? ' on' : ''), text: name });
-          c.onclick = () => { this.qty = name; const L = Units.QUANTITIES.find((x) => x[0] === name)[2]; this.from = L[0]; this.to = L[1] || L[0]; fromI.value = this.from; toI.value = this.to; drawChips(); calc(); };
+          c.onclick = () => { this.qty = name; const L = Units.QUANTITIES.find((x) => x[0] === name)[2]; this.from = L[0]; this.to = L[1] || L[0]; fill(); drawChips(); calc(); };
           chips.append(c);
         }
       };
-      const valI = el('input', { class: 'search cv-in', value: this.val, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Value' });
-      const fromI = el('input', { class: 'search cv-in', value: this.from, autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': 'From unit' });
-      const toI = el('input', { class: 'search cv-in', value: this.to, autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': 'To unit' });
-      const swap = el('button', { class: 'ib', 'aria-label': 'Swap units', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/></svg>', onclick: () => { [fromI.value, toI.value] = [toI.value, fromI.value]; calc(); } });
+      const read = (S, I) => (S.value === OTHER ? I.value.trim() : S.value);
+      const swap = el('button', { class: 'ib', 'aria-label': 'Swap units', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M4 7l3-3 3 3M17 20V4M14 17l3 3 3-3"/></svg>', onclick: () => { [this.from, this.to] = [this.to, this.from]; fill(); calc(); } });
       const out = el('div'); const all = el('div');
-      const lab = (t, n) => el('label', { class: 'cv-lab' }, el('span', { text: t }), n);
-      const unitHelp = el('p', { class: 'desc', text: 'Type any unit, including compound ones: W/(m·K), km/s/Mpc, MeV/c², kg m s^-2, ps/(nm·km). Prefixes from q to Q work on SI units.' });
+      const lab = (t, ...n) => el('label', { class: 'cv-lab' }, el('span', { text: t }), ...n);
+      const unitHelp = el('p', { class: 'desc', text: 'Pick units from the lists. For anything else choose Other unit… and type it, including compound units: W/(m·K), km/s/Mpc, MeV/c², ps/(nm·km). Prefixes from q to Q work on SI units.' });
       const calc = () => {
-        this.val = valI.value; this.from = fromI.value.trim(); this.to = toI.value.trim();
+        this.val = valI.value; this.from = read(fromS, fromI); this.to = read(toS, toI);
         out.innerHTML = ''; all.innerHTML = '';
         const v = evalNum(valI.value);
         if (!isFinite(v)) { out.append(el('p', { class: 'desc', text: 'Enter a number, e.g. 1550, 2.5e-3 or 3/4.' })); return; }
+        if (!this.from || !this.to) { out.append(el('p', { class: 'desc', text: 'Type the other unit.' })); return; }
         let pf;
         try { pf = Units.parse(this.from); } catch (e) { out.append(el('p', { class: 'desc err', text: e.message })); return; }
         try {
@@ -101,37 +126,71 @@
         const qn = Units.quantityOf(pf.d);
         const list = Units.alternatives(this.from, v).filter((u) => u !== this.from);
         all.append(el('h4', { class: 'cv-h', text: (qn ? qn[0] : Units.dimText(pf.d)) + ' — ' + F(v).text + ' ' + this.from + ' is' }));
-        for (const u of list) { try { const r = Units.convert(v, this.from, u); all.append(resultRow(app, r, u, (Units.lookup(u) || {}).name || '', { sheet: this.sheet, onPick: () => { toI.value = u; calc(); } })); } catch (e) { /* skip */ } }
+        for (const u of list) { try { const r = Units.convert(v, this.from, u); all.append(resultRow(app, r, u, (Units.lookup(u) || {}).name || '', { sheet: this.sheet, onPick: () => { this.to = u; fill(); calc(); } })); } catch (e) { /* skip */ } }
         const ph = Units.photonEquivalents(v, this.from);
         if (ph.length) { all.append(el('h4', { class: 'cv-h', text: 'As light (photon equivalents)' })); for (const p of ph) all.append(resultRow(app, p.value, p.unit, Units.SPEC_LABEL[p.kind], { sheet: this.sheet })); }
       };
-      for (const i of [valI, fromI, toI]) i.addEventListener('input', calc);
+      valI.addEventListener('input', calc);
+      for (const [S, I] of [[fromS, fromI], [toS, toI]]) {
+        S.addEventListener('change', () => { I.hidden = S.value !== OTHER; if (!I.hidden) { I.value = ''; I.focus(); } calc(); if (S === fromS && S.value !== OTHER) { fill(); calc(); } });
+        I.addEventListener('input', calc);
+        I.addEventListener('change', () => { fill(); calc(); });
+      }
       q.oninput = drawChips;
-      b.append(q, chips, fmtSeg(app, calc), lab('Value', valI), el('div', { class: 'cv-units' }, lab('From', fromI), swap, lab('To', toI)), unitHelp, out, all);
-      drawChips(); calc();
+      b.append(q, chips, fmtSeg(app, calc), lab('Value', valI), el('div', { class: 'cv-stack' }, lab('From', fromS, fromI), el('div', { class: 'cv-swap' }, swap), lab('To', toS, toI)), unitHelp, out, all);
+      fill(); drawChips(); calc();
     },
 
-    /* ---------------- light & photons ---------------- */
+    /* ---------------- optics: linewidth Δν ↔ Δλ, photon equivalents ---------------- */
     photon(b) {
       const app = this.app;
-      const kinds = [['nm', 'Wavelength'], ['µm', 'Wavelength'], ['THz', 'Frequency'], ['1/cm', 'Wavenumber'], ['eV', 'Photon energy'], ['rad/s', 'Angular frequency'], ['J', 'Energy']];
-      this.ph = this.ph || { v: '1550', u: 'nm', n: '1', dv: '0.1', du: 'nm' };
+      const CENTRE = [['Wavelength', ['nm', 'µm', 'pm', 'Å', 'm']], ['Frequency', ['THz', 'GHz', 'PHz', 'Hz']], ['Wavenumber', ['1/cm']], ['Photon energy', ['eV', 'J']], ['Angular frequency', ['rad/s']]];
+      const WIDTH = [['Wavelength (Δλ)', ['pm', 'nm', 'µm', 'fm', 'Å']], ['Frequency (Δν)', ['Hz', 'kHz', 'MHz', 'GHz', 'THz']], ['Wavenumber (Δν̃)', ['1/cm', '1/m']], ['Energy (ΔE)', ['µeV', 'meV', 'eV']], ['Angular frequency (Δω)', ['rad/s']]];
+      const OUT = [['Wavelength', ['fm', 'pm', 'nm', 'µm']], ['Frequency', ['Hz', 'kHz', 'MHz', 'GHz', 'THz']], ['Wavenumber', ['1/cm', '1/m']], ['Energy', ['µeV', 'meV', 'eV']], ['Angular frequency', ['rad/s']]];
+      const grouped = (groups, cur) => el('select', { class: 'search cv-in' }, groups.map(([g, us]) => el('optgroup', { label: g }, us.map((u) => el('option', { value: u, text: u, selected: u === cur })))));
+      this.ph = Object.assign({ v: '1550', u: 'nm', n: '1', dv: '0.02', du: 'nm', ou: 'MHz' }, this.ph || {});
       const S = this.ph;
-      const vI = el('input', { class: 'search cv-in', value: S.v, inputmode: 'decimal' });
-      const uSel = el('select', { class: 'search cv-in' }, kinds.map(([u, k]) => el('option', { value: u, text: k + ' (' + u + ')', selected: u === S.u })));
-      const nI = el('input', { class: 'search cv-in', value: S.n, inputmode: 'decimal' });
-      const dvI = el('input', { class: 'search cv-in', value: S.dv, inputmode: 'decimal' });
-      const duSel = el('select', { class: 'search cv-in' }, ['nm', 'pm', 'µm', 'GHz', 'MHz', 'THz', '1/cm'].map((u) => el('option', { value: u, text: u, selected: u === S.du })));
+      const vI = el('input', { class: 'search cv-in', value: S.v, inputmode: 'decimal', 'aria-label': 'Centre value' });
+      const uSel = grouped(CENTRE, S.u); uSel.setAttribute('aria-label', 'Centre unit');
+      const dvI = el('input', { class: 'search cv-in', value: S.dv, inputmode: 'decimal', 'aria-label': 'Width value' });
+      const duSel = grouped(WIDTH, S.du); duSel.setAttribute('aria-label', 'Width unit');
+      const ouSel = grouped(OUT, S.ou); ouSel.setAttribute('aria-label', 'Show the width in');
+      const nI = el('input', { class: 'search cv-in', value: S.n, inputmode: 'decimal', 'aria-label': 'Refractive index' });
       const out = el('div');
       const lab = (t, n) => el('label', { class: 'cv-lab' }, el('span', { text: t }), n);
+      const widthKind = (u) => Units.specKind(u); // wavelength, freq, wavenumber, energy, angfreq
       const calc = () => {
-        Object.assign(S, { v: vI.value, u: uSel.value, n: nI.value, dv: dvI.value, du: duSel.value });
+        Object.assign(S, { v: vI.value, u: uSel.value, n: nI.value, dv: dvI.value, du: duSel.value, ou: ouSel.value });
         out.innerHTML = '';
         const v = evalNum(S.v), n = evalNum(S.n) || 1;
-        if (!(v > 0)) { out.append(el('p', { class: 'desc', text: 'Enter a positive value.' })); return; }
-        const k = Units.specKind(S.u); const si = Units.convert(v, S.u, Units.SPEC_UNITS[k]);
-        const Ej = Units.SPEC[k](si);
+        if (!(v > 0)) { out.append(el('p', { class: 'desc', text: 'Enter a positive centre wavelength or frequency.' })); return; }
+        const k = Units.specKind(S.u); const Ej = Units.SPEC[k](Units.convert(v, S.u, Units.SPEC_UNITS[k]));
         const lam = H * C0 / Ej, nu = Ej / H;
+        // ---- linewidth / bandwidth
+        const dv = evalNum(S.dv);
+        if (dv > 0) {
+          const wk = widthKind(S.du); const x = Units.convert(dv, S.du, Units.SPEC_UNITS[wk]);
+          const dnu = wk === 'wavelength' ? C0 * x / (lam * lam) : wk === 'freq' ? x : wk === 'wavenumber' ? C0 * x : wk === 'energy' ? x / H : x / (2 * Math.PI);
+          const dlam = dnu * lam * lam / C0;
+          const ok = widthKind(S.ou);
+          const inOut = ok === 'wavelength' ? Units.convert(dlam, 'm', S.ou) : ok === 'freq' ? Units.convert(dnu, 'Hz', S.ou) : ok === 'wavenumber' ? Units.convert(dnu / C0, '1/m', S.ou) : ok === 'energy' ? Units.convert(dnu * H, 'J', S.ou) : 2 * Math.PI * dnu;
+          const sym = { wavelength: 'Δλ', freq: 'Δν', wavenumber: 'Δν̃', energy: 'ΔE', angfreq: 'Δω' }[ok];
+          out.append(el('h4', { class: 'cv-h', text: 'Width ' + F(dv).text + ' ' + S.du + ' at ' + F(v).text + ' ' + S.u }));
+          out.append(resultRow(app, inOut, S.ou, sym + (wk === 'wavelength' && ok !== 'wavelength' ? ' = cΔλ/λ²' : wk !== 'wavelength' && ok === 'wavelength' ? ' = λ²Δν/c' : ''), { main: true, sheet: this.sheet }));
+          const best = (si, siU, units) => { const c = units.map((u) => [u, Units.convert(si, siU, u)]); return c.find(([, y]) => Math.abs(y) >= 1 && Math.abs(y) < 1000) || c[c.length - 1]; };
+          const rows = [];
+          const L = best(dlam, 'm', ['fm', 'pm', 'nm', 'µm']); rows.push([L[1], L[0], 'Δλ = λ²Δν/c']);
+          const N = best(dnu, 'Hz', ['Hz', 'kHz', 'MHz', 'GHz', 'THz']); rows.push([N[1], N[0], 'Δν = cΔλ/λ²']);
+          if (N[0] !== 'MHz') rows.push([dnu / 1e6, 'MHz', 'Δν']);
+          if (N[0] !== 'GHz') rows.push([dnu / 1e9, 'GHz', 'Δν']);
+          rows.push([dnu / C0 / 100, '1/cm', 'Δν̃ = Δν/c'], [2 * Math.PI * dnu, 'rad/s', 'Δω = 2πΔν'], [dnu * H / E * 1e6, 'µeV', 'ΔE = hΔν'],
+            [dnu / nu, '', 'fractional width Δν/ν = Δλ/λ'], [nu / dnu, '', 'quality factor Q = ν/Δν'],
+            [C0 / (n * dnu), 'm', 'coherence length c/(nΔν) (Lorentzian: ÷π)'], [1 / (Math.PI * dnu), 's', 'coherence time 1/(πΔν), Lorentzian'],
+            [0.441 / dnu, 's', 'transform-limited Gaussian pulse 0.441/Δν'], [0.315 / dnu, 's', 'transform-limited sech² pulse 0.315/Δν']);
+          for (const [x2, u, l] of rows) out.append(resultRow(app, x2, u, l, { sheet: this.sheet }));
+          out.append(el('p', { class: 'desc', text: 'Δν = cΔλ/λ² is the first-order relation; it is exact to better than (Δλ/2λ)², which is negligible for narrow lines.' }));
+        } else out.append(el('p', { class: 'desc', text: 'Enter a width Δλ or Δν (for example 0.02 nm, the resolution of an OSA) to convert it at this centre.' }));
+        // ---- photon equivalents of the centre
         const rows = [
           [lam * 1e9, 'nm', 'vacuum wavelength λ₀'], [lam * 1e6, 'µm', 'vacuum wavelength λ₀'],
           [lam / n * 1e9, 'nm', 'wavelength in the medium λ₀/n (n = ' + n + ')'],
@@ -141,22 +200,14 @@
           [1 / nu * 1e15, 'fs', 'optical period 1/ν'], [1e-3 / Ej, '1/s', 'photons per second in 1 mW'],
           [E / Ej, 'A/W', 'ideal responsivity qλ/hc (η = 1)'],
         ];
-        out.append(el('h4', { class: 'cv-h', text: 'Equivalents' }));
+        out.append(el('h4', { class: 'cv-h', text: 'The centre, ' + F(v).text + ' ' + S.u + ', is' }));
         for (const [x, u, l] of rows) out.append(resultRow(app, x, u, l, { sheet: this.sheet }));
-        // linewidth / bandwidth
-        const dv = evalNum(S.dv);
-        if (dv > 0) {
-          let dnu;
-          if (/m$/.test(S.du)) dnu = C0 * Units.convert(dv, S.du, 'm') / (lam * lam);
-          else if (S.du === '1/cm') dnu = C0 * dv * 100;
-          else dnu = Units.convert(dv, S.du, 'Hz');
-          const dlam = dnu * lam * lam / C0;
-          out.append(el('h4', { class: 'cv-h', text: 'Linewidth / bandwidth at this wavelength' }));
-          for (const [x, u, l] of [[dlam * 1e9, 'nm', 'Δλ = λ²Δν/c'], [dlam * 1e12, 'pm', 'Δλ'], [dnu / 1e9, 'GHz', 'Δν'], [dnu / C0 / 100, '1/cm', 'Δν̃'], [C0 / (n * dnu), 'm', 'coherence length c/(nΔν) (Lorentzian ≈ ÷π)'], [0.441 / dnu * 1e15, 'fs', 'transform-limited Gaussian pulse 0.441/Δν']]) out.append(resultRow(app, x, u, l, { sheet: this.sheet }));
-        }
       };
-      for (const i of [vI, uSel, nI, dvI, duSel]) { i.addEventListener('input', calc); i.addEventListener('change', calc); }
-      b.append(fmtSeg(app, calc), el('div', { class: 'cv-units' }, lab('Value', vI), lab('Quantity', uSel)), el('div', { class: 'cv-units' }, lab('Refractive index n', nI), lab('Linewidth Δ', dvI), lab('in', duSel)), out);
+      for (const i of [vI, uSel, nI, dvI, duSel, ouSel]) { i.addEventListener('input', calc); i.addEventListener('change', calc); }
+      b.append(fmtSeg(app, calc),
+        el('div', { class: 'cv-units' }, lab('Centre λ or ν', vI), lab('Unit', uSel)),
+        el('div', { class: 'cv-units' }, lab('Width Δλ or Δν', dvI), lab('Unit', duSel)),
+        el('div', { class: 'cv-units' }, lab('Show the width in', ouSel), lab('Refractive index n', nI)), out);
       calc();
     },
 
@@ -229,10 +280,11 @@
       this.root = el('div', { class: 'page conv', style: { padding: '10px 12px', overflowY: 'auto' } });
       if (state.tab) Converter.tab = state.tab;
       Object.assign(Converter, state.units || {});
+      if (state.ph) Converter.ph = state.ph;
       Converter.build(this.root, app, { sheet: false });
     }
     get target() { return null; }
-    serialize() { return { tab: Converter.tab, units: { qty: Converter.qty, from: Converter.from, to: Converter.to, val: Converter.val } }; }
+    serialize() { return { tab: Converter.tab, units: { qty: Converter.qty, from: Converter.from, to: Converter.to, val: Converter.val }, ph: Converter.ph }; }
   }
 
   root.Converter = Converter; root.ConverterPage = ConverterPage; root.evalNum = evalNum;

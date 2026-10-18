@@ -177,7 +177,10 @@ Add these from **+**.
 - **Program Editor.**
   - Write TI-Basic functions and programs (`Func…EndFunc`, `Prgm…EndPrgm`).
   - A program can then be called from the CAS tab like any built-in function. The editor starts with a Fibonacci example.
-- **Unit Converter.** Units for every physical quantity, light and photon energy, number bases, and decibels.
+- **Unit Converter.** It has four parts:
+  - **Units:** choose a quantity, then pick the From and To units from the dropdowns. For a unit that isn't listed, choose *Other unit…* and type it, for example W/(m·K).
+  - **Optics:** enter a centre wavelength or frequency and a width Δλ or Δν, then pick the unit to show the width in. For example, an OSA resolution of 0.02 nm at 1550 nm is 2495.7 MHz. The tool also gives the coherence length, Q and the photon equivalents of the centre.
+  - **Number base** and **Decibels.**
 
 ---
 
