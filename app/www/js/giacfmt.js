@@ -442,6 +442,18 @@
     return tex(ast, opts);
   }
 
-  const api = { parse, lex, giacToTex, tex, compile, fmtNum, idTex };
+  /** LaTeX for plain text (escapes the characters that LaTeX treats specially). */
+  function textTex(s) { return '\\text{' + String(s).replace(/[\\{}$&#^_%~]/g, (c) => '\\' + c) + '}'; }
+  /** Entry-line LaTeX for a unit such as _km: math mode, so the next key is maths again. */
+  function unitEntryTex(u) { return '\\mathrm{\\_' + String(u).replace(/^_/, '').replace(/_/g, '\\_') + '}'; }
+  /** Rewrites units saved by older versions as text (\text{\_km}, \text{_#?}km) into math mode. */
+  function fixUnitTex(t) {
+    return String(t)
+      .replace(/\\text\{_#\?\}([A-Za-zµΩÅ°]*)/g, (m, n) => (n ? unitEntryTex(n) : '\\_'))
+      .replace(/\\text\{_\}([A-Za-zµΩÅ°]*)/g, (m, n) => (n ? unitEntryTex(n) : '\\_'))
+      .replace(/\\(?:text|textrm)\{\\_([^{}\\]*)\}/g, (m, n) => unitEntryTex(n));
+  }
+
+  const api = { parse, lex, giacToTex, tex, compile, fmtNum, idTex, textTex, unitEntryTex, fixUnitTex };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.GiacFmt = api;
 })(typeof self !== 'undefined' ? self : this);

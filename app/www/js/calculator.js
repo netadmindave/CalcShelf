@@ -66,7 +66,7 @@
     if (!approx && kind === 'expr' && !STRUCTURAL.test(code) && !/[=<>:"]|\bor\b|\band\b|list\[|_\(|\b_\w/.test(out) && out.length < 4000) {
       try { const r = await app.cas.eval('regroup(' + out + ')'); if (!/ERROR|Error/.test(r)) out = r; } catch (e) { /* keep */ }
     }
-    const texOut = GiacFmt.giacToTex(out, fmtOpts(S)) || '\\text{' + out + '}';
+    const texOut = GiacFmt.giacToTex(out, fmtOpts(S)) || GiacFmt.textTex(out);
     if (kind === 'expr' || kind === 'assign') app.lastAns = out;
     return { ok: true, code, out, tex: texOut, kind };
   }
@@ -141,7 +141,7 @@
   class CalculatorPage {
     constructor(app, state = {}) {
       this.app = app; this.kind = 'calc'; this.title = 'Calculator';
-      this.history = state.history || [];
+      this.history = (state.history || []).map((h) => (h.tex ? Object.assign(h, { tex: GiacFmt.fixUnitTex(h.tex) }) : h));
       this.root = el('div', { class: 'page calc' });
       this.hist = el('div', { class: 'hist' });
       this.picks = el('div', { class: 'picks', hidden: true });
@@ -279,7 +279,7 @@
       row.classList.add('sel'); part.classList.add('pick');
       const p = this.picks; p.innerHTML = ''; p.hidden = false;
       const chip = (label, fn) => p.append(el('button', { class: 'chip', text: label, onclick: () => { fn(); this.unselect(); } }));
-      if (which === 'in') chip('Use entry', () => { this.mf.insert(h.tex, { format: 'latex', insertionMode: 'replaceSelection' }); this.mf.focus(); });
+      if (which === 'in') chip('Use entry', () => { this.mf.insert(GiacFmt.fixUnitTex(h.tex), { format: 'latex', insertionMode: 'replaceSelection' }); this.mf.focus(); });
       if (which === 'out' && !h.error && !h.table) {
         chip('Use answer', () => { this.mf.insert(h.unc ? String(+h.unc.v.toPrecision(12)) : (GiacFmt.giacToTex(h.out, { digits: 15, editable: true }) || h.out), { format: 'latex' }); this.mf.focus(); });
         if (h.unc) chip('Uncertainty budget', () => this.uncSheet(h));
@@ -296,7 +296,7 @@
     unselect() { this.picks.hidden = true; this.hist.querySelectorAll('.sel,.pick').forEach((x) => x.classList.remove('sel', 'pick')); }
     ansTex() { return this.app.lastAns != null && this.app.settings.autoAns !== false ? '\\operatorname{ans}' : null; }
     autoAns() { return UI.Edit.autoAns(this.mf, this.ansTex()); }
-    recall() { const last = [...this.history].reverse().find((h) => h.tex); if (last) this.mf.value = last.tex; }
+    recall() { const last = [...this.history].reverse().find((h) => h.tex); if (last) this.mf.value = GiacFmt.fixUnitTex(last.tex); }
     clear() { this.history = this.history.filter((h) => h.pinned); this.renderAll(); this.app.saveSoon(); }
 
     async enter(approx = false) {

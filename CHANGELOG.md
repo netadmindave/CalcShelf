@@ -2,6 +2,10 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## 2.7.3
+
+- **Fixed: units in the CAS entry line.** A unit from the Units menu, or one typed with the abc keypad's **_** key, no longer leaves the entry line in text mode. Before, the next key went in as raw LaTeX (for example `\times`), and *Use entry* on such a line put the LaTeX back in. Units are now entered as maths, so `1.6_km × 2` works as expected. Entries saved by earlier versions are fixed when they are loaded or recalled.
+
 ## 2.7.2
 
 - **Conversion tool, Units:** the From and To units are now dropdowns listing the units of the chosen quantity. *Other unit…* still takes any typed unit, including compound ones such as W/(m·K).

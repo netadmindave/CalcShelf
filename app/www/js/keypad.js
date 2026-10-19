@@ -44,7 +44,7 @@
       T('$\\square_{\\square}', '_{#?}', 'tpl'), T("y'", "'", 'fn'), T('Define', '\\operatorname{Define}#?\\left(x\\right)=#?', 'cmd'), T('approx', OP('approx'), 'cmd'), T('exact', OP('exact'), 'cmd'), T('"…"', '\\text{"#?"}', 'fn'),
     ] },
     { id: 'abc', label: 'abc', cols: 10, keys: 'qwertyuiop'.split('').map((c) => ({ l: c, ch: c, t: 'abc' }))
-      .concat('asdfghjkl'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: '_', i: '\\text{_#?}', t: 'abc' }])
+      .concat('asdfghjkl'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: '_', i: '\\_', t: 'abc' }])
       .concat([{ l: '⇧', a: 'shift', t: 'abc mod' }], 'zxcvbnm'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: "'", i: "'", t: 'abc' }, { l: '"', i: '\\text{"#?"}', t: 'abc' }])
       .concat([{ l: 'α', i: '\\alpha ', t: 'abc' }, { l: 'β', i: '\\beta ', t: 'abc' }, { l: 'λ', i: '\\lambda ', t: 'abc' }, { l: 'μ', i: '\\mu ', t: 'abc' }, { l: 'space', i: '\\ ', t: 'abc', w: 2 }, { l: 'ω', i: '\\omega ', t: 'abc' }, { l: 'φ', i: '\\phi ', t: 'abc' }, { l: 'σ', i: '\\sigma ', t: 'abc' }, { l: 'Δ', i: '\\Delta ', t: 'abc' }]) },
   ];

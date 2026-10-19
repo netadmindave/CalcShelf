@@ -288,7 +288,7 @@
       }
       const num = Number(out);
       if (/^-?[\d.]+(e[-+]?\d+)?$/i.test(out) && isFinite(num) && (forceDec || /[.e]/i.test(out))) return { tex: this.numText(num) };
-      let tex = GiacFmt.giacToTex(out.replace(/t36_([xyztabcd])/g, '$1'), { digits: 10 }) || '\\text{' + out + '}';
+      let tex = GiacFmt.giacToTex(out.replace(/t36_([xyztabcd])/g, '$1'), { digits: 10 }) || GiacFmt.textTex(out);
       if (S.frac === 'Und') tex = tex.replace(/\\frac\{(\d+)\}\{(\d+)\}/g, (m, a, b) => { a = +a; b = +b; return a > b ? Math.floor(a / b) + (a % b ? '\\frac{' + (a % b) + '}{' + b + '}' : '') : m; });
       return { tex };
     }

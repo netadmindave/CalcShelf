@@ -329,6 +329,7 @@
     insert(latex) {
       const mf = this.target; if (!mf) return;
       mf.focus();
+      latex = GiacFmt.fixUnitTex(latex);
       mf.executeCommand(['insert', latex, { format: 'latex', insertionMode: 'replaceSelection', selectionMode: 'placeholder', focus: true }]);
     },
     typed(ch) { const mf = this.target; if (!mf) return; mf.focus(); mf.executeCommand(['typedText', ch, { focus: true, feedback: false, simulateKeystroke: true }]); },
@@ -497,7 +498,7 @@
         for (const [cat, list] of NspireMenus.UNITS) {
           b.append(el('h3', { text: cat, style: { fontSize: '14px', color: 'var(--ink2)', margin: '14px 2px 6px' } }));
           const c = el('div', { class: 'chips', style: { flexWrap: 'wrap' } });
-          list.forEach((u) => c.append(el('button', { class: 'chip', text: u, onclick: () => { Sheet.close(); this.insert('\\text{' + u.replace(/_/g, '\\_') + '}'); } })));
+          list.forEach((u) => c.append(el('button', { class: 'chip', text: u, onclick: () => { Sheet.close(); this.insert(GiacFmt.unitEntryTex(u)); } })));
           b.append(c);
         }
       });

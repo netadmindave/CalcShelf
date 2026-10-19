@@ -165,6 +165,7 @@
     command(c) {
       switch (c) {
         case 'placeholder': this.arg(); return { k: 'hole' };
+        case '_': return { k: 'raw', v: this.unitTail('_') };                                   // \_km → _km
         case 'frac': case 'dfrac': case 'tfrac': case 'cfrac': {
           const a = this.arg(), b = this.arg();
           const d = this.derivFrac(a, b);
@@ -212,7 +213,7 @@
         case 'hbar': return { k: 'id', v: 'hbar' };
         case 'text': case 'textrm': case 'mathrm': case 'operatorname': case 'mathit': case 'mathbf': case 'textit': case 'textbf': case 'mbox': {
           const s = this.rawArg();
-          if (/^\s*_/.test(s)) return { k: 'raw', v: s.replace(/\s+/g, '') };                  // unit like _m
+          if (/^\s*_/.test(s)) return { k: 'raw', v: this.unitTail(s.replace(/\s+/g, '')) };   // unit like _m
           if (s === 'd') return { k: 'dmark' };
           if (/^[A-Za-zΑ-ω_][\w▸θ]*$/.test(s)) return { k: 'id', v: s, fn: c === 'operatorname' };
           return { k: 'raw', v: s };
@@ -233,6 +234,22 @@
           if (FUNCS[c]) return this.func(c);
           return { k: 'id', v: c };
       }
+    }
+
+    /** a unit name after "_": letters typed after it, plain or in \mathrm{…} (MathLive splits them) */
+    unitTail(s) {
+      for (;;) {
+        const k = this.peek(); if (!k) break;
+        if (k.t === 'let' || (k.t === 'ch' && /[µΩÅ°]/.test(k.v))) { s += k.v; this.i++; continue; }
+        if (k.t === 'cmd' && k.v === 'mu') { s += 'µ'; this.i++; continue; }
+        if (k.t === 'cmd' && /^(mathrm|text|textrm|mathit)$/.test(k.v)) {
+          const save = this.i; this.i++; const a = this.rawArg();
+          if (/^[A-Za-zµΩÅ°]+$/.test(a)) { s += a; continue; }
+          this.i = save;
+        }
+        break;
+      }
+      return s;
     }
 
     rawArg() {
