@@ -156,6 +156,8 @@ math-field::part(container) { padding: 0; }
   .strip { grid-column: 2; grid-row: 2; align-self: start; }
   .kp { grid-column: 2; grid-row: 3; height: calc(100dvh - 44px - 44px - var(--safe-t)); }
   .key { font-size: 15px; } .key.num { font-size: 17px; }
+  /* emulators and keypad-less pages use the whole width */
+  body.fullpage .pages, body.nokeys .pages { grid-column: 1 / 3; }
 }
 
 .page.prog > * { flex: none; }
