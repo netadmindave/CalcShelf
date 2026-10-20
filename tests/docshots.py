@@ -12,14 +12,14 @@ async def main():
         ctx = await mk(); pg = await ctx.new_page()
         await pg.goto(B + '/index.html'); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2500)
         for t in ['\\int_0^{\\pi}\\sin\\left(x\\right)^2dx', '\\operatorname{solve}\\left(x^2-5x+6=0,x\\right)', '\\frac{d}{dx}\\left(x^3\\cdot e^x\\right)', '\\sqrt{2}', '\\left(5.03\\pm0.02\\right)\\times\\left(2.1\\pm0.1\\right)', '9.81\\text{_m}/\\text{_s}^2\\cdot2\\text{_kg}']:
-            await pg.evaluate("async (t)=>{ const p=__app.page; p.mf.value=t; await p.enter(false); }", t); await pg.wait_for_timeout(900)
+            await pg.evaluate("async (t)=>{ const p=__app.page.t36||__app.page; p.mf.value=t; await p.enter(false); }", t); await pg.wait_for_timeout(900)
         await pg.wait_for_timeout(1500); await pg.screenshot(path=OUT + 'cas.png')
         # TI-36X Pro
-        await pg.evaluate("__app.addPage('ti36')"); await pg.wait_for_timeout(1200)
+        await pg.evaluate("__app.emuApply('ti36','36xpro',null)"); await pg.wait_for_timeout(1200)
         for t in ['\\frac{1}{2}+\\frac{1}{3}', '\\sin\\left(30\\right)', '\\sqrt{8}']:
             await pg.evaluate("async (t)=>{ const p=__app.pages[__app.active]; p.mf.value=t; await p.enter(); }", t); await pg.wait_for_timeout(900)
         await pg.screenshot(path=OUT + 'ti36.png')
-        await pg.evaluate("__app.pages[__app.active].setNight(true)"); await pg.wait_for_timeout(400); await pg.screenshot(path=OUT + 'ti36_night.png')
+        await pg.evaluate("__app.page.t36.setNight(true)"); await pg.wait_for_timeout(400); await pg.screenshot(path=OUT + 'ti36_night.png')
         await pg.evaluate("__app.pages[__app.active].setNight(false)")
         # Trig solver
         await pg.evaluate("Library.open(__app, 'trig')"); await pg.wait_for_timeout(1200); await pg.screenshot(path=OUT + 'trig.png')

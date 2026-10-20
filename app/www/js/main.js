@@ -13,7 +13,6 @@
     lists: { name: 'Lists & Spreadsheet', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.5h16M4 15h16M10 4v16"/></svg>', make: (a, s) => new Lists.ListsPage(a, s) },
     notes: { name: 'Notes', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 4h9l4 4v12H6z"/><path d="M9 11h7M9 15h5"/></svg>', make: (a, s) => new Notes.NotesPage(a, s) },
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
-    ti36: { name: 'TI-36X Pro', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5"/><rect x="7.5" y="4.5" width="9" height="5" rx=".8"/><path d="M8.5 12.5h1M11.5 12.5h1M14.5 12.5h1M8.5 15.5h1M11.5 15.5h1M14.5 15.5h1M8.5 18.5h1M11.5 18.5h4"/></svg>', make: (a, s) => new TI36.TI36Page(a, s) },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
   };
@@ -21,6 +20,7 @@
   /* Every emulated calculator: [family, model id, full name, tab name (model number), firmware note].
      ti68k → TiEmu (ti89/), z80 → TilEm (classic/), hp → Emu48 (hp/), nspire → Firebird (nspire/). */
   const EMU_MODELS = [
+    ['ti36', '36xpro', 'TI-36X Pro', 'TI-36X Pro', 'Built in: a recreation on the CAS, no firmware needed'],
     ['ti68k', '89', 'TI-89 Titanium', 'TI-89', 'OS file (.89u) or ROM'], ['ti68k', '92p', 'TI-92 Plus', 'TI-92+', 'OS file (.9xu) or ROM'], ['ti68k', 'v200', 'Voyage 200', 'V200', 'OS file (.v2u) or ROM'], ['ti68k', '92', 'TI-92', 'TI-92', 'ROM dump'],
     ['z80', 'z', 'TI-84 Plus Silver Edition', 'TI-84+SE', 'OS file (.8xu) or ROM'], ['z80', '4', 'TI-84 Plus', 'TI-84+', 'OS file (.8xu) or ROM'], ['z80', 's', 'TI-83 Plus Silver Edition', 'TI-83+SE', 'OS file (.8xu) or ROM'], ['z80', 'p', 'TI-83 Plus', 'TI-83+', 'OS file (.8xu) or ROM'],
     ['z80', '3', 'TI-83 / TI-82 STATS', 'TI-83', 'ROM dump'], ['z80', '2', 'TI-82', 'TI-82', 'ROM dump'], ['z80', '6', 'TI-86', 'TI-86', 'ROM dump'], ['z80', '5', 'TI-85', 'TI-85', 'ROM dump'], ['z80', '7', 'TI-73 Explorer', 'TI-73', 'OS file (.73u) or ROM'], ['z80', '1', 'TI-81', 'TI-81', 'ROM dump'],
@@ -29,7 +29,7 @@
   ];
   /** HP models removed in 2.6 (HP-42S, 12C, 15C, 16C) open as the HP 48GX */
   const OLD_HP = new Set(['42s', '12c', '15c', '16c']);
-  const EMU_FAMILY = { nspire: 'TI-Nspire (Firebird)', ti68k: 'TI 68k (TiEmu)', z80: 'TI Z80 (TilEm)', hp: 'HP' };
+  const EMU_FAMILY = { ti36: 'TI scientific (built in)', nspire: 'TI-Nspire (Firebird)', ti68k: 'TI 68k (TiEmu)', z80: 'TI Z80 (TilEm)', hp: 'HP' };
   const emuModel = (fam, id) => EMU_MODELS.find((m) => m[0] === fam && m[1] === id);
   /** OS file extension → the calculator it belongs to (null model: keep the chosen one if it accepts the file) */
   const OS_EXT = { '89u': ['ti68k', '89'], '9xu': ['ti68k', '92p'], 'v2u': ['ti68k', 'v200'], '8xu': ['z80', null], '73u': ['z80', '7'], tcc2: ['nspire', 'cx2cas'], tco2: ['nspire', 'cx2cas'], tct2: ['nspire', 'cx2cas'] };
@@ -41,12 +41,15 @@
       this.fam = state.fam || 'ti68k'; this.model = state.model || '89';
       if (this.fam === 'hp' && OLD_HP.has(this.model)) this.model = '48gx';
       if (!emuModel(this.fam, this.model)) { this.fam = 'ti68k'; this.model = '89'; }
+      this.t36State = state.t36 || null;      // the TI-36X Pro's memory, kept while another model is shown
       this.root = el('div', { class: 'page emu' });
       this.mount();
     }
+    /** the TI-36X Pro is built in, not an emulator in a frame */
+    get target() { return this.t36 ? this.t36.target : null; }
+    focus() { if (this.t36) this.t36.focus(); }
     get info() { return emuModel(this.fam, this.model); }
     get defaultName() { return this.info[3]; }
-    get target() { return null; }
     src() {
       if (this.fam === 'ti68k') return 'ti89/index.html' + (this.model === '89' ? '' : '?slot=' + this.model);
       if (this.fam === 'z80') return 'classic/index.html?model=' + encodeURIComponent(this.model);
@@ -55,11 +58,19 @@
     }
     mount() {
       this.ready = new Promise((res) => { this._ready = res; });
+      this.t36 = null; this.frame = null;
+      if (this.fam === 'ti36') {
+        this.t36 = new TI36.TI36Page(this.app, this.t36State || {});
+        this.t36.root.style.position = 'absolute';
+        this.root.innerHTML = ''; this.root.append(this.t36.root); this._ready();
+        return;
+      }
       this.frame = el('iframe', { src: this.src(), title: this.info[2], style: { border: '0', width: '100%', height: '100%', display: 'block', background: 'var(--doc)' } });
       this.root.innerHTML = ''; this.root.append(this.frame);
     }
     /** ask the calculator in the frame to save its memory, then wait (at most 2.5 s) */
     saveFrame() {
+      if (this.t36) { this.t36State = this.t36.serialize(); return Promise.resolve(); }
       return new Promise((res) => {
         const id = Math.random().toString(36).slice(2); const t = setTimeout(done, 2500);
         function done() { clearTimeout(t); root.removeEventListener('message', on); res(); }
@@ -73,13 +84,17 @@
       await this.saveFrame();
       this.fam = fam; this.model = model; this.mount();
       this.app.saveSoon(); this.app.renderTabs();
+      if (this.app.page === this) { this.app.applyOrientation(this); if (this.target) { this.app.setTarget(this.target); setTimeout(() => this.focus(), 30); } }
     }
     async install(file) {
+      if (this.t36) return;
       const bytes = new Uint8Array(await file.arrayBuffer());
       await this.ready;
       this.frame.contentWindow.postMessage({ type: 'emu-install', name: file.name, bytes }, '*');
     }
-    serialize() { return { fam: this.fam, model: this.model }; }
+    serialize() { const t = this.t36 ? this.t36.serialize() : this.t36State; return t ? { fam: this.fam, model: this.model, t36: t } : { fam: this.fam, model: this.model }; }
+    /** -1 follow the phone, 1 portrait, 6 landscape */
+    get orientation() { return this.fam === 'ti36' ? 1 : this.fam === 'ti68k' && this.model !== '89' ? 6 : -1; }
   }
   root.addEventListener('message', (e) => {
     const d = e.data, app = root.__app; if (!d || !app) return;
@@ -89,8 +104,8 @@
     else if (d.type === 'classic-model' && p.fam === 'z80' && p.model !== d.model && emuModel('z80', d.model)) { p.model = d.model; app.saveSoon(); app.renderTabs(); }
   });
 
-  const UNIQUE = new Set(['calc', 'ti36', 'emu']);
-  const DEFAULT_NAMES = { calc: 'CAS', ti36: 'TI-36X Pro', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
+  const UNIQUE = new Set(['calc', 'emu']);
+  const DEFAULT_NAMES = { calc: 'CAS', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
   const App = {
@@ -136,14 +151,21 @@
     isUnique(kind) { return UNIQUE.has(kind) && !(kind === 'emu' && this.settings.multiEmu); },
     migrateDoc(d) {
       const out = [], seen = {}, models = new Set();
+      let t36 = null, t36At = -1;   // before 2.8 the TI-36X Pro was its own kind of tab; now it is an emulated calculator
       for (const pg of d.pages || []) {
         let { kind, state = {}, name } = pg;
+        if (kind === 'ti36') { if (!t36) { t36 = { state, name }; t36At = out.length; } continue; }
         if (kind === 'ti89') { state = { fam: 'ti68k', model: state.slot || '89' }; kind = 'emu'; }
         else if (kind === 'classic') { state = { fam: 'z80', model: state.model || 'z' }; kind = 'emu'; }
         else if (kind === 'hp') { state = { fam: 'hp', model: OLD_HP.has(state.model || '42s') ? '48gx' : state.model }; kind = 'emu'; }
         if (!APPS[kind] || (this.isUnique(kind) && seen[kind])) continue;
         if (kind === 'emu') { const id = (state.fam || 'ti68k') + ':' + (state.model || '89'); if (models.has(id)) continue; models.add(id); }
         seen[kind] = true; out.push({ kind, state, name });
+      }
+      if (t36) {
+        const emu = out.find((x) => x.kind === 'emu');
+        if (emu && !this.settings.multiEmu) { if (!emu.state.t36) emu.state = Object.assign({}, emu.state, { t36: t36.state }); }
+        else if (!models.has('ti36:36xpro')) out.splice(Math.max(0, t36At), 0, { kind: 'emu', state: { fam: 'ti36', model: '36xpro', t36: t36.state }, name: t36.name });
       }
       const ci = out.findIndex((x) => x.kind === 'calc');
       if (ci < 0) out.unshift({ kind: 'calc', state: {} }); else if (ci > 0) out.unshift(out.splice(ci, 1)[0]);
@@ -192,9 +214,16 @@
       document.body.classList.toggle('fullpage', !!(p && p.fullscreen));
       document.body.classList.toggle('nokeys', !!(p && p.noKeypad));
       $('#strip').hidden = $('#kp').hidden = !!(p && p.fullscreen);
+      this.applyOrientation(p);
       if (p && p.onShow) p.onShow();
       if (p && p.target) { this.setTarget(p.target); setTimeout(() => p.focus && p.focus(), 30); }
       this.renderTabs();
+    },
+    /** the CAS and the TI-36X Pro stay upright; the TI-92, TI-92 Plus and Voyage 200 are landscape only */
+    applyOrientation(p) {
+      const o = !p ? -1 : p.kind === 'calc' ? 1 : p.kind === 'emu' ? p.orientation : -1;
+      if (o === this._orient) return; this._orient = o;
+      try { if (root.TiBridge && root.TiBridge.setOrientation) root.TiBridge.setOrientation(o); } catch (e) { /* older shell */ }
     },
     /** the tab's name: what the user typed, else CAS / the calculator's model number / the app's short name */
     tabName(p) {
@@ -229,9 +258,11 @@
         if (p.kind === 'emu') item('Replace OS or change calculator', 'Now ' + p.info[2] + ' · each model keeps its own OS and memory', () => this.emuChooser());
         if (i > 1) item('Move left', '', () => { this.pages.splice(i - 1, 0, this.pages.splice(i, 1)[0]); this.select(i - 1); this.saveSoon(); });
         if (i > 0 && i < this.pages.length - 1) item('Move right', '', () => { this.pages.splice(i + 1, 0, this.pages.splice(i, 1)[0]); this.select(i + 1); this.saveSoon(); });
-        if (p.kind === 'ti36') item(p.S.night ? 'Day display' : 'Night display', p.S.night ? 'Back to the grey-green screen' : 'Dark screen with light text', () => { Sheet.close(); p.setNight(!p.S.night); });
-        if (p.exportCSV) item('Export history (CSV)', 'Inputs, results, decimals, uncertainties and units', () => p.exportCSV());
-        if (p.clear) item('Clear page', p.kind === 'calc' ? 'Pinned results stay' : '', () => p.clear());
+        const t36 = p.t36;
+        if (t36) item(t36.S.night ? 'Day display' : 'Night display', t36.S.night ? 'Back to the grey-green screen' : 'Dark screen with light text', () => { Sheet.close(); t36.setNight(!t36.S.night); });
+        const pp = p.t36 || p;
+        if (pp.exportCSV) item('Export history (CSV)', 'Inputs, results, decimals, uncertainties and units', () => pp.exportCSV());
+        if (pp.clear) item('Clear page', p.kind === 'calc' ? 'Pinned results stay' : '', () => pp.clear());
         if (p.kind !== 'calc') item('Close tab', p.kind === 'emu' ? 'The calculator’s OS and memory stay on this phone' : '', async () => { if (p.saveFrame) await p.saveFrame(); this.pages.splice(i, 1); p.root.remove(); this.select(Math.max(0, i - 1)); this.saveSoon(); });
         b.append(L);
       });
@@ -251,10 +282,9 @@
       Sheet.open('Add a tab', (b) => {
         const L = el('ul', { class: 'mlist' });
         const row = (icon, label, sub, fn) => { const x = el('button', { class: 'mi', html: icon.replace('class="ic"', 'class="ic" style="width:22px;height:22px"') + '<span class="lbl"></span>' + (sub ? '<span class="sub"></span>' : ''), onclick: fn }); x.querySelector('.lbl').textContent = label; if (sub) x.querySelector('.sub').textContent = sub; L.append(el('li', {}, x)); };
-        const t36 = this.pages.find((x) => x.kind === 'ti36'), emu = this.pages.find((x) => x.kind === 'emu');
-        row(APPS.ti36.icon, 'TI-36X Pro', t36 ? 'Already open as “' + this.tabName(t36) + '” — go to it' : 'Scientific calculator with the TI-36X Pro keypad', () => { Sheet.close(); this.addPage('ti36'); });
+        const emu = this.pages.find((x) => x.kind === 'emu');
         if (this.settings.multiEmu) row(APPS.emu.icon, 'Emulated calculator', 'A new tab; the other calculators keep running', () => this.emuChooser(true, null));
-        else row(APPS.emu.icon, 'Emulated calculator', emu ? 'Open as “' + this.tabName(emu) + '” — change the model with Replace OS' : 'TI-Nspire CX II CAS, TI-89, TI-92, Voyage 200, TI-84 Plus … TI-81, HP 48GX/48SX, HP 49g+/49G', () => { if (emu) { Sheet.close(); this.select(this.pages.indexOf(emu)); this.emuChooser(); } else this.emuChooser(true); });
+        else row(APPS.emu.icon, 'Emulated calculator', emu ? 'Open as “' + this.tabName(emu) + '” — change the model with Replace OS' : 'TI-36X Pro, TI-Nspire CX II CAS, TI-89, TI-92, Voyage 200, TI-84 Plus … TI-81, HP 48GX/48SX, HP 49g+/49G', () => { if (emu) { Sheet.close(); this.select(this.pages.indexOf(emu)); this.emuChooser(); } else this.emuChooser(true); });
         b.append(L, el('h3', { text: 'More pages', style: { fontSize: '14px', color: 'var(--ink2)', margin: '16px 2px 4px' } }));
         const M = el('ul', { class: 'mlist' }); b.append(M);
         for (const [k, a] of Object.entries(APPS)) if (a.menu !== false && !UNIQUE.has(k)) M.append(el('li', {}, el('button', { class: 'mi', html: a.icon.replace('class="ic"', 'class="ic" style="width:22px;height:22px"') + '<span class="lbl">' + a.name + '</span>', onclick: () => { Sheet.close(); this.addPage(k); } })));
@@ -283,17 +313,18 @@
     emuModelActions(b, m) {
       const cur = this._emuTarget;
       const isCur = cur && cur.fam === m[0] && cur.model === m[1];
-      b.append(el('p', { class: 'desc', text: m[4] + '.' + (m[0] === 'hp' ? '' : ' Firmware stays on this phone; the app contains no TI code.') }));
+      const builtIn = m[0] === 'hp' || m[0] === 'ti36';
+      b.append(el('p', { class: 'desc', text: m[4] + '.' + (builtIn ? '' : ' Firmware stays on this phone; the app contains no TI code.') }));
       const L = el('ul', { class: 'mlist' }); b.append(L);
       const item = (label, sub, fn) => L.append(el('li', {}, el('button', { class: 'mi', 'data-act': label, onclick: fn }, el('span', { class: 'lbl', text: label }), sub ? el('span', { class: 'sub', text: sub }) : null)));
       const ns = m[0] === 'nspire';
-      if (m[0] !== 'hp') item(ns ? (isCur ? 'Load system files or a new OS…' : 'Choose system files and OS…') : isCur ? 'Replace OS or ROM…' : 'Choose OS file or ROM…',
+      if (!builtIn) item(ns ? (isCur ? 'Load system files or a new OS…' : 'Choose system files and OS…') : isCur ? 'Replace OS or ROM…' : 'Choose OS file or ROM…',
         ns ? 'boot ROM with keys, manuf, btldr, instl, diags and the .tcc2 OS — select them all at once' : isCur ? 'Erases this calculator’s memory' : 'Switches to the ' + m[3] + ' and installs it', () => {
         const f = $('#file-emu'); f.value = ''; f.multiple = ns;
         f.onchange = () => { const files = [...f.files]; f.value = ''; if (!files.length) return; Sheet.close(); this.emuApply(m[0], m[1], files); };
         f.click();
       });
-      if (!isCur) item((cur ? 'Switch to the ' : 'Open the ') + m[3], m[0] === 'hp' ? 'Ready to use' : 'Uses the OS already loaded for it, or asks for one', () => { Sheet.close(); this.emuApply(m[0], m[1], null); });
+      if (!isCur) item((cur ? 'Switch to the ' : 'Open the ') + m[3], builtIn ? 'Ready to use' : 'Uses the OS already loaded for it, or asks for one', () => { Sheet.close(); this.emuApply(m[0], m[1], null); });
     },
     async emuApply(fam, model, files) {
       files = files ? (Array.isArray(files) ? files : [files]) : [];

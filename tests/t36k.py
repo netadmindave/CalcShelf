@@ -10,8 +10,8 @@ async def main():
         pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type=='error' else None)
         E=lambda js: pg.evaluate(js)
         await pg.goto(BASE+'/index.html'); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2500)
-        await E("__app.addPage('ti36')"); await pg.wait_for_timeout(700)
-        P="__app.page"
+        await E("__app.emuApply('ti36','36xpro',null)"); await pg.wait_for_timeout(700)
+        P="(__app.page.t36||__app.page)"
         async def k(*ids):
             for i in ids:
                 sec = i.startswith('2:')
@@ -20,7 +20,7 @@ async def main():
         nxt = lambda: E(P+".mf.executeCommand('moveToNextPlaceholder')")
         out = lambda: E(P+".mf.executeCommand('moveAfterParent')")
         async def ent(w=1100): await k('enter'); await pg.wait_for_timeout(w)
-        last = lambda: E("(h=>h.in+' = '+(h.tex||h.err))(__app.page.history[__app.page.history.length-1])")
+        last = lambda: E("(h=>h.in+' = '+(h.tex||h.err))((__app.page.t36||__app.page).history[(__app.page.t36||__app.page).history.length-1])")
         R=[]
         await pg.screenshot(path=f'out/{TAG}_pad.png')
         await k('2','add','3','mul','4'); await ent(); R.append(await last())

@@ -2,6 +2,11 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## 2.7.4
+
+- **The TI-36X Pro is now one of the emulated calculators**, under + → Emulated calculator → *TI scientific*, instead of its own kind of tab. A TI-36X Pro tab you already have becomes an emulator tab with its memory and night setting; with one emulator tab, it keeps the TI-36X Pro's memory when you switch that tab to another calculator.
+- **Screen rotation:** the CAS and the TI-36X Pro stay upright. The TI-92, TI-92 Plus and Voyage 200 always run in landscape, and their portrait two-page keypad is gone. Other tabs still turn with the phone.
+
 ## 2.7.3
 
 - **Fixed: units in the CAS entry line.** A unit from the Units menu, or one typed with the abc keypad's **_** key, no longer leaves the entry line in text mode. Before, the next key went in as raw LaTeX (for example `\times`), and *Use entry* on such a line put the LaTeX back in. Units are now entered as maths, so `1.6_km × 2` works as expected. Entries saved by earlier versions are fixed when they are loaded or recalled.

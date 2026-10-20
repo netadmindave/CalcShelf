@@ -2,7 +2,7 @@
 .super Ljava/lang/Object;
 .source "Bridge.java"
 
-# window.TiBridge: haptics, saving files to Downloads, leaving the app.
+# window.TiBridge: saving files to Downloads, leaving the app, screen orientation.
 
 .field private final act:Lcom/ti89touch/MainActivity;
 
@@ -145,5 +145,22 @@
     iget-object v0, p0, Lcom/ti89touch/Bridge;->act:Lcom/ti89touch/MainActivity;
     const/4 v1, 0x1
     invoke-virtual {v0, v1}, Lcom/ti89touch/MainActivity;->moveTaskToBack(Z)Z
+    return-void
+.end method
+
+
+# setOrientation(o): -1 follow the phone, 1 portrait, 6 landscape (either way up).
+.method public setOrientation(I)V
+    .registers 3
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    :try_start_0
+    iget-object v0, p0, Lcom/ti89touch/Bridge;->act:Lcom/ti89touch/MainActivity;
+    invoke-virtual {v0, p1}, Lcom/ti89touch/MainActivity;->setRequestedOrientation(I)V
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    :catch_0
     return-void
 .end method

@@ -1,3 +1,4 @@
+import re
 import os
 import asyncio, sys, re
 from playwright.async_api import async_playwright
@@ -24,50 +25,18 @@ async def main():
         print('eng results:', await E("[...document.querySelectorAll('.page:not([hidden]) .out, .page:not([hidden]) .res')].slice(-2).map(x=>x.textContent).join(' ; ')"))
         print('settings.fmt:', await E("__app.settings.fmt"))
         await pg.screenshot(path=f'out/{TAG}_eng.png')
-        # TI-36X tab, only one
+        # TI-36X Pro: since 2.8 it is in the emulated calculators, not its own entry in the + menu
         await pg.locator('#btn-addpage').tap(); await pg.wait_for_timeout(300)
-        await pg.locator('#sheet .mi', has_text='TI-36X Pro').first.tap(); await pg.wait_for_timeout(700)
-        await pg.locator('#btn-addpage').tap(); await pg.wait_for_timeout(300)
-        print('add menu 2nd time:', await E("document.querySelector('#sheet .mlist').innerText.replace(/\\s+/g,' ').slice(0,200)"))
-        await pg.locator('#sheet .mi', has_text='TI-36X Pro').first.tap(); await pg.wait_for_timeout(500)
-        print('after ti36 x2:', await tabs())
-        # emulator: HP-15C
+        print('add menu has no TI-36 entry:', await pg.locator('#sheet .mlist .mi .lbl', has_text='TI-36X Pro').count() == 0)
+        await E("UI.Sheet.close()")
+        # emulator: HP 48GX
         await pg.locator('#btn-addpage').tap(); await pg.wait_for_timeout(300)
         await pg.locator('#sheet .mi', has_text='Emulated calculator').first.tap(); await pg.wait_for_timeout(400)
         await pg.screenshot(path=f'out/{TAG}_chooser.png')
-        await pg.locator('#sheet [data-emu="hp:15c"]').tap(); await pg.wait_for_timeout(300)
-        await pg.locator('#sheet .mi', has_text='Switch to the HP-15C').tap(); await pg.wait_for_timeout(3500)
-        print('after hp15c:', await tabs())
+        await pg.locator('#sheet [data-emu="hp:48gx"]').tap(); await pg.wait_for_timeout(300)
+        await pg.locator('#sheet .mi', has_text=re.compile("(Switch to|Open) the HP 48GX")).tap(); await pg.wait_for_timeout(3500)
+        print('after hp48gx:', await tabs())
         await pg.screenshot(path=f'out/{TAG}_hp.png')
-        # from inside the HP frame: Change calculator → TI-84+SE with a ROM
-        fr = pg.frame_locator('#pages .page.emu iframe')
-        await fr.locator('#btn-menu').tap(); await pg.wait_for_timeout(300)
-        await fr.locator('#m-model').tap(); await pg.wait_for_timeout(500)
-        print('sheet title:', await E("document.querySelector('#sheet-title') ? document.querySelector('#sheet-title').textContent : document.querySelector('#sheet h2, #sheet .title')?.textContent"))
-        await pg.locator('#sheet [data-emu="z80:z"]').tap(); await pg.wait_for_timeout(300)
-        async with pg.expect_file_chooser() as fc:
-            await pg.locator('#sheet .mi', has_text='Choose OS file or ROM').tap()
-        f = await fc.value; await f.set_files(U+'ti84se.rom'); await pg.wait_for_timeout(7000)
-        print('after 84:', await tabs(), '| frame src:', await E("document.querySelector('#pages .page.emu iframe').getAttribute('src')"))
-        await pg.screenshot(path=f'out/{TAG}_84.png')
-        # from inside the classic frame: Replace OS → TI-89 chosen but a .9xu/.rom of a 92+ … use 92+ ROM with the TI-92 Plus model
-        fr = pg.frame_locator('#pages .page.emu iframe')
-        await fr.locator('#btn-menu').tap(); await pg.wait_for_timeout(300)
-        print('classic m-os label:', await fr.locator('#m-os').inner_text())
-        await fr.locator('#m-os').tap(); await pg.wait_for_timeout(500)
-        await pg.locator('#sheet [data-emu="ti68k:92p"]').tap(); await pg.wait_for_timeout(300)
-        async with pg.expect_file_chooser() as fc:
-            await pg.locator('#sheet .mi', has_text='Choose OS file or ROM').tap()
-        f = await fc.value; await f.set_files(U+'ti92p.rom'); await pg.wait_for_timeout(9000)
-        print('after 92p:', await tabs(), '| setup hidden:', await fr.locator('#setup').is_hidden())
-        await pg.screenshot(path=f'out/{TAG}_92p.png')
-        # switch back to the 84 — keeps its OS and memory
-        await pg.locator('#tabs .tab.on').tap(); await pg.wait_for_timeout(300)
-        print('emu tab menu:', await E("document.querySelector('#sheet .mlist').innerText.replace(/\\s+/g,' ')"))
-        await pg.locator('#sheet .mi', has_text='Replace OS or change calculator').tap(); await pg.wait_for_timeout(400)
-        await pg.locator('#sheet [data-emu="z80:z"]').tap(); await pg.wait_for_timeout(300)
-        await pg.locator('#sheet .mi', has_text='Switch to the TI-84+SE').tap(); await pg.wait_for_timeout(6000)
-        print('back to 84:', await tabs(), '| setup hidden:', await fr.locator('#setup').is_hidden())
         # rename: long-press CAS tab
         cas = pg.locator('#tabs .tab').first
         bb = await cas.bounding_box()

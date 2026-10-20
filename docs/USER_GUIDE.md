@@ -23,7 +23,8 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Tap a tab** to go to it.
 - **Tap the open tab** to get its menu: rename, move, close, export history, and so on.
 - **Long-press a tab** to rename it.
-- **Tap +** to add a tab: the TI-36X Pro, an emulated calculator, Graphs, Lists & Spreadsheet, Notes, Program Editor or the Unit Converter.
+- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor or the Unit Converter.
+- **Screen rotation:** the CAS and the TI-36X Pro stay upright, and the TI-92, TI-92 Plus and Voyage 200 always run in landscape. The other tabs turn with the phone.
 
 **Main menu (☰, top left).**
 
@@ -208,7 +209,9 @@ Open this from **const** on the toolbar, or from the main menu. It has four tabs
 
 <img src="img/ti36.png" width="240" align="right" alt="TI-36X Pro"> <img src="img/ti36-night.png" width="240" align="right" alt="TI-36X Pro night display">
 
-This tab is a recreation of the current TI-36X Pro's keypad, MultiView display and menus. It runs on the CAS engine, so it is not an emulation and needs no firmware.
+This is a recreation of the current TI-36X Pro's keypad, MultiView display and menus. It runs on the CAS engine, so it is not an emulation and needs no firmware.
+
+Open it from **+ → Emulated calculator → TI-36X Pro** (under *TI scientific*). With one emulator tab, switching that tab to another calculator keeps the TI-36X Pro's memory for when you switch back.
 
 - **Keys** are where they are on the real calculator, with their 2nd legends above them. Press **2nd** for the second function.
 - **Multi-tap keys** work as on the real calculator: tap again within 1.6 s for the next legend. These keys are:
@@ -339,7 +342,7 @@ These use the same TiEmu core, with Graph89's landscape layout: every key is whe
 - **TI-92 and TI-92 Plus:** F1–F8 sit in two columns to the left of the screen.
 - **All three:** the cursor pad and number block are on the right, and the QWERTY keyboard is below. Each key shows its 2nd and ◆ legends.
 
-**Turn the phone sideways.** The layout is landscape. In portrait, the page turns itself so that you can just rotate the phone. If you'd rather use a portrait keypad (a math page and a letters page), choose **☰ → Keypad → Two pages in portrait**.
+**Landscape only.** On the phone, CalcShelf turns the screen to landscape while one of these is open. In a browser held in portrait, the page turns itself so that you can just rotate the device.
 
 **What you need:**
 
