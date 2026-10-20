@@ -330,3 +330,4 @@ details.ugrp .chips { padding: 0 2px 10px; }
 .dt-tbl { display: grid; gap: 2px 10px; font-size: 13px; align-items: center; overflow-x: auto; }
 .dt-tbl b { font-size: 12px; color: var(--ink2); position: sticky; top: 0; background: var(--doc); }
 .dt-tbl .chip { padding: 4px 10px; }
+.seg.seg-wrap button { font-size: 13px; padding: 8px 2px; }

@@ -142,7 +142,8 @@
     },
 
     /* ---------------- optics: linewidth Δν ↔ Δλ, photon equivalents ---------------- */
-    photon(b) {
+    photon(b) { OpticsTools.build(b, this.app, (body) => this.linewidth(body)); },
+    linewidth(b) {
       const app = this.app;
       const CENTRE = [['Wavelength', ['nm', 'µm', 'pm', 'Å', 'm']], ['Frequency', ['THz', 'GHz', 'PHz', 'Hz']], ['Wavenumber', ['1/cm']], ['Photon energy', ['eV', 'J']], ['Angular frequency', ['rad/s']]];
       const WIDTH = [['Wavelength (Δλ)', ['pm', 'nm', 'µm', 'fm', 'Å']], ['Frequency (Δν)', ['Hz', 'kHz', 'MHz', 'GHz', 'THz']], ['Wavenumber (Δν̃)', ['1/cm', '1/m']], ['Energy (ΔE)', ['µeV', 'meV', 'eV']], ['Angular frequency (Δω)', ['rad/s']]];

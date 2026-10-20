@@ -152,7 +152,7 @@
     terms.forEach((t, i) => { t.d = (nums[1 + 2 * i] - nums[2 + 2 * i]) / (2 * t.h); t.c = (t.d * t.s) ** 2; s2 += t.c; });
     const sg = Math.sqrt(s2);
     app.lastAns = String(v);
-    return { ok: true, code, out: String(v), tex: fmtUnc(v, sg), kind: 'expr', unc: { v, s: sg, terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
+    return { ok: true, code, out: String(v), tex: fmtUnc(v, sg), kind: 'expr', unc: { v, s: sg, code, names: terms.map((t) => t.name), terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
   }
 
   /* ---------------------------------------------------------------- results with units (Giac prints 6.28_ft, 19.62_(kg*m/s^2)) */
@@ -274,6 +274,72 @@
         b.append(c, inp, msg, el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Convert', onclick: () => { const u = inp.value.trim(); try { Units.convert(1, h.unit.u, u); Sheet.close(); this.convertTo(h, u); } catch (e) { msg.hidden = false; msg.textContent = e.message; } } })));
       });
     }
+    /** correlation coefficients between the inputs: σ² = Σᵢ Σⱼ cᵢ cⱼ rᵢⱼ σᵢ σⱼ */
+    corrBox(U) {
+      const n = U.terms.length; U.r = U.r || U.terms.map((_, i) => U.terms.map((__, j) => (i === j ? 1 : 0)));
+      const box = el('div', { class: 'card', style: { marginTop: '10px' } }, el('h4', { class: 'cv-h', text: 'Correlated inputs', style: { margin: '0 0 6px' } }), el('p', { class: 'desc', text: 'Correlation coefficients r between −1 and 1 (0 = independent). Use them when two inputs share a cause, such as one calibration.' }));
+      const grid = el('div', { style: { display: 'grid', gridTemplateColumns: 'auto ' + 'minmax(0,1fr) '.repeat(n), gap: '4px', alignItems: 'center', fontSize: '13px' } });
+      grid.append(el('span'), ...U.terms.map((t, j) => el('b', { text: 'x' + (j + 1), style: { textAlign: 'center' } })));
+      const res = el('p', { class: 'desc' });
+      const total = () => {
+        let s2 = 0; for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) s2 += U.terms[i].d * U.terms[j].d * U.r[i][j] * U.terms[i].s * U.terms[j].s;
+        const sg = Math.sqrt(Math.max(0, s2)); U.sCorr = sg;
+        res.textContent = 'With these correlations: σ = ' + +sg.toPrecision(4) + '  (independent: ' + +U.s.toPrecision(4) + '), result ' + +U.v.toPrecision(10) + ' ± ' + +sg.toPrecision(3) + '.';
+      };
+      U.terms.forEach((t, i) => {
+        grid.append(el('b', { text: 'x' + (i + 1) }));
+        for (let j = 0; j < n; j++) {
+          if (j === i) { grid.append(el('span', { text: '1', class: 'mono', style: { textAlign: 'center' } })); continue; }
+          const inp = el('input', { class: 'search mono', value: String(U.r[i][j]), inputmode: 'decimal', 'aria-label': 'r between x' + (i + 1) + ' and x' + (j + 1), style: { margin: 0, padding: '6px', textAlign: 'center' } });
+          inp.onchange = () => { let v = Number(inp.value); if (!isFinite(v)) v = 0; v = Math.max(-1, Math.min(1, v)); U.r[i][j] = U.r[j][i] = v; box.querySelectorAll('input').forEach((x) => { const m = x.getAttribute('aria-label').match(/x(\d+) and x(\d+)/); x.value = String(U.r[m[1] - 1][m[2] - 1]); }); total(); };
+          grid.append(inp);
+        }
+      });
+      box.append(el('p', { class: 'desc', style: { margin: '0 0 4px' }, text: U.terms.map((t, i) => 'x' + (i + 1) + ' = ' + t.v + ' ± ' + t.s).join(' · ') }), grid, res);
+      total();
+      return box;
+    }
+    /** Monte Carlo propagation (GUM supplement 1): normal inputs, with the correlations above */
+    mcBox(U) {
+      const box = el('div', { class: 'card', style: { marginTop: '10px' } }, el('h4', { class: 'cv-h', text: 'Monte Carlo check', style: { margin: '0 0 6px' } }),
+        el('p', { class: 'desc', text: 'Draws every input from a normal distribution and evaluates the expression many times. If the result differs from the first-order σ, the expression is too nonlinear for the simple formula; use the Monte Carlo interval.' }));
+      const out = el('div');
+      const run = async () => {
+        out.innerHTML = ''; out.append(el('p', { class: 'desc', text: 'Running…' }));
+        const n = U.terms.length, r = U.r || U.terms.map((_, i) => U.terms.map((__, j) => (i === j ? 1 : 0)));
+        // Cholesky of the correlation matrix
+        const L = r.map(() => new Array(n).fill(0));
+        for (let i = 0; i < n; i++) for (let j = 0; j <= i; j++) { let s = r[i][j]; for (let k = 0; k < j; k++) s -= L[i][k] * L[j][k]; if (i === j) { if (s <= 0) { out.innerHTML = ''; out.append(el('p', { class: 'desc err', text: 'Those correlations are impossible together (the matrix isn’t positive definite).' })); return; } L[i][i] = Math.sqrt(s); } else L[i][j] = s / L[j][j]; }
+        const gauss = () => { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random()); };
+        const draw = () => { const z = U.terms.map(gauss); return U.terms.map((t, i) => { let s = 0; for (let k = 0; k <= i; k++) s += L[i][k] * z[k]; return t.v + t.s * s; }); };
+        let f = null; try { const fn = GiacFmt.compile(U.code, U.names); f = (xs) => fn(...xs); if (!isFinite(f(U.terms.map((t) => t.v)))) f = null; } catch (e) { f = null; }
+        const N = f ? 50000 : 2000, ys = [];
+        if (f) for (let k = 0; k < N; k++) { const v = f(draw()); if (isFinite(v)) ys.push(v); }
+        else {
+          const pts = []; for (let k = 0; k < N; k++) pts.push('evalf(subst(' + U.code + ',[' + U.names.join(',') + '],[' + draw().join(',') + ']))');
+          for (let k = 0; k < N; k += 200) { const rr = await this.app.cas.batch(pts.slice(k, k + 200)); for (const v of rr) if (isFinite(+v)) ys.push(+v); }
+        }
+        ys.sort((a, b) => a - b);
+        const m = ys.reduce((a, b) => a + b, 0) / ys.length, sd = Math.sqrt(ys.reduce((a, b) => a + (b - m) ** 2, 0) / (ys.length - 1));
+        const q = (p) => ys[Math.min(ys.length - 1, Math.max(0, Math.round(p * (ys.length - 1))))];
+        out.innerHTML = '';
+        const card = el('div', { class: 'dt-card' }); const kv = (k, v) => card.append(el('div', { class: 'dt-kv' }, el('span', { text: k }), el('span', { class: 'mono', text: v })));
+        kv('samples', ys.length + (f ? '' : ' (evaluated by the CAS)'));
+        kv('mean', String(+m.toPrecision(8))); kv('standard deviation', String(+sd.toPrecision(4)));
+        kv('first-order σ', String(+(U.sCorr || U.s).toPrecision(4)));
+        kv('95 % interval', +q(0.025).toPrecision(8) + ' … ' + +q(0.975).toPrecision(8));
+        kv('median', String(+q(0.5).toPrecision(8)));
+        out.append(card);
+        if (root.Plot) {
+          const bins = 60, lo = q(0.001), hi = q(0.999), w = (hi - lo) / bins || 1, hx = [], hy = [], cnt = new Array(bins).fill(0);
+          for (const v of ys) { const k = Math.floor((v - lo) / w); if (k >= 0 && k < bins) cnt[k]++; }
+          cnt.forEach((c, k) => { hx.push(lo + k * w, lo + (k + 1) * w); hy.push(c, c); });
+          const P = new Plot({ height: 150 }); out.append(P.el); P.set([{ xs: Float64Array.from(hx), ys: Float64Array.from(hy), mode: 'line', color: '--g1', width: 1.5 }]);
+        }
+      };
+      box.append(el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Run Monte Carlo', onclick: run })), out);
+      return box;
+    }
     uncSheet(h) {
       const U = h.unc;
       Sheet.open('Uncertainty budget', (b) => {
@@ -286,7 +352,10 @@
           const bar = el('span', { class: 'unc-bar' }, el('i', { style: { width: Math.max(1, x.pct).toFixed(1) + '%' } }), el('em', { text: x.pct.toFixed(1) + ' %' }));
           t.append(c, el('span', { class: 'mono', text: String(+x.d.toPrecision(5)) }), el('span', { class: 'mono', text: '±' + +(Math.abs(x.d) * x.s).toPrecision(3) }), bar);
         }
-        b.append(t, el('div', { class: 'btnrow' },
+        b.append(t);
+        if (U.terms.length > 1) b.append(this.corrBox(U));
+        if (U.code) b.append(this.mcBox(U));
+        b.append(el('div', { class: 'btnrow' },
           el('button', { class: 'btn', text: 'Use value', onclick: () => { Sheet.close(); this.mf.insert(String(+U.v.toPrecision(12)), { format: 'latex' }); this.mf.focus(); } }),
           el('button', { class: 'btn', text: 'Use value ± σ', onclick: () => { Sheet.close(); this.mf.insert(String(+U.v.toPrecision(12)) + '\\pm' + +U.s.toPrecision(6), { format: 'latex' }); this.mf.focus(); } })));
       });

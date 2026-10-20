@@ -203,7 +203,7 @@
   /* ---- TI-92 Plus / TI-92 / Voyage 200 in Graph89's landscape layout ---- */
   const SKIN = SKIN92[SLOT === 'v200' ? 'v200' : '92p'];
   let skinOn = false;
-  const skinWanted = () => is92() && (S.lay92 !== 'pages' || window.innerWidth > window.innerHeight);
+  const skinWanted = () => is92();   // the TI-92 models are landscape only (the app turns the phone's screen)
   function buildSkin() {
     const LEG = SKINLEG92[SLOT === 'v200' ? 'v200' : SLOT === '92' ? '92' : '92p'];
     keyEls.length = 0; PAD = { fkeys: [], cluster: [[]] };
@@ -553,7 +553,6 @@
     const sm = document.createElement('small'); sm.textContent = snap ? 'Saved ' + new Date(snap).toLocaleString() : 'No snapshot yet'; $('#m-restore').appendChild(sm);
     document.querySelectorAll('#s-lcd button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.lcd));
     document.querySelectorAll('#s-speed button').forEach((b) => b.classList.toggle('on', +b.dataset.v === S.speed));
-    $('#lay92').hidden = !is92(); document.querySelectorAll('#s-lay92 button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.lay92));
     $('#s-gray').checked = S.gray; $('#s-grid').checked = S.grid; $('#s-turbo').checked = S.turbo;
     $('#about').textContent = `Running TI AMS ${core ? core.romVersion() : ''} on the TiEmu emulator core, built on Graph89 by Dritan Hashorva. Free software under the GNU GPL v3. The TI-89, TI-92 Plus and Voyage 200 and the AMS operating system are © Texas Instruments; this app contains no TI code.`;
   }
@@ -579,7 +578,6 @@
     $('#s-gray').onchange = (e) => { S.gray = e.target.checked; saveSettings(); toast('Takes effect next time the app starts'); };
     $('#s-grid').onchange = (e) => { S.grid = e.target.checked; saveSettings(); forceDraw = true; };
     $('#s-turbo').onchange = (e) => { S.turbo = e.target.checked; saveSettings(); };
-    document.querySelectorAll('#s-lay92 button').forEach((b) => b.onclick = () => { S.lay92 = b.dataset.v; saveSettings(); renderMenu(); closeSheets(); choosePad(); });
   }
   function applyLcd() { const l = $('#lcd'); l.classList.remove('paper', 'night'); if (S.lcd !== 'stn') l.classList.add(S.lcd); layoutScreen(); }
 
