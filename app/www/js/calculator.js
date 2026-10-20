@@ -38,6 +38,9 @@
     } else if (kind === 'assign' && approx && !/=>\s*_/.test(code)) {
       run = code.replace(/^(\s*[A-Za-z]\w*\s*:=)(.*)$/, '$1evalf($2)').replace(/^(.*)=>(\s*[A-Za-z]\w*\s*)$/, 'evalf($1)=>$2');
     }
+    // unit conversions Giac can't do as written (its _Da, _yr, °C… differ from ours, or the user's own units): convert here
+    if (kind === 'expr') { const cv = await convertUnits(app, code); if (cv) return cv; }
+    run = Units.toGiac(run);
     let out;
     let printed = [];
     try { const r = await app.cas.evalFull(run); out = r.out; printed = r.printed.filter((t) => t.trim() !== '');
@@ -53,7 +56,7 @@
     }
     // remember state changes so they survive a restart
     if (kind === 'func' || kind === 'assign') {
-      app.cas.forget(name); app.cas.remember(run);
+      app.cas.forget(name); app.cas.remember(run);   // run already has the units in Giac's form
       if (kind === 'func') { app.userFuncs.add(name); app.vars.delete(name); } else { app.vars.add(name); app.userFuncs.delete(name); }
       app.saveSoon();
     } else if (kind === 'purge') {
@@ -71,6 +74,33 @@
     return { ok: true, code, out, tex: texOut, kind };
   }
 
+
+  /** "expr => _unit" (or convert(expr,_unit)) when a unit on either side isn't one Giac reads exactly as we do. */
+  const TEMP_ABS = /^\s*\(?\s*(-?\d+(?:\.\d*)?(?:e-?\d+)?)\s*\)?\s*\*?\s*_(°C|°F|°R|K|degC|degF|degR|℃|℉)\s*$/;
+  async function convertUnits(app, code) {
+    let m = code.match(/^(.*)=>\s*(_[^=]*?)\s*$/s) || code.match(/^convert\((.*),\s*(_[^,()]*(?:\([^()]*\))?[^,()]*)\)$/s);
+    if (!m) return null;
+    const lhs = m[1], target = m[2];
+    if (!/^[\s_\wµμΩÅ°℃℉⊕☉ₑγ₀*\/^().\-]+$/.test(target)) return null;
+    if (Units.giacNative(code) && !/_(°|deg[CFR]|℃|℉)/.test(code)) return null;
+    const to = Units.fromGiacUnit(target.replace(/\s+/g, ''));
+    let val;
+    try {
+      const t = lhs.match(TEMP_ABS);
+      if (t && Units.sameDim(Units.parse(to).d, Units.parse('K').d) && Units.parse(to).simple) val = Units.convert(+t[1], t[2], to);   // 20 °C → 68 °F (absolute)
+      else {
+        const r = String(await app.cas.eval('evalf(mksa(' + Units.toGiac(lhs) + '))'));
+        if (/ERROR|Error/.test(r)) return null;
+        const mm = r.match(/^\s*(-?[\d.]+(?:e[-+]?\d+)?)\s*(?:\*?\s*_(.*))?$/);
+        if (!mm) return { ok: false, code, error: 'Error: the value to convert has to be a number with units' };
+        val = Units.convert(+mm[1], mm[2] ? Units.fromGiacUnit(mm[2]) : '1', to);
+      }
+    } catch (e) { return { ok: false, code, error: 'Error: ' + e.message }; }
+    const u = to.replace(/·/g, '*');
+    const out = Units.num(val, 12) + '_' + (/^[\wµμΩÅ°℃℉⊕☉ₑγ₀]+$/.test(u) ? u : '(' + u + ')');
+    app.lastAns = out;
+    return { ok: true, code, out, tex: GiacFmt.giacToTex(out, fmtOpts(app.settings)) || out, kind: 'expr' };
+  }
 
   /** readable plain text from simple LaTeX (for CSV) */
   function plainTex(t) {
@@ -122,7 +152,7 @@
     terms.forEach((t, i) => { t.d = (nums[1 + 2 * i] - nums[2 + 2 * i]) / (2 * t.h); t.c = (t.d * t.s) ** 2; s2 += t.c; });
     const sg = Math.sqrt(s2);
     app.lastAns = String(v);
-    return { ok: true, code, out: String(v), tex: fmtUnc(v, sg), kind: 'expr', unc: { v, s: sg, terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
+    return { ok: true, code, out: String(v), tex: fmtUnc(v, sg), kind: 'expr', unc: { v, s: sg, code, names: terms.map((t) => t.name), terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
   }
 
   /* ---------------------------------------------------------------- results with units (Giac prints 6.28_ft, 19.62_(kg*m/s^2)) */
@@ -131,7 +161,7 @@
     const s = String(out), i = s.indexOf('_');
     if (i <= 0 || s.indexOf('_', i + 1) >= 0) return null;
     const vp = s.slice(0, i).trim(), up = s.slice(i + 1).trim().replace(/^\((.*)\)$/, '$1').replace(/\^\(?(-?\d+)(?:\.0+)?\)?/g, '^$1');
-    if (!/^[-+\d.eE*\/() ]+$/.test(vp) || /[^\w*\/^.\-()µΩ°Å]/.test(up)) return null;
+    if (!/^[-+\d.eE*\/() ]+$/.test(vp) || /[^\w*\/^.\-()µμΩ°Å℃℉⊕☉ₑγ₀]/.test(up)) return null;
     let v; try { v = Function('"use strict";return (' + vp.replace(/\^/g, '**') + ')')(); } catch (e) { return null; }
     if (!isFinite(v)) return null;
     try { Units.parse(up); } catch (e) { return null; }
@@ -313,6 +343,7 @@
       if (r.ok && !r.unc && !r.done && !r.printed && r.kind === 'expr') {
         const out = String(r.out);
         r.unit = unitOf(out);
+        if (r.unit) { const su = Units.simplifyUnit(r.unit.u); if (su !== r.unit.u) { try { r.unit = { v: Units.convert(r.unit.v, r.unit.u, su || '1'), u: su }; } catch (e) { /* keep Giac's */ } } if (!r.unit.u) { r.unit = null; r.tex = GiacFmt.giacToTex(String(Units.convert(+unitOf(out).v, unitOf(out).u, '1')), fmtOpts(this.app.settings)); } }
         if (r.unit) r.tex = (GiacFmt.giacToTex(String(+r.unit.v.toPrecision(12)), fmtOpts(this.app.settings)) || String(r.unit.v)) + '\\,' + unitTexOf(r.unit.u);
         // an exact numeric answer also gets its decimal value
         if (!r.unit && !approx && !/[.\[_]|e-?\d/.test(out) && !/^-?\d+$/.test(out) && out.length < 400) {

@@ -80,7 +80,7 @@
       /** units offered for the current quantity (or for a typed unit with no named quantity) */
       const unitList = () => {
         let L = [];
-        try { const d = Units.parse(this.from).d; const qq = Units.quantityOf(d); L = qq ? qq[2].slice() : Units.alternatives(this.from, 1); } catch (e) {
+        try { const d = Units.parse(this.from).d; const qq = Units.quantityOf(d, this.qty); L = qq ? qq[2].slice() : Units.alternatives(this.from, 1); } catch (e) {
           const qq = Units.QUANTITIES.find((x) => x[0] === this.qty); L = qq ? qq[2].slice() : [];
         }
         for (const u of [this.from, this.to]) if (u && !L.includes(u)) { try { if (!L.length || Units.compatible(L[0], u)) L.push(u); } catch (e) { /* skip */ } }
@@ -123,8 +123,8 @@
           const r = Units.convert(v, this.from, this.to);
           out.append(resultRow(app, r, this.to, '', { main: true, sheet: this.sheet }));
         } catch (e) { out.append(el('p', { class: 'desc err', text: e.message })); }
-        const qn = Units.quantityOf(pf.d);
-        const list = Units.alternatives(this.from, v).filter((u) => u !== this.from);
+        const qn = Units.quantityOf(pf.d, this.qty);
+        const list = Units.alternatives(this.from, v, this.qty).filter((u) => u !== this.from);
         all.append(el('h4', { class: 'cv-h', text: (qn ? qn[0] : Units.dimText(pf.d)) + ' — ' + F(v).text + ' ' + this.from + ' is' }));
         for (const u of list) { try { const r = Units.convert(v, this.from, u); all.append(resultRow(app, r, u, (Units.lookup(u) || {}).name || '', { sheet: this.sheet, onPick: () => { this.to = u; fill(); calc(); } })); } catch (e) { /* skip */ } }
         const ph = Units.photonEquivalents(v, this.from);
@@ -142,7 +142,8 @@
     },
 
     /* ---------------- optics: linewidth Δν ↔ Δλ, photon equivalents ---------------- */
-    photon(b) {
+    photon(b) { OpticsTools.build(b, this.app, (body) => this.linewidth(body)); },
+    linewidth(b) {
       const app = this.app;
       const CENTRE = [['Wavelength', ['nm', 'µm', 'pm', 'Å', 'm']], ['Frequency', ['THz', 'GHz', 'PHz', 'Hz']], ['Wavenumber', ['1/cm']], ['Photon energy', ['eV', 'J']], ['Angular frequency', ['rad/s']]];
       const WIDTH = [['Wavelength (Δλ)', ['pm', 'nm', 'µm', 'fm', 'Å']], ['Frequency (Δν)', ['Hz', 'kHz', 'MHz', 'GHz', 'THz']], ['Wavenumber (Δν̃)', ['1/cm', '1/m']], ['Energy (ΔE)', ['µeV', 'meV', 'eV']], ['Angular frequency (Δω)', ['rad/s']]];

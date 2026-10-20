@@ -94,6 +94,14 @@ EMU48=/path/to/emu48android python3 core-build/hp48/gen/layouts.py app/www/hp/js
 - **The ROMs** `rom.48g`, `rom.48s` and `rom.49g` come from the same repository (`app/src/main/assets/calculators/`).
 - **Tests.** `test/boot.mjs` and `test/state.mjs` boot each model and check save and resume in Node.
 
+### Giac unit table
+
+```sh
+node core-build/units/gen_giacunits.js app/www/data/giacunits.js
+```
+
+This checks every unit name, and every prefixed name, against Giac. A name goes into `ok` when Giac reads it exactly as `js/units.js` does, and into `alias` when Giac has its own spelling for it. Every other unit is sent to Giac in SI form. Run it again after adding units.
+
 ### Graph89 key positions (TI-92 and Voyage 200 layout)
 
 ```sh

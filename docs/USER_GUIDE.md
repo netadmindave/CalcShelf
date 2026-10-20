@@ -126,6 +126,14 @@ Type values as **value ± σ**. The ± key is the long-press option on (−), an
 
 Units are written with an underscore, as on the TI-89: `_m`, `_kg`, `_s`, `_ft`, `_N`, `_J`, `_eV` and so on. Pick them from **menu → Units**, or type them.
 
+- **The Units sheet** lists about 300 units in 130 quantities, from length and pressure to GVD (fs²/mm), D* and noise densities (V/√Hz). Search it by name (*debye*, *torr*). Type any combination in its box, such as `W/(m·K)` or `mW/(cm²·nm)`, and tap **Insert**.
+- **Every unit computes correctly.** Giac, the CAS engine, misreads some names (it takes `_Da` as deca-are). CalcShelf hands those to it in SI form, so `3_Da→_kg`, `1_kn→_m/_s` or `2_furlong→_m` come out right.
+- **Temperatures:** `20_°C→_°F` gives 68 °F. In other calculations a temperature counts as a difference.
+- **Combined units are simplified**: `5_W/(_m·_K)·2_m` gives **10 W/K**.
+- **Your own units and constants:** open **const → Mine**.
+  - A unit has a symbol and a definition, for example `_thou = 25.4 µm`. It then works in the CAS, the conversion tool and its lists.
+  - A constant has a name and a value, for example `lref = 1550.12 nm`. It becomes a CAS variable in every document.
+
 - **Clean results.** Results come out with tidy unit names: `9.81_m/_s²·2_kg` → **19.62 kg·m/s²**.
 - **Convert chips.** The newest answer has one-tap chips, such as **→ N**, **→ kN** and **More…**. **More…** takes any compatible unit.
 - **Older answers** convert from their tap menu.
@@ -180,7 +188,12 @@ Add these from **+**.
   - A program can then be called from the CAS tab like any built-in function. The editor starts with a Fibonacci example.
 - **Unit Converter.** It has four parts:
   - **Units:** choose a quantity, then pick the From and To units from the dropdowns. For a unit that isn't listed, choose *Other unit…* and type it, for example W/(m·K).
-  - **Optics:** enter a centre wavelength or frequency and a width Δλ or Δν, then pick the unit to show the width in. For example, an OSA resolution of 0.02 nm at 1550 nm is 2495.7 MHz. The tool also gives the coherence length, Q and the photon equivalents of the centre.
+  - **Optics** has five calculators:
+    - **Δν ↔ Δλ:** enter a centre wavelength or frequency and a width Δλ or Δν, then pick the unit to show the width in. For example, an OSA resolution of 0.02 nm at 1550 nm is 2495.7 MHz. It also gives the coherence length, Q and the photon equivalents of the centre.
+    - **Beam:** a Gaussian beam (wavelength, waist, M²) through free space, thin lenses, mirrors, glass slabs or any ABCD matrix. It plots w(z) and gives the new waist and its position. Add a target waist to see the coupling efficiency (mode matching).
+    - **Dispersion:** pick a glass or crystal (or enter Sellmeier coefficients) and a wavelength. You get n, the group index, β₂, D, β₃, the zero-dispersion wavelength, and the delay, GDD and TOD of a thickness, with a plot against λ.
+    - **Etalon:** a Fabry–Pérot from its length, index and mirror reflectances. You get the FSR, finesse, linewidth, Q, photon lifetime and contrast, with the transmission curve.
+    - **Thin film:** reflectance of a layer stack (transfer matrices) against wavelength, at any angle and polarisation. Thicknesses are in nm or quarter waves, and indices can be complex (n+ki). There are presets for an MgF₂ AR coat and quarter-wave mirrors.
   - **Number base** and **Decibels.**
 
 ---

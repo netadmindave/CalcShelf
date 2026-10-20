@@ -117,6 +117,7 @@
       await DB.open();
       const s = await DB.get('settings'); if (s) Object.assign(this.settings, s);
       if (s && !s.fmt) this.settings.fmt = s.sci ? 'sci' : 'norm';
+      Units.defineUser(this.settings.userUnits || []);
       this.applyTheme();
       this.cas = new CAS('js/cas-worker.js');
       this.cas.onBusy = (b) => document.body.classList.toggle('cas-busy', b);
@@ -525,13 +526,35 @@
     },
     unitsSheet() {
       Sheet.open('Units', (b) => {
-        b.append(el('p', { class: 'desc', html: 'Units start with an underscore. Convert with <b>→</b>, for example <span class="mono">3_ft→_m</span>.' }));
-        for (const [cat, list] of NspireMenus.UNITS) {
-          b.append(el('h3', { text: cat, style: { fontSize: '14px', color: 'var(--ink2)', margin: '14px 2px 6px' } }));
-          const c = el('div', { class: 'chips', style: { flexWrap: 'wrap' } });
-          list.forEach((u) => c.append(el('button', { class: 'chip', text: u, onclick: () => { Sheet.close(); this.insert(GiacFmt.unitEntryTex(u)); } })));
-          b.append(c);
-        }
+        b.append(el('p', { class: 'desc', html: 'Units start with an underscore. Convert with <b>→</b>, for example <span class="mono">3_ft→_m</span>. Combine them freely: <span class="mono">W/(m·K)</span>, <span class="mono">ps/(nm·km)</span>, <span class="mono">kg·m²</span>.' }));
+        const put = (u) => { Sheet.close(); this.insert(Units.entryTex(u)); };
+        // any unit, typed
+        const typed = el('input', { class: 'search', placeholder: 'Type any unit, e.g. W/(m·K) or mW/(cm²·nm)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': 'Unit to insert' });
+        const msg = el('p', { class: 'desc', hidden: true });
+        const go = () => { const u = typed.value.trim(); if (!u) return; try { Units.parse(u); put(u); } catch (e) { msg.hidden = false; msg.textContent = e.message; } };
+        typed.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+        typed.addEventListener('input', () => { msg.hidden = true; filter(); });
+        b.append(el('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } }, typed, el('button', { class: 'btn pri', text: 'Insert', onclick: go })), msg);
+        const mine = Units.userUnits();
+        const sec = el('div');
+        b.append(el('div', { class: 'btnrow' }, el('button', { class: 'btn', text: mine.length ? 'Your units (' + mine.length + ')…' : 'Add your own unit…', onclick: () => Library.open(this, 'mine') })), sec);
+        const groups = [];
+        if (mine.length) groups.push(['Your units', mine.map((x) => x.sym)]);
+        for (const [cat, , list] of Units.QUANTITIES) groups.push([cat, list.filter((u) => u !== '1')]);
+        const draw = (s) => {
+          sec.innerHTML = '';
+          for (const [cat, list] of groups) {
+            const hit = !s || cat.toLowerCase().includes(s) ? list : list.filter((u) => u.toLowerCase().includes(s) || ((Units.lookup(u) || {}).name || '').toLowerCase().includes(s));
+            if (!hit.length) continue;
+            const d = el('details', { class: 'ugrp' }); if (s || cat === 'Your units' || ['Length', 'Mass', 'Time'].includes(cat)) d.open = true;
+            d.append(el('summary', { text: cat }));
+            const c = el('div', { class: 'chips', style: { flexWrap: 'wrap' } });
+            for (const u of hit) c.append(el('button', { class: 'chip', text: u, title: (Units.lookup(u) || {}).name || u, onclick: () => put(u) }));
+            d.append(c); sec.append(d);
+          }
+        };
+        const filter = () => { const v = typed.value.trim().toLowerCase(); draw(v.length >= 2 ? v : ''); };
+        draw('');
       });
     },
 
@@ -562,7 +585,13 @@
     async applyCasSettings() {
       const S = this.settings;
       const set = ['angle_radian:=' + (S.angle === 'deg' ? 0 : 1), 'complex_mode:=' + (S.complex === 'real' ? 0 : 1)];
-      for (const c of set) this.cas.remember(c, 'setting');
+      // the user's own constants are variables in every document
+      const names = new Set();
+      for (const c of S.userConsts || []) { const g = Library.constGiac(c.value); if (g && /^[A-Za-z]\w*$/.test(c.name)) { set.push(c.name + ':=' + g); this.vars.add(c.name); names.add(c.name); } }
+      const gone = [...(this._constNames || [])].filter((x) => !names.has(x));
+      if (gone.length) { this.cas.settings = this.cas.settings.filter((x) => !gone.includes(x.split(':=')[0])); gone.forEach((x) => this.vars.delete(x)); set.push('purge(' + gone.join(',') + ')'); }
+      this._constNames = names;
+      for (const c of set) if (!/^purge\(/.test(c)) this.cas.remember(c, 'setting');
       await this.cas.batch(set).catch(() => {});
     },
     applyTheme() { const t = this.settings.theme; if (t === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t); },

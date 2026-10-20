@@ -6,6 +6,10 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 
 - **The TI-36X Pro is now one of the emulated calculators**, under + → Emulated calculator → *TI scientific*, instead of its own kind of tab. A TI-36X Pro tab you already have becomes an emulator tab with its memory and night setting; with one emulator tab, it keeps the TI-36X Pro's memory when you switch that tab to another calculator.
 - **Screen rotation:** the CAS and the TI-36X Pro stay upright. The TI-92, TI-92 Plus and Voyage 200 always run in landscape, and their portrait two-page keypad is gone. Other tabs still turn with the phone.
+- **Units:** about 300 units in 130 quantities, many of them derived or combined (momentum, moment of inertia, GVD, D*, noise densities, radiance, dose rate…). The CAS Units sheet can be searched and takes any combination you type. Units that Giac reads differently from CalcShelf (`_Da`, `_kn`, `_yr`, `_°C`…) are now passed to it in SI form, so they compute correctly. `20_°C→_°F` gives 68 °F. Combined results are simplified (W·m/(K·m) → W/K).
+- **Your own units and constants** (const → Mine): units work in the CAS and the conversion tool; constants are CAS variables in every document.
+- **Optics calculators** in the conversion tool's Optics tab: Gaussian beam through ABCD elements with mode matching, material dispersion (n, n_g, β₂, D, β₃, zero-dispersion wavelength), Fabry–Pérot etalon, and thin-film stacks. New Sellmeier data: silicon, zinc selenide and YAG.
+- In the conversion tool, the From and To lists show the units of the quantity you pick (for example, torque rather than energy for N·m).
 
 ## 2.7.3
 
