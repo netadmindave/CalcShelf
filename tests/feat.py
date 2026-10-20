@@ -11,10 +11,10 @@ async def main():
         E=lambda js: pg.evaluate(js)
         await pg.goto(BASE+'/index.html'); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2500)
         async def run(t, w=1500):
-            await E("(t)=>{ const p=__app.page; p.mf.value=t; return p.enter(false); }", t) if False else None
-            await pg.evaluate("async (t)=>{ const p=__app.page; p.mf.value=t; await p.enter(false); }", t); await pg.wait_for_timeout(300)
+            await E("(t)=>{ const p=__app.page.t36||__app.page; p.mf.value=t; return p.enter(false); }", t) if False else None
+            await pg.evaluate("async (t)=>{ const p=__app.page.t36||__app.page; p.mf.value=t; await p.enter(false); }", t); await pg.wait_for_timeout(300)
         rowtxt = lambda: E("(()=>{const r=[...document.querySelectorAll('.page.calc .hist .row')].pop(); return r? r.innerText.replace(/\\s+/g,' ') : ''})()")
-        hlast = lambda: E("(h=>JSON.stringify({out:h.out, outTex:h.outTex, dec:h.dec, unc:h.unc&&{v:h.unc.v,s:h.unc.s}, unit:h.unit}))(__app.page.history[__app.page.history.length-1])")
+        hlast = lambda: E("(h=>JSON.stringify({out:h.out, outTex:h.outTex, dec:h.dec, unc:h.unc&&{v:h.unc.v,s:h.unc.s}, unit:h.unit}))((__app.page.t36||__app.page).history[(__app.page.t36||__app.page).history.length-1])")
         for t in ['\\sqrt{2}', '\\frac{\\pi}{4}', '2^{40}', '\\frac{1}{3}', 'x+1']:
             await run(t); print(t, '->', await hlast())
         await run('\\left(5.03\\pm0.02\\right)\\times\\left(2.1\\pm0.1\\right)'); print('unc ->', await hlast(), '|', await rowtxt())
@@ -39,12 +39,12 @@ async def main():
         await pg.locator('.page.calc .picks .chip', has_text='Pin').click(); await pg.wait_for_timeout(300)
         print('pins:', await E("document.querySelector('.page.calc .pins').innerText.replace(/\\s+/g,' ')"))
         # swipe-delete the last row, then undo
-        n0 = await E("__app.page.history.length")
+        n0 = await E("(__app.page.t36||__app.page).history.length")
         row = pg.locator('.page.calc .hist .row').last; bb = await row.bounding_box()
         await pg.mouse.move(bb['x']+bb['width']*0.6, bb['y']+12); await pg.mouse.down(); await pg.mouse.move(bb['x']+bb['width']*0.6-180, bb['y']+14, steps=8); await pg.mouse.up(); await pg.wait_for_timeout(500)
-        n1 = await E("__app.page.history.length"); print('swipe delete:', n0, '->', n1, '| undo bar:', await E("document.querySelector('.undo-bar')?.innerText.replace(/\\s+/g,' ')"))
+        n1 = await E("(__app.page.t36||__app.page).history.length"); print('swipe delete:', n0, '->', n1, '| undo bar:', await E("document.querySelector('.undo-bar')?.innerText.replace(/\\s+/g,' ')"))
         await pg.screenshot(path=f'out/{TAG}_undo.png')
-        await pg.locator('.undo-bar button').click(); await pg.wait_for_timeout(300); print('after undo:', await E("__app.page.history.length"))
+        await pg.locator('.undo-bar button').click(); await pg.wait_for_timeout(300); print('after undo:', await E("(__app.page.t36||__app.page).history.length"))
         # copy LaTeX chip exists; export CSV from the tab menu
         await pg.locator('#tabs .tab.on').click(); await pg.wait_for_timeout(300)
         async with pg.expect_download() as dl:
@@ -58,8 +58,8 @@ async def main():
         # keypad ± (◆ of (−)) and f(x) page
         print('± keys:', await E("[...document.querySelectorAll('.kpage .key')].filter(k=>/±/.test(k.textContent)).length"))
         # TI-36 export
-        await E("__app.addPage('ti36')"); await pg.wait_for_timeout(500)
-        await E("(async()=>{const p=__app.page; p.mf.value='2+2'; await p.enter();})()"); await pg.wait_for_timeout(1200)
+        await E("__app.emuApply('ti36','36xpro',null)"); await pg.wait_for_timeout(500)
+        await E("(async()=>{const p=__app.page.t36||__app.page; p.mf.value='2+2'; await p.enter();})()"); await pg.wait_for_timeout(1200)
         await pg.locator('#tabs .tab.on').click(); await pg.wait_for_timeout(300)
         async with pg.expect_download() as dl:
             await pg.locator('#sheet .mi', has_text='Export history').click()

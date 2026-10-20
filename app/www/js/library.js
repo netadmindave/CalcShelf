@@ -28,9 +28,10 @@
     trigSub(sub) { Trig.sub = sub; this.open(root.App, 'trig'); },
     build(b) {
       const seg = el('div', { class: 'seg', style: { marginBottom: '8px' } });
-      for (const [k, l] of [['const', 'Constants'], ['form', 'Formulas'], ['trig', 'Trig'], ['conv', 'Convert']]) { const x = el('button', { text: l, class: this.tab === k ? 'on' : '' }); x.onclick = () => { this.tab = k; this.cat = 'All'; Sheet.render(); }; seg.append(x); }
+      for (const [k, l] of [['const', 'Constants'], ['form', 'Formulas'], ['trig', 'Trig'], ['conv', 'Convert'], ['mine', 'Mine']]) { const x = el('button', { text: l, class: this.tab === k ? 'on' : '' }); x.onclick = () => { this.tab = k; this.cat = 'All'; Sheet.render(); }; seg.append(x); }
       if (this.tab === 'conv') { b.append(seg); Converter.build(b, this.app, { sheet: true }); return; }
       if (this.tab === 'trig') { b.append(seg); Trig.build(b, this.app); return; }
+      if (this.tab === 'mine') { b.append(seg); this.mine(b); return; }
       const q = el('input', { class: 'search', type: 'search', value: this.q, placeholder: this.tab === 'const' ? 'Search constants (e.g. Planck, BK7, dn/dT)' : 'Search formulas (e.g. Snell, Rayleigh, hoop)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
       const cats = this.tab === 'const' ? CONSTANTS.map((c) => c.cat) : [...new Set(FORMULAS.map((f) => f.cat))];
       const chips = el('div', { class: 'chips' });
@@ -61,6 +62,74 @@
       };
       q.oninput = render;
       b.append(seg, q, chips, list); render();
+    },
+    /* ---------------- your own constants and units (kept in the settings, for every document) ---------------- */
+    mine(b) {
+      const app = this.app, S = app.settings;
+      S.userConsts = S.userConsts || []; S.userUnits = S.userUnits || [];
+      b.append(el('p', { class: 'desc', text: 'Constants become variables in the CAS (for example lref for your reference wavelength). Units work everywhere a unit does: the CAS, the conversion tool and the formula solver. Both are kept for every document.' }));
+      const sec = (title) => b.append(el('h3', { text: title, style: { fontSize: '14px', color: 'var(--ink2)', margin: '14px 2px 4px' } }));
+      const row = (main, sub, acts) => el('li', {}, el('div', { class: 'mi', style: { cursor: 'default' } }, el('span', { style: { display: 'flex', flexDirection: 'column', gap: '3px', flex: 1, minWidth: 0 } }, el('span', { class: 'lbl mono', text: main }), sub ? el('span', { class: 'sub', text: sub }) : null), el('span', { class: 'cv-act' }, ...acts.map(([t, fn]) => el('button', { class: 'chip', text: t, onclick: fn })))));
+      sec('Your constants');
+      const L1 = el('ul', { class: 'mlist' }); b.append(L1);
+      S.userConsts.forEach((c, i) => L1.append(row(c.name + ' = ' + c.value, c.desc || '', [
+        ['Insert', () => { Sheet.close(); app.insert(c.name.length > 1 ? '\\mathrm{' + c.name + '}' : c.name); }],
+        ['Edit', () => this.editConst(i)], ['Delete', () => { S.userConsts.splice(i, 1); app.saveSettings(); app.applyCasSettings(); Sheet.render(); }]])));
+      if (!S.userConsts.length) L1.append(el('li', { class: 'desc', style: { padding: '6px 4px' }, text: 'None yet.' }));
+      b.append(el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Add a constant…', onclick: () => this.editConst(-1) })));
+      sec('Your units');
+      const L2 = el('ul', { class: 'mlist' }); b.append(L2);
+      S.userUnits.forEach((u, i) => { let q = ''; try { const qq = Units.quantityOf(Units.parse(u.sym).d); q = qq ? qq[0] : Units.dimText(Units.parse(u.sym).d); } catch (e) { q = 'not valid any more'; }
+        L2.append(row('_' + u.sym + ' = ' + u.def, (u.name ? u.name + ' · ' : '') + q, [
+          ['Insert', () => { Sheet.close(); app.insert(Units.entryTex(u.sym)); }],
+          ['Edit', () => this.editUnit(i)], ['Delete', () => { S.userUnits.splice(i, 1); Units.defineUser(S.userUnits); app.saveSettings(); Sheet.render(); }]])); });
+      if (!S.userUnits.length) L2.append(el('li', { class: 'desc', style: { padding: '6px 4px' }, text: 'None yet.' }));
+      b.append(el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Add a unit…', onclick: () => this.editUnit(-1) })));
+    },
+    /** a form with labelled fields; save(values) returns an error message or null */
+    form(title, fields, save) {
+      Sheet.push(title, (b) => {
+        const ins = fields.map(([k, label, val, ph]) => { const i = el('input', { class: 'search', value: val || '', placeholder: ph || '', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': label }); b.append(el('label', { class: 'cv-lab', style: { margin: '6px 0' } }, el('span', { text: label }), i)); return [k, i]; });
+        const msg = el('p', { class: 'desc err', hidden: true });
+        b.append(msg, el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Save', onclick: async () => {
+          const v = Object.fromEntries(ins.map(([k, i]) => [k, i.value.trim()]));
+          const e = await save(v); if (e) { msg.hidden = false; msg.textContent = e; return; }
+          Sheet.back(); Sheet.render();
+        } })));
+        setTimeout(() => ins[0][1].focus(), 60);
+      });
+    },
+    editConst(i) {
+      const app = this.app, S = app.settings, c = S.userConsts[i] || {};
+      this.form(i < 0 ? 'New constant' : 'Edit ' + c.name, [['name', 'Name (a CAS variable)', c.name, 'lref'], ['value', 'Value, with a unit if it has one', c.value, '1550.12 nm'], ['desc', 'Description (optional)', c.desc, 'Reference laser wavelength']], async (v) => {
+        if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(v.name)) return 'A name starts with a letter and has only letters, digits and _';
+        if (S.userConsts.some((x, k) => k !== i && x.name === v.name)) return 'You already have a constant called ' + v.name;
+        const code = Library.constGiac(v.value); if (!code) return 'Enter a value, for example 1550.12 nm or 2.5e-3';
+        const r = await app.cas.eval('evalf(' + code + ')');
+        if (/ERROR|Error/.test(r)) return 'The CAS can’t read that value: ' + r.replace(/GIAC_ERROR:?/, '').trim().slice(0, 120);
+        const x = { name: v.name, value: v.value, desc: v.desc };
+        if (i < 0) S.userConsts.push(x); else { if (c.name && c.name !== x.name) await app.cas.eval('purge(' + c.name + ')'); S.userConsts[i] = x; }
+        app.saveSettings(); await app.applyCasSettings(); toast('Saved ' + x.name); return null;
+      });
+    },
+    editUnit(i) {
+      const app = this.app, S = app.settings, u = S.userUnits[i] || {};
+      this.form(i < 0 ? 'New unit' : 'Edit _' + u.sym, [['sym', 'Symbol (letters only, used as _symbol)', u.sym, 'thou'], ['def', 'Equals (a number and a unit)', u.def, '25.4 µm'], ['name', 'Name (optional)', u.name, 'thousandth of an inch']], (v) => {
+        const sym = v.sym.replace(/^_/, '');
+        const others = S.userUnits.filter((x, k) => k !== i);
+        Units.defineUser(others);
+        try { Units.checkUser(sym, v.def); } catch (e) { Units.defineUser(S.userUnits); return e.message; }
+        const x = { sym, def: v.def, name: v.name };
+        if (i < 0) S.userUnits.push(x); else S.userUnits[i] = x;
+        Units.defineUser(S.userUnits); app.saveSettings(); toast('Saved _' + sym); return null;
+      });
+    },
+    /** a constant's value as Giac code: "1550.12 nm" → (1550.12*_nm); anything else is read as maths */
+    constGiac(t) {
+      t = String(t || '').trim(); if (!t) return null;
+      const { n, unit } = Units.splitDef(t);
+      if (/^[-+]?[\d.]/.test(t) && isFinite(n)) { if (!unit) return String(n); try { Units.parse(unit); return '(' + Units.num(n, 15) + '*' + Units.unitToGiac(unit) + ')'; } catch (e) { /* not a plain unit */ } }
+      return Units.toGiac(t.replace(/π/g, 'pi').replace(/×/g, '*').replace(/·/g, '*').replace(/−/g, '-'));
     },
     constRow(it) {
       const sym = el('span', { style: { minWidth: '64px', fontSize: '17px' } }); renderTex(sym, it.s);

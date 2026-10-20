@@ -1,4 +1,5 @@
 # CAS entry line: units from the Units menu, the abc _ key, and recalled old entries stay in math mode.
+import re
 import asyncio
 from playwright.async_api import async_playwright
 async def main():
@@ -13,7 +14,7 @@ async def main():
         # 1. unit menu, then × 2
         await E("__app.page.mf.value='1.6'; __app.page.mf.focus(); __app.page.mf.position=99")
         await E("__app.unitsSheet()"); await pg.wait_for_timeout(300)
-        await pg.locator('#sheet-body .chip', has_text='_km').first.tap(); await pg.wait_for_timeout(300)
+        await pg.locator('#sheet-body .chip', has_text=re.compile('^km$')).first.tap(); await pg.wait_for_timeout(300)
         await E("__app.insert('\\\\times')"); await E("__app.typed('2')")
         print('unit menu then ×2:', await E(V))
         await E("__app.page.enter()"); await pg.wait_for_timeout(1500)

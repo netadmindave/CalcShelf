@@ -300,3 +300,10 @@ select.cv-in { font-family: inherit; padding: 10px 10px; appearance: auto; }
 .page.t36.night .t36-tabs button, .page.t36.night .t36-items button { color: #9FE6D6; }
 .page.t36.night .t36-tabs button.on, .page.t36.night .t36-items button.on { background: #9FE6D6; color: #0E181C; }
 .page.t36.night .t36-hist math-field, .page.t36.night .t36-hist .ML__latex, .page.t36.night .t36-lcd .ML__latex { color: #9FE6D6; }
+
+/* 2.8 units sheet: one collapsible group per quantity */
+details.ugrp { border-bottom: 1px solid var(--line); padding: 2px 0; }
+details.ugrp > summary { cursor: pointer; padding: 10px 4px; font-size: 14.5px; font-weight: 600; color: var(--ink); list-style: none; }
+details.ugrp > summary::before { content: '▸ '; color: var(--ink2); }
+details.ugrp[open] > summary::before { content: '▾ '; }
+details.ugrp .chips { padding: 0 2px 10px; }

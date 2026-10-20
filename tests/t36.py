@@ -8,8 +8,8 @@ async def main():
         pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type=='error' else None)
         E=lambda js: pg.evaluate(js)
         await pg.goto('http://localhost:8091/index.html'); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2500)
-        await E("__app.addPage('ti36')"); await pg.wait_for_timeout(600)
-        P="__app.page"
+        await E("__app.emuApply('ti36','36xpro',null)"); await pg.wait_for_timeout(600)
+        P="(__app.page.t36||__app.page)"
         IDS={'+':'add','×':'mul','n/d':'frac'}
         SEC={'table':'approx','5':'cos','6':'tan'}
         async def tap(lab, sec=False):
@@ -53,7 +53,7 @@ async def main():
         await E(P+".S.angle='rad'; "+P+".renderInd()"); await E(P+".mf.value='\\\\sin\\\\left(\\\\frac{\\\\pi}{2}\\\\right)'"); await tap('enter'); await pg.wait_for_timeout(1000)
         await E(P+".S.cplx='rect'"); await E(P+".mf.value='\\\\sqrt{-4}'"); await tap('enter'); await pg.wait_for_timeout(1000)
         await E(P+".mf.value='12'"); await E(P+".convert('in','cm')"); await pg.wait_for_timeout(800)
-        print('hist:', await E("__app.page.history.map(h=>h.in+' = '+(h.tex||h.err)).join(' | ')"))
+        print('hist:', await E("(__app.page.t36||__app.page).history.map(h=>h.in+' = '+(h.tex||h.err)).join(' | ')"))
         await pg.screenshot(path='out/t36_b.png')
         print('errors', errs[-6:])
         await b.close()
