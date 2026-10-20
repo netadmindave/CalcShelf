@@ -13,6 +13,7 @@
     lists: { name: 'Lists & Spreadsheet', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.5h16M4 15h16M10 4v16"/></svg>', make: (a, s) => new Lists.ListsPage(a, s) },
     notes: { name: 'Notes', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 4h9l4 4v12H6z"/><path d="M9 11h7M9 15h5"/></svg>', make: (a, s) => new Notes.NotesPage(a, s) },
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
+    data: { name: 'Data & Fit', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><circle cx="8" cy="14" r="1.1"/><circle cx="11" cy="9.5" r="1.1"/><circle cx="14" cy="8" r="1.1"/><circle cx="17" cy="12" r="1.1"/><path d="M6 16c3-9 8-10 13-3"/></svg>', make: (a, s) => new DataTools.DataPage(a, s) },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
   };
@@ -105,7 +106,7 @@
   });
 
   const UNIQUE = new Set(['calc', 'emu']);
-  const DEFAULT_NAMES = { calc: 'CAS', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
+  const DEFAULT_NAMES = { calc: 'CAS', data: 'Data', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
   const App = {

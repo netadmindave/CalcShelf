@@ -307,3 +307,26 @@ details.ugrp > summary { cursor: pointer; padding: 10px 4px; font-size: 14.5px; 
 details.ugrp > summary::before { content: '▸ '; color: var(--ink2); }
 details.ugrp[open] > summary::before { content: '▾ '; }
 details.ugrp .chips { padding: 0 2px 10px; }
+
+/* 2.8 Data & Fit */
+.page.data { overflow-y: auto; }
+.dt-wrap { padding: 8px 10px calc(var(--safe-b) + 16px); display: flex; flex-direction: column; gap: 6px; }
+.dt-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.dt-empty { padding: 18px 4px; }
+.dt-sel { display: flex; gap: 8px; }
+.plotbox { position: relative; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: var(--card); flex: none; }
+.plotbox canvas { display: block; }
+.plot-read { position: absolute; left: 58px; top: 12px; background: var(--sheet); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; font: 12px var(--mono); pointer-events: none; }
+.dt-opts { flex-wrap: wrap; }
+.dt-params { display: grid; grid-template-columns: auto minmax(70px, 1fr) auto minmax(0, 1.6fr); gap: 6px 8px; align-items: center; margin: 8px 0; font-size: 14px; }
+.dt-params b { font-size: 12px; color: var(--ink2); font-weight: 600; }
+.dt-params .search { margin: 0; padding: 8px; }
+.dt-params input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--acc); }
+.dt-res { font-size: 12.5px; word-break: break-all; }
+.dt-card { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.dt-kv { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding: 3px 0; }
+.dt-kv > span:first-child { color: var(--ink2); }
+.dt-kv > span:last-child { text-align: right; word-break: break-all; }
+.dt-tbl { display: grid; gap: 2px 10px; font-size: 13px; align-items: center; overflow-x: auto; }
+.dt-tbl b { font-size: 12px; color: var(--ink2); position: sticky; top: 0; background: var(--doc); }
+.dt-tbl .chip { padding: 4px 10px; }

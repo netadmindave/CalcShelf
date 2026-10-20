@@ -7,7 +7,8 @@
 (function (root) {
   'use strict';
   const { el, toast, renderTex, mathField, Sheet } = UI;
-  const COLS = 26, ROWS = 99;
+  const COLS = 26, ROWS = 999;
+  const PLAIN = /^-?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i;   // a plain number needs no CAS
   const L = (i) => String.fromCharCode(97 + i);
 
   class ListsPage {
@@ -31,7 +32,7 @@
     serialize() { return { names: this.names, colf: this.colf, cells: this.cells }; }
     menu() {
       return [
-        ['Data', [['Generate sequence', () => this.seqDialog()], ['Fill down', () => this.fillDown()], ['Sort ascending', () => this.sort(1)], ['Sort descending', () => this.sort(-1)], ['Clear column', () => this.clearCol(this.sel.c)], ['Clear all', () => this.clear()]]],
+        ['Data', [['Import CSV or text file…', () => this.importFile()], ['Open in Data & Fit', () => this.toData()], ['Generate sequence', () => this.seqDialog()], ['Fill down', () => this.fillDown()], ['Sort ascending', () => this.sort(1)], ['Sort descending', () => this.sort(-1)], ['Clear column', () => this.clearCol(this.sel.c)], ['Clear all', () => this.clear()]]],
         ['Statistics', [['One-variable statistics', { dialog: 'onevar' }], ['Two-variable statistics', { dialog: 'twovar' }], ['Linear regression', { dialog: 'reg', reg: 'linear' }], ['Quadratic regression', { dialog: 'reg', reg: 'quad' }], ['Exponential regression', { dialog: 'reg', reg: 'exp' }], ['Power regression', { dialog: 'reg', reg: 'power' }]]],
         ['Insert', [['Row above', () => this.insertRow(this.sel.r)], ['Column left', () => this.insertCol(this.sel.c)]]],
         ['Delete', [['Row', () => this.deleteRow(this.sel.r)], ['Column', () => this.deleteCol(this.sel.c)]]],
@@ -62,7 +63,7 @@
         for (let c = 0; c < nc; c++) {
           const k = L(c) + r, x = this.cells[k];
           const td = el('td', { 'data-k': k, style: { padding: '4px 8px', borderRight: '1px solid var(--line)', borderBottom: '1px solid var(--line)', textAlign: 'right', height: '34px', whiteSpace: 'nowrap', background: this.sel.c === c && this.sel.r === r && !this.sel.head && !this.sel.cf ? 'var(--sel)' : '' } });
-          if (x && x.v != null && x.v !== '') renderTex(td, GiacFmt.giacToTex(String(x.v), { digits: this.app.settings.digits }) || String(x.v));
+          if (x && x.v != null && x.v !== '') { if (PLAIN.test(String(x.v))) td.textContent = String(+Number(x.v).toPrecision(Math.max(this.app.settings.digits, 6))); else renderTex(td, GiacFmt.giacToTex(String(x.v), { digits: this.app.settings.digits }) || String(x.v)); }
           if (x && x.err) { td.textContent = 'Error'; td.style.color = 'var(--err)'; }
           td.onclick = () => this.selectCell(c, r);
           tr.append(td);
@@ -106,6 +107,7 @@
       for (let pass = 0; pass < 2; pass++) {
         for (const [k, x] of Object.entries(this.cells)) {
           if (!x.tex || x.fromCol) continue;
+          if (PLAIN.test(x.tex)) { x.v = x.tex; x.err = null; continue; }
           try { x.v = await this.evalCellTex(x.tex); x.err = null; } catch (e) { x.v = null; x.err = true; }
         }
       }
@@ -149,6 +151,34 @@
     deleteRow(r0) { this.shiftCells((c, r) => (r === r0 ? null : L(c) + (r > r0 ? r - 1 : r))); this.recalc().then(() => this.render()); }
     insertCol(c0) { this.shiftCells((c, r) => L(c >= c0 ? c + 1 : c) + r); this.names.splice(c0, 0, ''); this.names.length = COLS; this.colf.splice(c0, 0, ''); this.colf.length = COLS; this.render(); }
     deleteCol(c0) { this.shiftCells((c, r) => (c === c0 ? null : L(c > c0 ? c - 1 : c) + r)); this.names.splice(c0, 1); this.names.push(''); this.colf.splice(c0, 1); this.colf.push(''); this.render(); this.app.saveSoon(); }
+    /** replace the first columns with named lists of numbers: [[name, values], …] */
+    async importColumns(cols) {
+      this.cells = {}; this.colf = Array(COLS).fill(''); this.names = Array(COLS).fill('');
+      cols.slice(0, COLS).forEach(([name, vals], c) => { this.names[c] = name; vals.slice(0, ROWS).forEach((v, r) => { if (isFinite(v)) { const t = String(+(+v).toPrecision(12)).replace(/e\+?/, 'e'); this.cells[L(c) + (r + 1)] = { tex: t, v: t }; } }); });
+      for (let c = 0; c < COLS; c++) if (this.names[c]) await this.syncColumn(c);
+      this.render(); this.app.saveSoon();
+    }
+    importFile() {
+      const f = el('input', { type: 'file', accept: '.csv,.txt,.tsv,.dat,.prn,text/*' });
+      f.onchange = async () => {
+        const file = f.files[0]; if (!file) return;
+        let t; try { t = Numeric.parseTable(await file.text()); } catch (e) { toast(e.message); return; }
+        const used = Object.keys(this.cells).length || this.names.some(Boolean);
+        if (used && !confirm('Replace the data on this page with ' + file.name + '?')) return;
+        const names = t.names.map((n) => n.replace(/\(.*?\)|\[.*?\]/g, '').replace(/[^A-Za-z0-9_]/g, '').replace(/^(\d)/, 'c$1').replace(/^[a-z]\d+$/, '$&_') || 'col');
+        await this.importColumns(Numeric.uniqueNames(names).map((n, i) => [n, Array.from(t.cols[i])]));
+        const rows = t.cols[0].length;
+        toast(file.name + ': ' + Math.min(rows, ROWS) + ' rows × ' + t.cols.length + ' columns' + (rows > ROWS ? ' (of ' + rows + '; open it in Data & Fit for all of them)' : ''), 5000);
+      };
+      f.click();
+    }
+    /** the named columns (or a and b) as a Data & Fit page */
+    toData() {
+      const use = this.names.map((n, i) => [n || L(i), i]).filter(([, i]) => this.colValues(i).length);
+      if (!use.length) { toast('No numbers to send'); return; }
+      const cols = use.map(([n, i]) => ({ name: n, unit: '', v: this.colValues(i).map(Number) }));
+      this.app.addPage('data', { cols, x: 0, y: Math.min(1, cols.length - 1) });
+    }
     plot() {
       const named = this.names.map((n, i) => [n, i]).filter(([n]) => n);
       if (named.length < 2) { toast('Name two columns first (tap a column header)'); return; }

@@ -107,6 +107,20 @@
     const a = el('a', { href: URL.createObjectURL(new Blob([text], { type: mime })), download: name });
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
   }
+  /** save binary data given as base64 (an image, say) */
+  function downloadB64(name, b64, mime) {
+    const bridge = root.TiBridge;
+    if (bridge && bridge.saveFile) { toast(bridge.saveFile(name, b64, mime) || 'Saved'); return; }
+    const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const a = el('a', { href: URL.createObjectURL(new Blob([u8], { type: mime })), download: name });
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  }
+  /** a short message with an Undo button (5 s) */
+  function undoBar(msg, undo) {
+    document.querySelectorAll('.undo-bar').forEach((x) => x.remove());
+    const b = el('div', { class: 'undo-bar', role: 'status' }, el('span', { text: msg }), el('button', { text: 'Undo', onclick: () => { b.remove(); undo(); } }));
+    document.body.append(b); setTimeout(() => b.remove(), 5000);
+  }
   function haptic() { /* key vibration was removed in 2.7 */ }
 
 
@@ -142,5 +156,5 @@
       });
     },
   };
-  root.UI = { $, el, DB, toast, Sheet, texHTML, renderTex, mathField, setOSKeyboard, download, haptic, Edit };
+  root.UI = { $, el, DB, toast, Sheet, texHTML, renderTex, mathField, setOSKeyboard, download, downloadB64, undoBar, haptic, Edit };
 })(typeof self !== 'undefined' ? self : this);
