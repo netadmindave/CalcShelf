@@ -24,12 +24,14 @@ It is free software under the GNU GPL v3. It stands on decades of work by the ca
 | | What it is | Firmware |
 |---|---|---|
 | **CAS** | A symbolic and numeric calculator on Giac. It has a 2D editor, a keypad laid out like the TI-89's, uncertainty propagation, results with units, history tools, and graphs, lists, notes and TI-Basic programs. | None needed |
-| **TI-36X Pro style** | A scientific calculator with the current TI-36X Pro's keypad and menus, running on the same CAS. It has a night display. | None needed (this is a recreation, not an emulation) |
+| **TI-36X Pro style** | A scientific calculator with the current TI-36X Pro's keypad and menus, running on the same CAS. It has a night display, and is listed with the emulated calculators. | None needed (this is a recreation, not an emulation) |
 | **TI-Nspire CX II CAS** | The real TI-Nspire OS on the Firebird emulator. | Your own: system files dumped from your calculator, plus TI's OS file |
-| **TI-89 Titanium, TI-92, TI-92 Plus, Voyage 200** | TI AMS on the TiEmu core. The TI-92 models use Graph89's landscape layout. | Your own: a TI OS upgrade file (`.89u`, `.9xu`, `.v2u`) or a ROM dump |
+| **TI-89 Titanium, TI-92, TI-92 Plus, Voyage 200** | TI AMS on the TiEmu core. The TI-92 models use Graph89's layout and always run in landscape. | Your own: a TI OS upgrade file (`.89u`, `.9xu`, `.v2u`) or a ROM dump |
 | **TI-84 Plus (SE), 83 Plus (SE), 83, 82, 85, 86, 73, 81** | The TI-OS on the TilEm core. | Your own: an OS file (`.8xu`, `.73u`) or a ROM dump |
 | **HP 48GX, HP 48SX, HP 49g+, HP 49G** | HP's own ROMs on the Emu48 core. | Included; HP allows these ROMs to be distributed for use with emulators |
-| **Constants, formulas and conversions** | CODATA constants, material data, solvable formulas, a triangle solver, trig identities, and a unit and number-base converter. | — |
+| **Constants, formulas and conversions** | CODATA constants, material and Sellmeier data, solvable formulas, a triangle solver, trig identities, about 300 units (with your own units and constants), and a number-base and decibel converter. | — |
+| **Optics calculators** | Δν ↔ Δλ linewidths, Gaussian beams through ABCD systems with mode matching, material dispersion (n_g, β₂, D, β₃), Fabry–Pérot etalons and thin-film stacks. | — |
+| **Guide & manuals** | This user guide inside the app, and links to the official TI and HP manuals of every calculator. | — |
 
 There is one document with named tabs. **Settings → Emulated calculators → Several** lets several emulated calculators run at the same time, each in its own tab.
 
