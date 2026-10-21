@@ -10,6 +10,9 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 - **Your own units and constants** (const → Mine): units work in the CAS and the conversion tool; constants are CAS variables in every document.
 - **Optics calculators** in the conversion tool's Optics tab: Gaussian beam through ABCD elements with mode matching, material dispersion (n, n_g, β₂, D, β₃, zero-dispersion wavelength), Fabry–Pérot etalon, and thin-film stacks. New Sellmeier data: silicon, zinc selenide and YAG.
 - In the conversion tool, the From and To lists show the units of the quantity you pick (for example, torque rather than energy for N·m).
+- **Guide & manuals tab** (+ or ☰ → Guide & manuals): the complete user guide in the app, and links to the official TI and HP manuals for every calculator, which open in the phone's browser.
+- **Combined units are tidied further:** units of one kind mixed together go to SI (ft·m → m², mm·km → m²), and combinations that make a common named unit become it (J/s → W, V·A → W, kg·m/s² → N). N·m stays N·m. A unit asked for with → is kept, and → now also converts to combined units such as J/s.
+- **Fixed:** the Program Editor tab was titled “[object HTMLInputElement]”.
 - **CAS history shows the value of ans.** When an entry uses ans, the history line shows the value it stood for, for example 5×2 instead of ans×2, so earlier lines still read correctly. ans(n) references are left as they are.
 - **Fixed: emulators in landscape** used only the left part of the screen (the space the CAS gives its page next to the keypad). They, and the other tabs without the keypad, now use the full width.
 

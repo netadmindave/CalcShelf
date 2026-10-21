@@ -138,7 +138,30 @@
 
 
 .method public shouldOverrideUrlLoading(Landroid/webkit/WebView;Landroid/webkit/WebResourceRequest;)Z
-    .registers 4
-    const/4 v0, 0x0
-    return v0
+    .registers 6
+    # the app's own pages load here; any other web address opens in the phone's browser
+    invoke-interface {p2}, Landroid/webkit/WebResourceRequest;->getUrl()Landroid/net/Uri;
+    move-result-object v0
+    invoke-virtual {v0}, Landroid/net/Uri;->getHost()Ljava/lang/String;
+    move-result-object v1
+    const-string v2, "appassets.androidplatform.net"
+    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v1
+    if-eqz v1, :cond_ext
+    const/4 v1, 0x0
+    return v1
+
+    :cond_ext
+    :try_start_0
+    new-instance v1, Landroid/content/Intent;
+    const-string v2, "android.intent.action.VIEW"
+    invoke-direct {v1, v2, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+    iget-object v2, p0, Lcom/ti89touch/AssetClient;->act:Lcom/ti89touch/MainActivity;
+    invoke-virtual {v2, v1}, Lcom/ti89touch/MainActivity;->startActivity(Landroid/content/Intent;)V
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    :catch_0
+    const/4 v1, 0x1
+    return v1
 .end method

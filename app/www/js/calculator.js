@@ -82,7 +82,7 @@
     if (!m) return null;
     const lhs = m[1], target = m[2];
     if (!/^[\s_\wµμΩÅ°℃℉⊕☉ₑγ₀*\/^().\-]+$/.test(target)) return null;
-    if (Units.giacNative(code) && !/_(°|deg[CFR]|℃|℉)/.test(code)) return null;
+    if (Units.giacNative(code) && !/_(°|deg[CFR]|℃|℉)/.test(code) && !/[*\/^]/.test(target)) return null;   // Giac can't convert to a combined unit itself
     const to = Units.fromGiacUnit(target.replace(/\s+/g, ''));
     let val;
     try {
@@ -354,8 +354,9 @@
       if (r.ok && !r.unc && !r.done && !r.printed && r.kind === 'expr') {
         const out = String(r.out);
         r.unit = unitOf(out);
-        if (r.unit) { const su = Units.simplifyUnit(r.unit.u); if (su !== r.unit.u) { try { r.unit = { v: Units.convert(r.unit.v, r.unit.u, su || '1'), u: su }; } catch (e) { /* keep Giac's */ } } if (!r.unit.u) { r.unit = null; r.tex = GiacFmt.giacToTex(String(Units.convert(+unitOf(out).v, unitOf(out).u, '1')), fmtOpts(this.app.settings)); } }
-        if (r.unit) r.tex = (GiacFmt.giacToTex(String(+r.unit.v.toPrecision(12)), fmtOpts(this.app.settings)) || String(r.unit.v)) + '\\,' + unitTexOf(r.unit.u);
+        const explicit = /=>\s*_|^\s*convert\(/.test(r.code || '');   // a unit the user asked for stays as it is
+        if (r.unit && !explicit) { const su = Units.simplifyUnit(r.unit.u); if (su !== r.unit.u) { try { r.unit = { v: Units.convert(r.unit.v, r.unit.u, su || '1'), u: su }; } catch (e) { /* keep Giac's */ } } if (!r.unit.u) { r.unit = null; r.tex = GiacFmt.giacToTex(String(Units.convert(+unitOf(out).v, unitOf(out).u, '1')), fmtOpts(this.app.settings)); } }
+        if (r.unit) r.tex = (GiacFmt.giacToTex(String(+r.unit.v.toPrecision(12)), fmtOpts(this.app.settings)) || String(r.unit.v)) + '\\,' + (/[²³⁴⁻¹]/.test(r.unit.u) ? Units.unitTex(r.unit.u.replace(/\*/g, '·')) : unitTexOf(r.unit.u));
         // an exact numeric answer also gets its decimal value
         if (!r.unit && !approx && !/[.\[_]|e-?\d/.test(out) && !/^-?\d+$/.test(out) && out.length < 400) {
           try { const d = await this.app.cas.eval('evalf(' + out + ')'); if (/^[-+]?\d*\.\d+(e[-+]?\d+)?$/i.test(d) || /^[-+]?[\d.e]+[-+][\d.e]+\*i$/i.test(d)) r.dec = d; } catch (e) { /* none */ }

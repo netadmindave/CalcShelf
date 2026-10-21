@@ -13,6 +13,7 @@
     lists: { name: 'Lists & Spreadsheet', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.5h16M4 15h16M10 4v16"/></svg>', make: (a, s) => new Lists.ListsPage(a, s) },
     notes: { name: 'Notes', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 4h9l4 4v12H6z"/><path d="M9 11h7M9 15h5"/></svg>', make: (a, s) => new Notes.NotesPage(a, s) },
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
+    guide: { name: 'Guide & manuals', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a1.6 1.6 0 0 0-1.6-1.6H5z"/><path d="M19 4.5h-5.5a1 1 0 0 0-1 1"/><path d="M19 4.5v13.9h-5.9a1.6 1.6 0 0 0-1.6 1.6"/></svg>', make: (a, s) => new Guide.GuidePage(a, s) },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
   };
@@ -105,7 +106,7 @@
   });
 
   const UNIQUE = new Set(['calc', 'emu']);
-  const DEFAULT_NAMES = { calc: 'CAS', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
+  const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
   const App = {
@@ -183,13 +184,13 @@
       await this.applyCasSettings();
       await this.cas.batch(d.defs || []).catch(() => {});
       this.cas.defs = (d.defs || []).slice();
-      for (const p of d.pages) { const pg = this.addPage(p.kind, p.state, true); if (pg && p.name) pg.name = p.name; }
+      for (const p of d.pages) { const pg = this.addPage(p.kind, p.state, true); if (pg && typeof p.name === 'string' && p.name) pg.name = p.name; }
       this.select(Math.min(d.active || 0, this.pages.length - 1));
       DB.set('lastDoc', d.id);
     },
     serializeDoc() {
       const d = this.doc;
-      d.pages = this.pages.map((p) => ({ kind: p.kind, state: p.serialize(), name: p.name || undefined }));
+      d.pages = this.pages.map((p) => ({ kind: p.kind, state: p.serialize(), name: typeof p.name === 'string' && p.name ? p.name : undefined }));
       d.active = this.active; d.defs = this.cas.defs.slice(); d.userFuncs = [...this.userFuncs]; d.vars = [...this.vars]; d.lastAns = this.lastAns; d.modified = Date.now();
       return d;
     },
@@ -199,7 +200,7 @@
     /* ---------------- tabs ---------------- */
     addPage(kind, state = {}, quiet) {
       const def = APPS[kind]; if (!def) return;
-      if (this.isUnique(kind)) { const i = this.pages.findIndex((x) => x.kind === kind); if (i >= 0) { if (!quiet) this.select(i); return this.pages[i]; } }
+      if (this.isUnique(kind) || kind === 'guide') { const i = this.pages.findIndex((x) => x.kind === kind); if (i >= 0) { if (!quiet) this.select(i); return this.pages[i]; } }
       const p = def.make(this, state);
       p.kind = kind;
       this.pages.push(p); $('#pages').append(p.root); p.root.hidden = true;
@@ -228,7 +229,7 @@
     },
     /** the tab's name: what the user typed, else CAS / the calculator's model number / the app's short name */
     tabName(p) {
-      if (p.name) return p.name;
+      if (typeof p.name === 'string' && p.name) return p.name;   // (before 2.7.4 a Program tab saved its name field here by mistake)
       if (p.kind === 'emu') return p.defaultName;
       const same = this.pages.filter((x) => x.kind === p.kind);
       const n = same.indexOf(p);
@@ -601,10 +602,11 @@
       Sheet.open('CalcShelf', (b) => {
         const L = el('ul', { class: 'mlist' });
         const item = (label, sub, fn) => L.append(el('li', {}, el('button', { class: 'mi', onclick: fn }, el('span', { class: 'lbl', text: label }), sub ? el('span', { class: 'sub', text: sub }) : null)));
+        item('Guide & manuals', 'The CalcShelf user guide, and the manuals of the real calculators', () => { Sheet.close(); this.addPage('guide'); });
         item('Settings', 'Angle, digits, number format (Normal / Sci / Eng), theme', () => Sheet.push('Settings', (bb) => this.settingsUI(bb)));
         item('Constants & formulas', 'CODATA constants and solvable formulas', () => { Sheet.close(); Library.open(this, 'const'); });
         item('Trigonometry & triangle solver', 'Identities, trig formulas, solve any triangle', () => { Sheet.close(); Library.open(this, 'trig'); });
-        item('Conversion tool', 'Units, light & photons, number bases, decibels', () => { Sheet.close(); Library.open(this, 'conv'); });
+        item('Conversion tool', 'Units, optics calculators, number bases, decibels', () => { Sheet.close(); Library.open(this, 'conv'); });
         const emu = this.pages.find((x) => x.kind === 'emu');
         if (this.settings.multiEmu) item('Add an emulated calculator', 'Opens in a new tab; change a tab’s model from its tab menu', () => this.emuChooser(true, null));
         else item(emu ? 'Replace OS or change calculator' : 'Add an emulated calculator', emu ? 'Now ' + emu.info[2] : 'TI-Nspire CX II CAS, TI-89, TI-92, V200, TI-84 Plus … TI-81, HP 48, HP 49', () => { if (emu) this.select(this.pages.indexOf(emu)); this.emuChooser(true); });

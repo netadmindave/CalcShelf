@@ -29,3 +29,4 @@ tests/out/*
 __pycache__/
 node_modules/
 .DS_Store
+app/www/docs/guide.md

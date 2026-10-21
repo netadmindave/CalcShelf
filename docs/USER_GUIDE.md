@@ -23,7 +23,8 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Tap a tab** to go to it.
 - **Tap the open tab** to get its menu: rename, move, close, export history, and so on.
 - **Long-press a tab** to rename it.
-- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor or the Unit Converter.
+- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, or **Guide & manuals**.
+- **Guide & manuals** (also in the main menu ☰) holds this whole guide, and links to the official manuals of every calculator CalcShelf runs. Those open in your browser.
 - **Screen rotation:** the CAS and the TI-36X Pro stay upright, and the TI-92, TI-92 Plus and Voyage 200 always run in landscape. The other tabs turn with the phone.
 
 **Main menu (☰, top left).**
@@ -129,7 +130,11 @@ Units are written with an underscore, as on the TI-89: `_m`, `_kg`, `_s`, `_ft`,
 - **The Units sheet** lists about 300 units in 130 quantities, from length and pressure to GVD (fs²/mm), D* and noise densities (V/√Hz). Search it by name (*debye*, *torr*). Type any combination in its box, such as `W/(m·K)` or `mW/(cm²·nm)`, and tap **Insert**.
 - **Every unit computes correctly.** Giac, the CAS engine, misreads some names (it takes `_Da` as deca-are). CalcShelf hands those to it in SI form, so `3_Da→_kg`, `1_kn→_m/_s` or `2_furlong→_m` come out right.
 - **Temperatures:** `20_°C→_°F` gives 68 °F. In other calculations a temperature counts as a difference.
-- **Combined units are simplified**: `5_W/(_m·_K)·2_m` gives **10 W/K**.
+- **Combined units are tidied:**
+  - The same unit above and below cancels: `5_W/(_m·_K)·2_m` gives **10 W/K**.
+  - Units of one kind mixed together go to SI: `3_ft·2_m` gives **1.8288 m²**, and `5_mm·2_km` gives **10 m²**.
+  - Several units that make a common named unit become it: `100_J/4_s` gives **25 W**, and `3_V·2_A` gives **6 W**. N·m stays N·m, because it is usually a torque.
+  - A unit you ask for with **→** is kept as written, for example `25_W→_J/_s`.
 - **Your own units and constants:** open **const → Mine**.
   - A unit has a symbol and a definition, for example `_thou = 25.4 µm`. It then works in the CAS, the conversion tool and its lists.
   - A constant has a name and a value, for example `lref = 1550.12 nm`. It becomes a CAS variable in every document.

@@ -2,7 +2,7 @@
 .super Ljava/lang/Object;
 .source "Bridge.java"
 
-# window.TiBridge: saving files to Downloads, leaving the app, screen orientation.
+# window.TiBridge: saving files to Downloads, leaving the app, screen orientation, opening links.
 
 .field private final act:Lcom/ti89touch/MainActivity;
 
@@ -158,6 +158,30 @@
     :try_start_0
     iget-object v0, p0, Lcom/ti89touch/Bridge;->act:Lcom/ti89touch/MainActivity;
     invoke-virtual {v0, p1}, Lcom/ti89touch/MainActivity;->setRequestedOrientation(I)V
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    :catch_0
+    return-void
+.end method
+
+
+# openUrl(url): opens a web page (a calculator manual) in the phone's browser.
+.method public openUrl(Ljava/lang/String;)V
+    .registers 5
+    .annotation runtime Landroid/webkit/JavascriptInterface;
+    .end annotation
+
+    :try_start_0
+    invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+    move-result-object v0
+    new-instance v1, Landroid/content/Intent;
+    const-string v2, "android.intent.action.VIEW"
+    invoke-direct {v1, v2, v0}, Landroid/content/Intent;-><init>(Ljava/lang/String;Landroid/net/Uri;)V
+    const/high16 v2, 0x10000000
+    invoke-virtual {v1, v2}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+    iget-object v0, p0, Lcom/ti89touch/Bridge;->act:Lcom/ti89touch/MainActivity;
+    invoke-virtual {v0, v1}, Lcom/ti89touch/MainActivity;->startActivity(Landroid/content/Intent;)V
     :try_end_0
     .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
 

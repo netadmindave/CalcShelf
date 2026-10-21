@@ -12,7 +12,7 @@
     constructor(app, state = {}) {
       this.app = app; this.kind = 'prog'; this.title = 'Program Editor'; this.noKeypad = true;
       this.root = el('div', { class: 'page prog', style: { padding: '10px 12px', gap: '8px', overflowY: 'auto' } });
-      this.name = el('input', { class: 'search', value: state.name || 'fib', placeholder: 'name', autocapitalize: 'off', spellcheck: 'false', style: { margin: 0, flex: 1 } });
+      this.nameIn = el('input', { class: 'search', value: state.name || 'fib', placeholder: 'name', autocapitalize: 'off', spellcheck: 'false', style: { margin: 0, flex: 1 } });
       this.args = el('input', { class: 'search', value: state.args ?? 'n', placeholder: 'arguments, e.g. x,y', autocapitalize: 'off', spellcheck: 'false', style: { margin: 0, flex: 1 } });
       this.type = state.type || 'Func';
       this.seg = el('div', { class: 'seg', style: { flex: 'none', width: '170px' } });
@@ -25,7 +25,7 @@
       const chips = el('div', { class: 'chips' }, snippets.map((s) => el('button', { class: 'chip mono', text: s.split('\n')[0].trim() || s, onclick: () => ins(s) })));
       this.root.append(
         el('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } }, this.seg),
-        el('div', { style: { display: 'flex', gap: '8px' } }, this.name, el('span', { text: '(', style: { alignSelf: 'center', fontSize: '20px' } }), this.args, el('span', { text: ')', style: { alignSelf: 'center', fontSize: '20px' } })),
+        el('div', { style: { display: 'flex', gap: '8px' } }, this.nameIn, el('span', { text: '(', style: { alignSelf: 'center', fontSize: '20px' } }), this.args, el('span', { text: ')', style: { alignSelf: 'center', fontSize: '20px' } })),
         chips, this.code,
         el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Check syntax & store', onclick: () => this.store() }), el('button', { class: 'btn', text: 'Run in Calculator', onclick: () => this.run() })),
         this.msg,
@@ -33,15 +33,15 @@
       );
     }
     get target() { return null; }
-    serialize() { return { name: this.name.value, args: this.args.value, code: this.code.value, type: this.type }; }
+    serialize() { return { name: this.nameIn.value, args: this.args.value, code: this.code.value, type: this.type }; }
     source() {
-      const n = this.name.value.trim(), a = this.args.value.trim();
+      const n = this.nameIn.value.trim(), a = this.args.value.trim();
       const lines = this.code.value.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => ':' + l.replace(/^:/, '').replace(/→/g, '→'));
       const end = this.type === 'Func' ? 'EndFunc' : 'EndPrgm';
       return 'Define ' + n + '(' + a + ')=' + this.type + '\n' + lines.join('\n') + '\n:' + end;
     }
     async store() {
-      const n = this.name.value.trim();
+      const n = this.nameIn.value.trim();
       if (!/^[A-Za-z]\w*$/.test(n)) { this.msg.textContent = 'Give the program a name that starts with a letter.'; return false; }
       const src = this.source();
       const r = await this.app.cas.evalFull(src);
@@ -60,7 +60,7 @@
       let ci = this.app.pages.findIndex((p) => p.kind === 'calc');
       if (ci < 0) { this.app.addPage('calc'); ci = this.app.pages.length - 1; } else this.app.select(ci);
       const calc = this.app.pages[ci];
-      calc.mf.value = '\\operatorname{' + this.name.value.trim() + '}\\left(' + this.args.value.split(',').map(() => '\\placeholder{}').join(',') + '\\right)';
+      calc.mf.value = '\\operatorname{' + this.nameIn.value.trim() + '}\\left(' + this.args.value.split(',').map(() => '\\placeholder{}').join(',') + '\\right)';
       calc.mf.focus();
       toast('Fill in the arguments and press enter');
     }

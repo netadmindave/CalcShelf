@@ -11,6 +11,7 @@ cd "$(dirname "$0")"
 : "${KEYSTORE:?set KEYSTORE to your signing keystore}" "${KS_ALIAS:?set KS_ALIAS}" "${KS_PASS:?set KS_PASS}"
 rm -rf apk/assets/www apk/build && mkdir -p apk/assets && cp -r app/www apk/assets/www
 cp LICENSE apk/assets/www/LICENSE.txt
+mkdir -p apk/assets/www/docs && cp docs/USER_GUIDE.md apk/assets/www/docs/guide.md   # the Guide tab shows the user guide
 java -jar "$TOOLS/apktool_2.9.3.jar" b apk -o out-unsigned.apk
 rm -rf signed
 java -jar "$TOOLS/uber-apk-signer-1.3.0.jar" -a out-unsigned.apk -o signed --ks "$KEYSTORE" --ksAlias "$KS_ALIAS" --ksPass "$KS_PASS" --ksKeyPass "${KS_KEY_PASS:-$KS_PASS}"

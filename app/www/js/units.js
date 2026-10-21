@@ -532,20 +532,32 @@
   const unitToGiac = (str) => toGiac(unitTo(str, 'giac'));
   const entryTex = (str) => unitTo(str, 'tex');
 
-  /** Cancels repeated factors in a product unit from Giac (W*m*K^-1*m^-1 → W/K); SI base products become a named unit (kg*m^2*s^-2 → J). */
+  /** Tidies a product unit from Giac (W*m*K^-1*m^-1, ft*m, J*s^-1):
+   *  · the same unit up and down cancels (W·m/(K·m) → W/K);
+   *  · two units of one kind (ft and m, mm and km) → everything in SI base units (ft·m → m²);
+   *  · more than one unit that makes a common named unit becomes it (J/s → W, kg·m/s² → N, V·A → W).
+   *  N·m is left alone, since it is usually a torque. */
+  const NAMED = ['W', 'J', 'N', 'Pa', 'V', 'Ω', 'C', 'F', 'H', 'T', 'Wb', 'S'];
   function simplifyUnit(u) {
     const str = String(u).replace(/^\((.*)\)$/, '$1');
     if (/[\/()]/.test(str)) return u;
     const exps = new Map();
     for (const part of str.split('*')) { const m = part.trim().match(/^([^\^]+)(?:\^\(?(-?[\d.]+)\)?)?$/); if (!m) return u; exps.set(m[1], (exps.get(m[1]) || 0) + (m[2] ? +m[2] : 1)); }
+    for (const [k, e] of exps) if (Math.abs(e) < 1e-9) exps.delete(k);
+    if (!exps.size) return '';
     const fmtE = (e) => (Math.abs(e) === 1 ? '' : '^' + (+Math.abs(e).toFixed(6)));
-    const pos = [], neg = [];
-    for (const [k, e] of exps) if (Math.abs(e) > 1e-9) (e > 0 ? pos : neg).push(k + fmtE(e));
-    if (!pos.length && !neg.length) return '';
-    if ([...exps.keys()].every((k) => ['m', 'kg', 's', 'A', 'K', 'mol', 'cd'].includes(k))) {
-      try { const p = parse(pos.join('*') + (neg.length ? '/(' + neg.join('*') + ')' : '')); for (const n of ['J', 'W', 'N', 'Pa', 'C', 'V', 'Ω', 'F', 'H', 'T', 'Wb', 'Hz', 'S']) if (sameDim(U[n].d, p.d) && Math.abs(p.f - 1) < 1e-12) return n; } catch (e) { /* keep */ }
+    const build = (m) => { const pos = [], neg = []; for (const [k, e] of m) (e > 0 ? pos : neg).push(k + fmtE(e)); return (pos.join('*') || '1') + (neg.length ? '/' + (neg.length > 1 ? '(' + neg.join('*') + ')' : neg[0]) : ''); };
+    const syms = [...exps.keys()], info = syms.map((k) => lookup(k));
+    if (info.some((x) => !x)) return build(exps);
+    let total; try { total = parse(syms.map((k) => k + '^(' + exps.get(k) + ')').join('*')).d; } catch (e) { return build(exps); }
+    if (syms.length > 1) {
+      const torque = syms.length === 2 && exps.get('N') === 1 && exps.get('m') === 1;
+      if (!torque) for (const n of NAMED) if (sameDim(U[n].d, total)) return n;
+      // two units of the same kind → SI base units
+      for (let a = 0; a < syms.length; a++) for (let b = a + 1; b < syms.length; b++) if (sameDim(info[a].d, info[b].d)) return siText(total);
+      if (syms.every((k) => ['m', 'kg', 's', 'A', 'K', 'mol', 'cd'].includes(k))) return siText(total);
     }
-    return (pos.join('*') || '1') + (neg.length ? '/' + (neg.length > 1 ? '(' + neg.join('*') + ')' : neg[0]) : '');
+    return build(exps);
   }
 
   const api = { simplifyUnit, unitToGiac, entryTex, unitTo, toGiac, giacUnit, giacNative, fromGiacUnit, siGiac, parse, convert, compatible, dimText, fmt, num, unitTex, alternatives, quantityOf, quantitiesOf, defineUser, checkUser, splitDef, userUnits: () => USER.slice(), QUANTITIES, U, lookup, photonEquivalents, specKind, SPEC, SPEC_INV, SPEC_UNITS, SPEC_LABEL, siText, sameDim };
