@@ -337,7 +337,18 @@
       this.mf.value = '';
       this.mf.focus();
     }
+    /** The entry as it goes into the history: ans replaced by the value it stood for, so the line still reads right later. */
+    ansShown(tex) {
+      const a = this.app.lastAns;
+      const re = /\\operatorname\{ans\}(?!\s*\\left\(|\s*\()|\\mathrm\{ans\}(?!\s*\\left\(|\s*\()|(?<![A-Za-z\\{])ans(?![A-Za-z(}]|\s*\\left\()/g;
+      if (a == null || !re.test(tex)) return tex;
+      let v = GiacFmt.giacToTex(String(a), { digits: 15, editable: true });
+      if (!v || /^\\text\{/.test(v)) return tex;
+      if (!/^\d+(\.\d+)?$/.test(String(a).trim()) && !/^\\mathrm\{[^{}]*\}$|^[A-Za-z]$/.test(v)) v = '\\left(' + v + '\\right)';
+      return tex.replace(re, () => v);
+    }
     async runTex(tex, approx) {
+      const shown = this.ansShown(tex);
       this.setBusy(true);
       const r = /\\pm/.test(tex) ? await evaluateUnc(this.app, tex) : await evaluate(this.app, tex, { approx });
       if (r.ok && !r.unc && !r.done && !r.printed && r.kind === 'expr') {
@@ -352,7 +363,7 @@
       }
       this.setBusy(false);
       if (!r.ok && !r.error) return;
-      const h = { tex, code: r.code, out: r.out, outTex: r.tex, error: r.ok ? null : r.error, done: r.done, approx, printed: r.printed, dec: r.dec, unc: r.unc, unit: r.unit || undefined, t: Date.now() };
+      const h = { tex: shown, code: r.code, out: r.out, outTex: r.tex, error: r.ok ? null : r.error, done: r.done, approx, printed: r.printed, dec: r.dec, unc: r.unc, unit: r.unit || undefined, t: Date.now() };
       this.push(h);
     }
     push(h) {
