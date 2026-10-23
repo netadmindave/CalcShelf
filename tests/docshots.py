@@ -33,8 +33,8 @@ async def main():
             return ctx, pg
         # CAS with its keypad
         ctx, pg = await fresh()
-        for t in ['\\int_0^{\\pi}\\sin\\left(x\\right)^2dx', '\\operatorname{solve}\\left(x^2-5x+6=0,x\\right)',
-                  '6.022ᴇ23\\times2']:
+        for t in ['\\int_0^{\\pi}\\sin\\left(x\\right)^2dx',
+                  '6.022ᴇ23\\times2', '1.5ᴇ{-}3\\div4']:
             await cas(pg, t)
         # units typed the way the keypad does it: 9.81 _m/_s² × 2 _kg
         await pg.evaluate("(() => { const p=__app.page; p.mf.value='9.81'; p.mf.focus(); p.mf.position=99; })()")

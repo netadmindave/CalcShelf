@@ -97,7 +97,7 @@ The **≈** key evaluates to a decimal instead of an exact answer. **enter** eva
   - **See what's defined:** use **menu → Actions → Variables**.
 - **ans** recalls the last answer. **Long-press enter** to choose **Entry**, which recalls the last entry for editing, or **≈**.
 - **In the history, ans shows its value.** `ans×2` after 5 is saved as `5×2`.
-- **EE works as on a TI calculator.** It types a small capital **ᴇ**, and the exponent goes on the same line: `6.02ᴇ23`, `1.5ᴇ−3` (use **(−)** for the minus). The number and its exponent count as one number, so `1/2ᴇ3` is 1/2000.
+- **EE works as on a TI calculator.** It types a small capital **ᴇ**, and the exponent goes on the same line: `6.02ᴇ23`, `1.5ᴇ−3` (use **(−)** for the minus). The number and its exponent count as one number, so `1/2ᴇ3` is 1/2000. Answers in scientific notation use the same ᴇ (`1.2044ᴇ24`).
 
 ### Results and history
 

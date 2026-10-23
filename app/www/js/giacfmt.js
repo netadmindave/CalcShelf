@@ -8,6 +8,8 @@
   'use strict';
 
   // ---------------------------------------------------------------- tokenizer
+  /** The exponent of a shown answer: the same small capital ᴇ the EE key types (2.5ᴇ24, 1.5ᴇ−3). */
+  const eeTex = (e) => { e = String(e).replace(/^\+/, ''); return 'ᴇ' + (e[0] === '-' ? '{-}' + e.slice(1) : e); };
   function lex(s) {
     const t = []; let i = 0;
     const two = [':=', '==', '!=', '<=', '>=', '->', '&&', '||', '=>'];
@@ -156,14 +158,14 @@
       const ms = g(String(m).includes('e') ? m.toFixed(Math.max(0, digits - 1)) : String(m));
       if (e === 0) return ms;
       if (opts.editable) return ms + 'ᴇ' + e;   // TI-style, read back by tex2giac
-      return ms + '\\mathrm{E}{' + e + '}';
+      return ms + eeTex(e);
     }
     if (opts.sci || (ax !== 0 && (ax >= 1e12 || ax < 1e-4))) {
       s = x.toExponential(Math.max(0, digits - 1));
       let [m, e] = s.split('e');
       if (m.includes('.')) m = m.replace(/0+$/, '').replace(/\.$/, '.');
       if (opts.editable) return m + 'ᴇ' + (e[0] === '+' ? e.slice(1) : e);
-      return m + '\\mathrm{E}{' + (e[0] === '+' ? e.slice(1) : e) + '}';
+      return m + eeTex(e);
     }
     s = x.toPrecision(digits);
     if (s.includes('e')) return fmtNum(x.toExponential(), { ...opts, sci: true });

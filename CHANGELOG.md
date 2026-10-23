@@ -8,7 +8,7 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 - **sin(x)² is read as (sin x)²**, as on a TI calculator. Before, it was read as sin(x²).
 - **Units in results are tidied when Giac writes them with /** too, so 9.81 m/s² × 2 kg gives 19.62 N. Units typed in the entry line show upright in the history (9.81 m, not _m).
 - **Guide pictures** retaken with the current screens.
-- **EE works as on a TI calculator:** it types a small capital ᴇ and the exponent stays on the same line (6.02ᴇ23, 1.5ᴇ−3). A number with ᴇ counts as one number, so 1/2ᴇ3 is 1/2000. Answers you reuse come back in the same form.
+- **EE works as on a TI calculator:** it types a small capital ᴇ and the exponent stays on the same line (6.02ᴇ23, 1.5ᴇ−3). A number with ᴇ counts as one number, so 1/2ᴇ3 is 1/2000. Answers in scientific notation show the same ᴇ (1.2044ᴇ24), and come back in that form when you reuse them.
 - **Security review and hardening:**
   - **Content security policy:** every page may only load the app's own files. Nothing can be fetched from, or sent to, another site, and injected scripts don't run.
   - **Links:** the link handler opens only web pages (http and https) in the browser, and blocks any other kind of link.
