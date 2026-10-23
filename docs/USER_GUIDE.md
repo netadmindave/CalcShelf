@@ -55,7 +55,7 @@ You type into the entry line at the bottom. Results stack up above it, the newes
 
 ### Keypad
 
-The toolbar above the keypad has these keys (**esc** and **tab** are the larger ones):
+The toolbar above the keypad has full-size keys (**esc** and **tab** are the wider ones):
 
 | Key | Does |
 |---|---|
@@ -65,8 +65,9 @@ The toolbar above the keypad has these keys (**esc** and **tab** are the larger 
 | **▤** | Opens the catalog. |
 | **const** | Opens Constants & formulas. |
 | **‹ ›** | Moves the cursor. |
+| **⌫** | Deletes. Hold it to keep deleting. |
 
-The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²**, **x⁻¹** and **⌫** on the right. Hold **⌫** to keep deleting. The other keypad pages have a ⌫ key too.
+The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²** (long-press for x³), **x⁻¹** (long-press for 1/x) and **|x|** (long-press for n!).
 
 **Keypad pages.** The strip below the keypad switches between them:
 

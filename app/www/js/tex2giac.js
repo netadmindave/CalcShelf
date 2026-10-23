@@ -119,7 +119,7 @@
       }
     }
 
-    atom() {
+    atom(noPost) {
       this.skipSpace();
       const k = this.next();
       if (!k) return null;
@@ -159,7 +159,7 @@
       } else n = this.command(k.v);
       if (!n) return null;
       if (n.k === 'op') return n;
-      return this.postfix(n);
+      return noPost ? n : this.postfix(n);
     }
 
     command(c) {
@@ -278,7 +278,8 @@
       this.skipSpace();
       let argNode;
       const k = this.peek();
-      if (this.isCmd(k, 'left') || this.isCh(k, '(')) argNode = this.atom();
+      // \sin(x)^2 is (sin x)², so a bracketed argument stops at its bracket and the power goes on the call
+      if (this.isCmd(k, 'left') || this.isCh(k, '(')) argNode = this.atom(true);
       else argNode = this.atom();     // \sin x
       if (!argNode) throw new TexError('Missing argument for ' + c);
       const args = argNode.k === 'grp' && argNode.o === '(' ? splitCommas(argNode.s) : [[argNode]];

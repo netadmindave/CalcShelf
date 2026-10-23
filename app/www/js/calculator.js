@@ -209,7 +209,7 @@
     rowFor(h, pinned) {
       const S = this.app.settings;
       const r = el('div', { class: 'row' + (h.pinned ? ' pinned' : '') });
-      const a = el('div', { class: 'in' }); renderTex(a, h.tex || '');
+      const a = el('div', { class: 'in' }); renderTex(a, GiacFmt.showUnitTex(h.tex || ''));
       const b = el('div', { class: 'out' + (h.error ? ' err' : '') + (h.done ? ' done' : '') });
       if (h.error) b.textContent = h.error;
       else if (h.table) b.append(this.table(h.table));

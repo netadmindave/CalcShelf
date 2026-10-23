@@ -539,10 +539,27 @@
    *  N·m is left alone, since it is usually a torque. */
   const NAMED = ['W', 'J', 'N', 'Pa', 'V', 'Ω', 'C', 'F', 'H', 'T', 'Wb', 'S'];
   function simplifyUnit(u) {
-    const str = String(u).replace(/^\((.*)\)$/, '$1');
-    if (/[\/()]/.test(str)) return u;
     const exps = new Map();
-    for (const part of str.split('*')) { const m = part.trim().match(/^([^\^]+)(?:\^\(?(-?[\d.]+)\)?)?$/); if (!m) return u; exps.set(m[1], (exps.get(m[1]) || 0) + (m[2] ? +m[2] : 1)); }
+    // factors joined by * and /, with (…) groups: kg*m/s^2, W/(K*m), J*s^-1
+    const add = (t, sg) => {
+      t = t.trim();
+      if (/^\(.*\)$/.test(t)) return walk(t.slice(1, -1), sg);
+      const m = t.match(/^([^\^()*\/]+)(?:\^\(?(-?[\d.]+)\)?)?$/); if (!m) return false;
+      exps.set(m[1], (exps.get(m[1]) || 0) + sg * (m[2] ? +m[2] : 1)); return true;
+    };
+    const walk = (str, sg) => {
+      let depth = 0, start = 0, cur = sg;
+      for (let i = 0; i <= str.length; i++) {
+        const c = str[i];
+        if (c === '(') depth++; else if (c === ')') depth--;
+        else if (i === str.length || (depth === 0 && (c === '*' || c === '/'))) {
+          if (!add(str.slice(start, i), cur)) return false;
+          cur = c === '/' ? -sg : sg; start = i + 1;
+        }
+      }
+      return depth === 0;
+    };
+    if (!walk(String(u), 1)) return u;
     for (const [k, e] of exps) if (Math.abs(e) < 1e-9) exps.delete(k);
     if (!exps.size) return '';
     const fmtE = (e) => (Math.abs(e) === 1 ? '' : '^' + (+Math.abs(e).toFixed(6)));

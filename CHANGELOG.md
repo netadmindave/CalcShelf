@@ -4,7 +4,10 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 
 ## 2.7.5
 
-- **CAS keypad:** larger **esc** and **tab** keys, and a new top row on the 123 page with **√**, **π**, **x²**, **x⁻¹** and **⌫** (delete, on the right; hold it to keep deleting). Delete moved there from the toolbar, and the f(x), ∫Σ and abc pages have a ⌫ key too.
+- **CAS keypad:** the toolbar keys are full size, with wider **esc** and **tab**, and **⌫** stays on the toolbar (hold it to keep deleting). A new top row on the 123 page has **√**, **π**, **x²**, **x⁻¹** and **|x|**.
+- **sin(x)² is read as (sin x)²**, as on a TI calculator. Before, it was read as sin(x²).
+- **Units in results are tidied when Giac writes them with /** too, so 9.81 m/s² × 2 kg gives 19.62 N. Units typed in the entry line show upright in the history (9.81 m, not _m).
+- **Guide pictures** retaken with the current screens.
 - **EE works as on a TI calculator:** it types a small capital ᴇ and the exponent stays on the same line (6.02ᴇ23, 1.5ᴇ−3). A number with ᴇ counts as one number, so 1/2ᴇ3 is 1/2000. Answers you reuse come back in the same form.
 - **Security review and hardening:**
   - **Content security policy:** every page may only load the app's own files. Nothing can be fetched from, or sent to, another site, and injected scripts don't run.

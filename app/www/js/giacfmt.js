@@ -455,6 +455,12 @@
       .replace(/\\(?:text|textrm)\{\\_([^{}\\]*)\}/g, (m, n) => unitEntryTex(n));
   }
 
-  const api = { parse, lex, giacToTex, tex, compile, fmtNum, idTex, textTex, unitEntryTex, fixUnitTex };
+  /** History display of an entry: units typed as _m or \mathrm{\_km} show upright, as m and km, a thin space after a number. */
+  function showUnitTex(t) {
+    return fixUnitTex(t)
+      .replace(/\\mathrm\{\\_([^{}\\]*)\}/g, '\\_$1')
+      .replace(/(\d\s*)?\\_([A-Za-zµΩÅ°]+)/g, (m, d, n) => (d ? d.trim() + '\\,' : '') + '\\mathrm{' + n + '}');
+  }
+  const api = { parse, lex, giacToTex, tex, compile, fmtNum, idTex, textTex, unitEntryTex, fixUnitTex, showUnitTex };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.GiacFmt = api;
 })(typeof self !== 'undefined' ? self : this);

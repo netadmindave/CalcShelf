@@ -443,7 +443,13 @@
     bindStrip() {
       document.querySelectorAll('#strip [data-a]').forEach((b) => {
         b.addEventListener('mousedown', (e) => e.preventDefault());
-        b.onclick = () => { if (this.settings.haptic) haptic(); this.action(b.dataset.a); };
+        b.onclick = () => { if (b._held) { b._held = false; return; } if (this.settings.haptic) haptic(); this.action(b.dataset.a); };
+        if (b.dataset.a !== 'del') return;
+        // hold ⌫ to keep deleting
+        let t = null, rep = null;
+        const stop = () => { clearTimeout(t); clearInterval(rep); t = rep = null; };
+        b.addEventListener('pointerdown', () => { stop(); t = setTimeout(() => { b._held = true; this.action('del'); rep = setInterval(() => this.action('del'), 70); }, 420); });
+        for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) b.addEventListener(ev, stop);
       });
     },
     action(a) {
