@@ -5,6 +5,8 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 ## 2.7.5
 
 - **CAS keypad:** the toolbar keys are full size, with wider **esc** and **tab**, and **⌫** stays on the toolbar (hold it to keep deleting). A new top row on the 123 page has **√**, **π**, **x²**, **x⁻¹** and **|x|**.
+- **The ) key closes a ( whose ) you deleted**, instead of wrapping the whole entry in another pair. With a plain ( open before the cursor, it just adds the ). Only when no ( is open does it wrap what is before the cursor.
+- **Uncertainties written without a leading zero work** ((1550 ± .02) × (1550 ± 1)). Before, they gave the "write each uncertain value…" error.
 - **sin(x)² is read as (sin x)²**, as on a TI calculator. Before, it was read as sin(x²).
 - **Units in results are tidied when Giac writes them with /** too, so 9.81 m/s² × 2 kg gives 19.62 N. Units typed in the entry line show upright in the history (9.81 m, not _m).
 - **Guide pictures** retaken with the current screens.

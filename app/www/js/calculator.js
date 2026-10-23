@@ -119,7 +119,7 @@
   /* ---------------------------------------------------------------- uncertainty propagation
      value ± σ terms are treated as independent inputs; σ_f² = Σ (∂f/∂xᵢ · σᵢ)² (first order, GUM),
      with the partial derivatives taken numerically by the CAS so every function and angle mode works. */
-  const NUMRE = '(-?\\d+(?:\\.\\d*)?(?:\\\\times\\s*10\\^\\{-?\\d+\\}|\\\\times\\s*10\\^-?\\d|e-?\\d+)?)';
+  const NUMRE = '(-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:\\\\times\\s*10\\^\\{-?\\d+\\}|\\\\times\\s*10\\^-?\\d|e-?\\d+)?)';
   const toNum = (t) => Number(String(t).replace(/\\times\s*10\^\{?(-?\d+)\}?/, 'e$1'));
   function fmtUnc(v, s) {
     if (!(s > 0)) return String(+v.toPrecision(10)) + '\\pm0';

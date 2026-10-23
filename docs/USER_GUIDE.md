@@ -88,7 +88,7 @@ The **≈** key evaluates to a decimal instead of an exact answer. **enter** eva
 - **Division is always a fraction.** ÷ (and typing `/`) makes a stacked fraction from the term before the cursor.
 - **Parentheses come in pairs.**
   - **(** inserts **( )** with the cursor inside.
-  - **)** steps out of the enclosing pair.
+  - **)** steps out of the enclosing pair. If you deleted a **)**, pressing **)** puts it back on the same **(**.
   - With nothing open, **)** wraps everything before it: `2+3)` becomes `(2+3)`.
 - **A new line starts from ans.** On an empty line, pressing + − × ÷ ^ x² ! % or sto▸ inserts **ans** first, as on a TI calculator. (−) still starts a negative number. Turn this off with **Settings → New line starts from ans**.
 - **Variables and functions:**

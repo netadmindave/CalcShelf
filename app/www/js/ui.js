@@ -125,10 +125,18 @@
       for (let k = 0; k < 16; k++) {
         const p = mf.position; mf.executeCommand('moveAfterParent');
         if (mf.position === p) break;
-        if (/\\right\)$/.test(mf.getValue(0, mf.position, 'latex'))) return;      // stepped out of a ( … )
+        const before = mf.getValue(0, mf.position, 'latex');
+        if (/\\right\)$/.test(before)) return;                                    // stepped out of a ( … )
+        if (/\\left\(/.test(before) && /\\right\.$/.test(before)) {                 // a ( whose ) was deleted: close it again
+          const at = mf.position, after = mf.getValue(at, mf.lastOffset, 'latex');
+          mf.value = before.slice(0, -7) + '\\right)' + after; mf.position = at; return;
+        }
       }
       mf.position = pos0;
       if (Edit.empty(mf)) { Edit.open(mf); return; }
+      // a plain ( still open before the cursor (typed or pasted): just add its )
+      const bare = mf.getValue(0, pos0, 'latex').replace(/\\(left|right|big|Big|bigg|Bigg)[lr]?\s*[()]/g, '');
+      if ((bare.match(/\(/g) || []).length > (bare.match(/\)/g) || []).length) { Edit.put(mf, ')', 'after'); return; }
       mf.executeCommand('extendToGroupStart');                                      // no ( open: wrap from the start
       Edit.put(mf, '\\left(#0\\right)', 'after');
     },
