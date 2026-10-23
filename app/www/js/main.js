@@ -75,9 +75,9 @@
       return new Promise((res) => {
         const id = Math.random().toString(36).slice(2); const t = setTimeout(done, 2500);
         function done() { clearTimeout(t); root.removeEventListener('message', on); res(); }
-        const on = (e) => { if (e.data && e.data.type === 'emu-saved' && e.data.id === id) done(); };
+        const on = (e) => { if (e.origin === location.origin && e.data && e.data.type === 'emu-saved' && e.data.id === id) done(); };
         root.addEventListener('message', on);
-        try { this.frame.contentWindow.postMessage({ type: 'emu-save', id }, '*'); } catch (e) { done(); }
+        try { this.frame.contentWindow.postMessage({ type: 'emu-save', id }, location.origin); } catch (e) { done(); }
       });
     }
     async setModel(fam, model) {
@@ -91,14 +91,14 @@
       if (this.t36) return;
       const bytes = new Uint8Array(await file.arrayBuffer());
       await this.ready;
-      this.frame.contentWindow.postMessage({ type: 'emu-install', name: file.name, bytes }, '*');
+      this.frame.contentWindow.postMessage({ type: 'emu-install', name: file.name, bytes }, location.origin);
     }
     serialize() { const t = this.t36 ? this.t36.serialize() : this.t36State; return t ? { fam: this.fam, model: this.model, t36: t } : { fam: this.fam, model: this.model }; }
     /** -1 follow the phone, 1 portrait, 6 landscape */
     get orientation() { return this.fam === 'ti36' ? 1 : this.fam === 'ti68k' && this.model !== '89' ? 6 : -1; }
   }
   root.addEventListener('message', (e) => {
-    const d = e.data, app = root.__app; if (!d || !app) return;
+    const d = e.data, app = root.__app; if (!d || !app || e.origin !== location.origin) return;
     const p = app.pages.find((x) => x.frame && x.frame.contentWindow === e.source); if (!p) return;
     if (d.type === 'emu-ready') p._ready && p._ready();
     else if (d.type === 'emu-replace') { app.select(app.pages.indexOf(p)); app.emuChooser(); }
@@ -380,20 +380,22 @@
           if (k.s) b.append(el('span', { class: 'ks', text: k.s.l }));
           if (k.d) b.append(el('span', { class: 'kd', text: k.d.l }));
           b.setAttribute('aria-label', (k.l.replace(/^\$/, '').replace(/\\[a-z]+/g, '').replace(/[{}^_]/g, '') || k.l) + (k.s ? ', 2nd ' + k.s.l : '') + (k.d ? ', diamond ' + k.d.l : ''));
-          let y0 = 0, lp = null, done = false;
+          let y0 = 0, lp = null, done = false, rep = null;
           const fire = (spec) => { done = true; b.classList.remove('pressed'); this.keyPress(spec, b); };
           b.addEventListener('pointerdown', (e) => {
             b.classList.add('pressed'); if (this.settings.haptic) haptic();
             y0 = e.clientY; done = false; try { b.setPointerCapture(e.pointerId); } catch (x) { /* ignore */ }
             if (k.s || k.d) lp = setTimeout(() => { lp = null; done = true; b.classList.remove('pressed'); this.keyPop(b, k); }, 480);
+            if (k.rep) lp = setTimeout(() => { lp = null; done = true; this.keyPress(k, b); rep = setInterval(() => this.keyPress(k, b), 70); }, 420);
           });
           b.addEventListener('pointermove', (e) => { if (lp && Math.abs(e.clientY - y0) > 14) { clearTimeout(lp); lp = null; } });
           b.addEventListener('pointerup', (e) => {
             if (lp) { clearTimeout(lp); lp = null; }
+            if (rep) { clearInterval(rep); rep = null; b.classList.remove('pressed'); }
             if (done) return;
             fire(k);
           });
-          b.addEventListener('pointercancel', () => { if (lp) clearTimeout(lp); lp = null; b.classList.remove('pressed'); });
+          b.addEventListener('pointercancel', () => { if (lp) clearTimeout(lp); lp = null; if (rep) clearInterval(rep); rep = null; b.classList.remove('pressed'); });
           b.addEventListener('click', (e) => { e.preventDefault(); if (e.detail === 0) this.keyPress(k, b); });   // keyboard activation only
           b.addEventListener('mousedown', (e) => e.preventDefault());
           b.addEventListener('contextmenu', (e) => e.preventDefault());

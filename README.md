@@ -23,7 +23,7 @@ It is free software under the GNU GPL v3. It stands on decades of work by the ca
 
 | | What it is | Firmware |
 |---|---|---|
-| **CAS** | A symbolic and numeric calculator on Giac. It has a 2D editor, a keypad laid out like the TI-89's, uncertainty propagation, results with units, history tools, and graphs, lists, notes and TI-Basic programs. | None needed |
+| **CAS** | A symbolic and numeric calculator on Giac. It has a 2D editor, a keypad laid out like the TI-89's (with √, π and TI-style ᴇ entry), uncertainty propagation, results with units, history tools, and graphs, lists, notes and TI-Basic programs. | None needed |
 | **TI-36X Pro style** | A scientific calculator with the current TI-36X Pro's keypad and menus, running on the same CAS. It has a night display, and is listed with the emulated calculators. | None needed (this is a recreation, not an emulation) |
 | **TI-Nspire CX II CAS** | The real TI-Nspire OS on the Firebird emulator. | Your own: system files dumped from your calculator, plus TI's OS file |
 | **TI-89 Titanium, TI-92, TI-92 Plus, Voyage 200** | TI AMS on the TiEmu core. The TI-92 models use Graph89's layout and always run in landscape. | Your own: a TI OS upgrade file (`.89u`, `.9xu`, `.v2u`) or a ROM dump |
@@ -42,7 +42,7 @@ There is one document with named tabs. **Settings → Emulated calculators → S
 
 You need Android 7.0 or newer, with a current Android System WebView. The TI-Nspire needs WebAssembly exception handling, which recent WebView versions have.
 
-The app is about 6 MB. It asks for no permissions. Everything stays on the phone, and calculator files you load are kept in the app's private storage.
+The app is about 6 MB. It asks for no permissions and works offline: a content security policy keeps every page to the app's own files, so nothing is fetched from or sent to other sites. Everything stays on the phone, and calculator files you load are kept in the app's private storage. See [SECURITY.md](SECURITY.md).
 
 ## Start here
 
@@ -50,6 +50,7 @@ The app is about 6 MB. It asks for no permissions. Everything stays on the phone
 - **[Building](docs/BUILDING.md)** explains how to build the APK and every emulator core from source.
 - **[Changelog](CHANGELOG.md)**
 - **[Credits](CREDITS.md)** lists who made the projects CalcShelf is built on.
+- **[Security](SECURITY.md)** explains what the app can and can't do, and how to report a problem.
 
 ## About firmware
 

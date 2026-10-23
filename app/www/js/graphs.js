@@ -263,7 +263,7 @@
       const y = best.compiled(x);
       this.trace = { f: best, x, y };
       this.info.hidden = false;
-      this.info.innerHTML = '<b style="color:' + this.color(best.color) + '">' + best.name + '</b>&nbsp; x = ' + fmt(x) + '&nbsp;&nbsp; y = ' + fmt(y);
+      this.info.innerHTML = ''; this.info.append(el('b', { text: best.name, style: { color: this.color(best.color) } }), '\u00a0 x = ' + fmt(x) + '\u00a0\u00a0 y = ' + fmt(y));
       this.draw();
     }
 

@@ -55,6 +55,22 @@
     .end annotation
 
     :try_start_0
+    # keep only the file name: no folders, no "..", so a file can only land in Downloads
+    new-instance v0, Ljava/io/File;
+    invoke-direct {v0, p1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+    invoke-virtual {v0}, Ljava/io/File;->getName()Ljava/lang/String;
+    move-result-object p1
+    invoke-virtual {p1}, Ljava/lang/String;->isEmpty()Z
+    move-result v1
+    if-eqz v1, :cond_named
+    const-string p1, "CalcShelf-file"
+    :cond_named
+    const-string v1, ".."
+    invoke-virtual {p1, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v1
+    if-eqz v1, :cond_safe
+    const-string p1, "CalcShelf-file"
+    :cond_safe
     const/4 v0, 0x0
     invoke-static {p2, v0}, Landroid/util/Base64;->decode(Ljava/lang/String;I)[B
     move-result-object v0
@@ -173,6 +189,16 @@
     .end annotation
 
     :try_start_0
+    # web pages only: no intent:, file: or content: links
+    const-string v0, "https://"
+    invoke-virtual {p1, v0}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+    move-result v1
+    if-nez v1, :cond_web
+    const-string v0, "http://"
+    invoke-virtual {p1, v0}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
+    move-result v1
+    if-eqz v1, :catch_0
+    :cond_web
     invoke-static {p1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
     move-result-object v0
     new-instance v1, Landroid/content/Intent;

@@ -2,6 +2,21 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## 2.7.5
+
+- **CAS keypad:** larger **esc** and **tab** keys, and a new top row on the 123 page with **√**, **π**, **x²**, **x⁻¹** and **⌫** (delete, on the right; hold it to keep deleting). Delete moved there from the toolbar, and the f(x), ∫Σ and abc pages have a ⌫ key too.
+- **EE works as on a TI calculator:** it types a small capital ᴇ and the exponent stays on the same line (6.02ᴇ23, 1.5ᴇ−3). A number with ᴇ counts as one number, so 1/2ᴇ3 is 1/2000. Answers you reuse come back in the same form.
+- **Security review and hardening:**
+  - **Content security policy:** every page may only load the app's own files. Nothing can be fetched from, or sent to, another site, and injected scripts don't run.
+  - **Links:** the link handler opens only web pages (http and https) in the browser, and blocks any other kind of link.
+  - **Saved files:** names are reduced to a plain file name, so a file can only land in Downloads.
+  - **Emulator frames:** messages between the app and the emulator frames are accepted only from the app itself.
+  - **Formulas from files:** LaTeX from backups or files can no longer use MathLive's HTML styling commands.
+  - **Graphs:** the trace read-out shows function names as text, not as HTML.
+  - **Checked and found clean:** MathLive 0.111.1 has the fixes for CVE-2025-29049 and CVE-2026-54705; no keys or passwords are in the repository history; the bundled test ROMs contain only CalcShelf's own test code.
+- New **SECURITY.md**: what the app can and can't do, and how to report a problem.
+- **Fixed: the version number.** Android showed every build as version 2.0, because the manifest's fixed values overrode the build's. It now shows 2.7.5.
+
 ## 2.7.4
 
 - **The TI-36X Pro is now one of the emulated calculators**, under + → Emulated calculator → *TI scientific*, instead of its own kind of tab. A TI-36X Pro tab you already have becomes an emulator tab with its memory and night setting; with one emulator tab, it keeps the TI-36X Pro's memory when you switch that tab to another calculator.

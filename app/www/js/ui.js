@@ -68,6 +68,8 @@
 
   /* ---------------- math rendering ---------------- */
   function texHTML(tex) {
+    // LaTeX can come from a backup or a file someone else made: drop the commands that style or tag HTML
+    tex = String(tex).replace(/\\(?:htmlData|htmlStyle|style|class|cssId|htmlId)\s*\{[^{}]*\}/g, '').replace(/\\(?:href|url)\s*\{[^{}]*\}/g, '');
     try { return MathLive.convertLatexToMarkup(tex, { defaultMode: 'math' }); } catch (e) { return el('span', { text: tex }).outerHTML; }
   }
   function renderTex(node, tex) { node.innerHTML = texHTML(tex); return node; }

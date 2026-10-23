@@ -395,10 +395,10 @@
     if (!EMBED) return;
     window.addEventListener('message', async (e) => {
       const d = e.data; if (!d || e.source !== window.parent) return;
-      if (d.type === 'emu-save') { try { await save(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, '*'); }
+      if (d.type === 'emu-save') { try { await save(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install') loadObjects([new File([d.bytes], d.name)]);
     });
-    window.parent.postMessage({ type: 'emu-ready' }, '*');
+    window.parent.postMessage({ type: 'emu-ready' }, location.origin);
   }
 
   async function main() {

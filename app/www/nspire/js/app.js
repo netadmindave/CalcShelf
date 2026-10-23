@@ -394,7 +394,7 @@
   let openSheet = null;
   function showSheet(id) { closeSheets(); $('#scrim').hidden = false; $(id).hidden = false; openSheet = id; if (id === '#sheet-type') setTimeout(() => $('#type-input').focus(), 60); }
   function closeSheets() { document.querySelectorAll('.sheet').forEach((s) => { s.hidden = true; }); $('#scrim').hidden = true; openSheet = null; }
-  const askReplace = () => { try { window.parent.postMessage({ type: 'emu-replace' }, '*'); } catch (e) {} };
+  const askReplace = () => { try { window.parent.postMessage({ type: 'emu-replace' }, location.origin); } catch (e) {} };
   function bindMenu() {
     $('#btn-menu').onclick = () => showSheet('#sheet-menu');
     $('#btn-type').onclick = () => showSheet('#sheet-type');
@@ -435,7 +435,7 @@
   if (EMBED) {
     window.addEventListener('message', async (e) => {
       const d = e.data; if (!d || e.source !== window.parent) return;
-      if (d.type === 'emu-save') { try { await saveState(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, '*'); }
+      if (d.type === 'emu-save') { try { await saveState(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install') { await addFiles([new File([d.bytes], d.name)]); if (!installed && NEED.every(([k]) => k === 'diags' || fw[k])) toast('All files loaded. Press Install the OS.'); }
     });
   }
@@ -447,7 +447,7 @@
     syncMenu();
     for (const [k] of NEED) { const v = await DB.get('fw:' + k); if (v) fw[k] = v; }
     renderFiles();
-    if (EMBED) window.parent.postMessage({ type: 'emu-ready' }, '*');
+    if (EMBED) window.parent.postMessage({ type: 'emu-ready' }, location.origin);
     if (fw.boot1 && await DB.get('fl:ok')) await resume();
     else $('#setup').hidden = false;
     window.__ns = { core: () => core, mode: () => mode, tick: () => tick, typeText, press, release, arrow, saveState, classify };

@@ -624,10 +624,23 @@
     return null;
   }
 
+  /** TI-style EE: 6.02ᴇ23 or 1.5ᴇ−3 is one number, (6.02×10^23); a ᴇ with no digits before it is 10^n. */
+  const EE = '(?:\\\\mathrm\\{ᴇ\\}|\\\\text\\{ᴇ\\}|ᴇ)';
+  const EXP = '\\s*(?:\\\\left\\(\\s*)?\\{?([-−+]|\\\\minus\\s*)?\\}?\\s*(\\d+)(?:\\s*\\\\right\\))?';
+  function eeToPow(tex) {
+    if (!/ᴇ/.test(tex)) return tex;
+    const sign = (sg) => (sg && sg.trim() !== '+' ? '-' : '');
+    tex = tex.replace(new RegExp('(\\d+\\.?\\d*|\\.\\d+)\\s*' + EE + EXP, 'g'), (m, a, sg, e) => '\\left(' + a + '\\times10^{' + sign(sg) + e + '}\\right)');
+    tex = tex.replace(new RegExp(EE + EXP, 'g'), (m, sg, e) => '10^{' + sign(sg) + e + '}');
+    if (/ᴇ/.test(tex)) throw new TexError('EE needs an exponent after it, for example 6.02ᴇ23');
+    return tex;
+  }
+
   /** Translate LaTeX from the math editor to a Giac command string. */
   function tex2giac(tex, ctx = {}) {
     // MathLive re-serialises \operatorname{nCr} as \operatorname{\mathrm{nCr}}
     tex = String(tex).replace(/\\operatorname\{\\(?:mathrm|text|textrm)\{([^{}]*)\}\}/g, '\\operatorname{$1}');
+    tex = eeToPow(tex);
     const p = new P(tokenize(tex), ctx);
     const seq = p.seq();
     if (p.i < p.t.length) throw new TexError('Unbalanced braces');
@@ -638,6 +651,6 @@
     return s;
   }
 
-  const api = { tex2giac, tokenize, TexError, ALIASES };
+  const api = { tex2giac, tokenize, TexError, ALIASES, eeToPow };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Tex2Giac = api;
 })(typeof self !== 'undefined' ? self : this);

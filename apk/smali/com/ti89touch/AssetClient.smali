@@ -152,6 +152,18 @@
     return v1
 
     :cond_ext
+    # only web pages go to the browser; any other scheme is simply blocked
+    invoke-virtual {v0}, Landroid/net/Uri;->getScheme()Ljava/lang/String;
+    move-result-object v1
+    const-string v2, "https"
+    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v2
+    if-nez v2, :cond_web
+    const-string v2, "http"
+    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+    move-result v2
+    if-eqz v2, :catch_0
+    :cond_web
     :try_start_0
     new-instance v1, Landroid/content/Intent;
     const-string v2, "android.intent.action.VIEW"

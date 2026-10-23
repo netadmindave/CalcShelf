@@ -380,15 +380,15 @@
 
   /* ---- embedded in CalcShelf: the main app chooses the model and hands over OS files ---- */
   const EMBED = window.parent !== window;
-  const askReplace = () => { try { window.parent.postMessage({ type: 'emu-replace' }, '*'); } catch (e) {} };
+  const askReplace = () => { try { window.parent.postMessage({ type: 'emu-replace' }, location.origin); } catch (e) {} };
   function emuBridge(saveFn, installFn) {
     if (!EMBED) return;
     window.addEventListener('message', async (e) => {
       const d = e.data; if (!d || e.source !== window.parent) return;
-      if (d.type === 'emu-save') { try { await saveFn(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, '*'); }
+      if (d.type === 'emu-save') { try { await saveFn(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install' && installFn) installFn(new File([d.bytes], d.name));
     });
-    window.parent.postMessage({ type: 'emu-ready' }, '*');
+    window.parent.postMessage({ type: 'emu-ready' }, location.origin);
   }
 
   /* ------------------------------------------------------------------ firmware & lifecycle */
@@ -421,7 +421,7 @@
     document.body.dataset.themeModel = model.theme;
     document.title = model.name;
     buildPad(); setMode(null);
-    try { if (window.parent !== window) window.parent.postMessage({ type: 'classic-model', model: model.id }, '*'); } catch (e) {}
+    try { if (window.parent !== window) window.parent.postMessage({ type: 'classic-model', model: model.id }, location.origin); } catch (e) {}
     const rom = await DB.get('rom:' + model.id);
     if (rom) { $('#setup').hidden = true; boot(rom, await DB.get('state:' + model.id)); }
     else { setupText(); $('#setup').hidden = false; }

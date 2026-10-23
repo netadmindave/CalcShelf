@@ -13,6 +13,10 @@
   const PAGES = [
     /* TI-89 layout: tap = primary, long-press = choose the 2nd legend s (blue) or ◆ legend d (green) */
     { id: 'num', label: '123', cols: 5, keys: [
+      // 2.7.5: a row for √, π and delete (delete moved here from the strip)
+      // EE types a TI-style small capital ᴇ: 6.02ᴇ23 stays on one line and is read as one number
+      K('√', '\\sqrt{#0}', 'fn', S('ⁿ√', '\\sqrt[#?]{#0}')), K('π', '\\pi ', 'fn', S('e', '\\exponentialE ')), K('x²', '^2', 'fn', S('x³', '^3')), K('x⁻¹', '^{-1}', 'fn', S('1/x', '\\frac{1}{#0}')),
+      { l: '⌫', c: 'deleteBackward', t: 'fn del', rep: true },   // hold to keep deleting
       K('x', 'x', 'var', S('ln', '\\ln\\left(#0\\right)'), S('eˣ', '\\exponentialE^{#?}')), K('y', 'y', 'var', S('sin', '\\sin\\left(#0\\right)'), S('sin⁻¹', '\\sin^{-1}\\left(#0\\right)')),
       K('z', 'z', 'var', S('cos', '\\cos\\left(#0\\right)'), S('cos⁻¹', '\\cos^{-1}\\left(#0\\right)')), K('t', 't', 'var', S('tan', '\\tan\\left(#0\\right)'), S('tan⁻¹', '\\tan^{-1}\\left(#0\\right)')),
       { ...K('^', '^{#?}', 'op', S('π', '\\pi '), S('θ', '\\theta ')), aa: 1 },
@@ -20,7 +24,7 @@
       { l: '÷', ty: '/', t: 'op div', aa: 1, s: { l: ']', c: 'moveAfterParent' } },
       K('|', '\\mid ', 'op', S('°', '\\degree '), S('≥', '\\ge ')), K('7', '7', 'num', S('∫', '\\int_{#?}^{#?}#0\\,\\mathrm{d}#?')), K('8', '8', 'num', S('d', '\\frac{\\mathrm{d}}{\\mathrm{d}#?}\\left(#0\\right)')), K('9', '9', 'num', S(';', ';')),
       { ...K('×', '\\times ', 'op', S('√', '\\sqrt{#0}'), S('ⁿ√', '\\sqrt[#?]{#0}')), aa: 1 },
-      K('EE', '\\times10^{#?}', 'fn', S('∠', '\\angle ')), K('4', '4', 'num', S(':=', '\\coloneq ')), K('5', '5', 'num', A('Math', 'menu')), K('6', '6', 'num', A('Mem', 'clearAZ', 'Clear a–z')),
+      K('EE', 'ᴇ', 'fn', S('∠', '\\angle ')), K('4', '4', 'num', S(':=', '\\coloneq ')), K('5', '5', 'num', A('Math', 'menu')), K('6', '6', 'num', A('Mem', 'clearAZ', 'Clear a–z')),
       { ...K('−', '-', 'op', A('Var-Link', 'vars')), aa: 1 },
       { ...K('sto▸', '\\to ', 'fn', A('Rcl', 'recallDef')), aa: 1 }, K('1', '1', 'num', S('"', '\\text{"#?"}')), K('2', '2', 'num', { l: 'x²', i: '^2', aa: 1 }), K('3', '3', 'num', A('Units', 'units')),
       { ...K('+', '+', 'op', A('Char', 'abcpage')), aa: 1 },
@@ -31,7 +35,7 @@
       T('sin', '\\sin\\left(#0\\right)', 'fn'), T('cos', '\\cos\\left(#0\\right)', 'fn'), T('tan', '\\tan\\left(#0\\right)', 'fn'), T('ln', '\\ln\\left(#0\\right)', 'fn'), T('log', '\\log\\left(#0\\right)', 'fn'), T('$\\log_{\\square}', '\\log_{#?}\\left(#0\\right)', 'tpl'),
       T('sin⁻¹', '\\sin^{-1}\\left(#0\\right)', 'fn'), T('cos⁻¹', '\\cos^{-1}\\left(#0\\right)', 'fn'), T('tan⁻¹', '\\tan^{-1}\\left(#0\\right)', 'fn'), T('$\\mathrm{e}^{\\square}', '\\exponentialE^{#?}', 'tpl'), T('$10^{\\square}', '10^{#?}', 'tpl'), T('$\\sqrt[\\square]{\\square}', '\\sqrt[#?]{#0}', 'tpl'),
       T('sinh', '\\sinh\\left(#0\\right)', 'fn'), T('cosh', '\\cosh\\left(#0\\right)', 'fn'), T('tanh', '\\tanh\\left(#0\\right)', 'fn'), T('$\\left|\\square\\right|', '\\left|#0\\right|', 'tpl'), { ...T('n!', '!', 'fn'), aa: 1 }, { ...T('$\\square^2', '^2', 'tpl'), aa: 1 },
-      T('i', '\\imaginaryI ', 'fn'), T('∞', '\\infty ', 'fn'), T('θ', '\\theta ', 'var'), T('±', '\\pm ', 'op'), T('z', 'z', 'var'), T('n', 'n', 'var'),
+      T('i', '\\imaginaryI ', 'fn'), T('∞', '\\infty ', 'fn'), T('θ', '\\theta ', 'var'), T('±', '\\pm ', 'op'), T('z', 'z', 'var'), { l: '⌫', c: 'deleteBackward', t: 'fn del', rep: true },
       T('→', '\\to ', 'op'), T(':=', '\\coloneq ', 'op'), T('|', '\\mid ', 'op'), T('<', '<', 'op'), T('≤', '\\le ', 'op'), T('≠', '\\ne ', 'op'),
     ] },
     { id: 'calc', label: '∫Σ', cols: 6, keys: [
@@ -41,11 +45,11 @@
       T('$\\begin{bmatrix}\\square&\\square\\\\\\square&\\square\\end{bmatrix}', '\\begin{pmatrix}#? & #?\\\\ #? & #?\\end{pmatrix}', 'tpl'), T('$\\begin{bmatrix}\\cdot&\\cdot&\\cdot\\\\\\cdot&\\cdot&\\cdot\\\\\\cdot&\\cdot&\\cdot\\end{bmatrix}', '\\begin{pmatrix}#? & #? & #?\\\\ #? & #? & #?\\\\ #? & #? & #?\\end{pmatrix}', 'tpl'),
       { l: '+row', c: 'addRowAfter', t: 'fn' }, { l: '+col', c: 'addColumnAfter', t: 'fn' }, T('$\\lbrace\\square\\rbrace', '\\lbrace #0\\rbrace', 'tpl'), T('$\\begin{cases}\\square\\\\\\square\\end{cases}', '\\begin{cases}#? & #?\\\\ #? & #?\\end{cases}', 'tpl'),
       T('deSolve', OP('deSolve', 3), 'cmd'), T('taylor', OP('taylor', 3), 'cmd'), T('cSolve', OP('cSolve', 2), 'cmd'), T('det', OP('det'), 'cmd'), { ...T('$\\square^{-1}', '^{-1}', 'tpl'), aa: 1 }, { ...T('$\\square^{T}', '^{T}', 'tpl'), aa: 1 },
-      T('$\\square_{\\square}', '_{#?}', 'tpl'), T("y'", "'", 'fn'), T('Define', '\\operatorname{Define}#?\\left(x\\right)=#?', 'cmd'), T('approx', OP('approx'), 'cmd'), T('exact', OP('exact'), 'cmd'), T('"…"', '\\text{"#?"}', 'fn'),
+      T('$\\square_{\\square}', '_{#?}', 'tpl'), T("y'", "'", 'fn'), T('Define', '\\operatorname{Define}#?\\left(x\\right)=#?', 'cmd'), T('approx', OP('approx'), 'cmd'), T('exact', OP('exact'), 'cmd'), { l: '⌫', c: 'deleteBackward', t: 'fn del', rep: true },
     ] },
     { id: 'abc', label: 'abc', cols: 10, keys: 'qwertyuiop'.split('').map((c) => ({ l: c, ch: c, t: 'abc' }))
       .concat('asdfghjkl'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: '_', i: '\\_', t: 'abc' }])
-      .concat([{ l: '⇧', a: 'shift', t: 'abc mod' }], 'zxcvbnm'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: "'", i: "'", t: 'abc' }, { l: '"', i: '\\text{"#?"}', t: 'abc' }])
+      .concat([{ l: '⇧', a: 'shift', t: 'abc mod' }], 'zxcvbnm'.split('').map((c) => ({ l: c, ch: c, t: 'abc' })), [{ l: "'", i: "'", t: 'abc' }, { l: '⌫', c: 'deleteBackward', t: 'abc del', rep: true }])
       .concat([{ l: 'α', i: '\\alpha ', t: 'abc' }, { l: 'β', i: '\\beta ', t: 'abc' }, { l: 'λ', i: '\\lambda ', t: 'abc' }, { l: 'μ', i: '\\mu ', t: 'abc' }, { l: 'space', i: '\\ ', t: 'abc', w: 2 }, { l: 'ω', i: '\\omega ', t: 'abc' }, { l: 'φ', i: '\\phi ', t: 'abc' }, { l: 'σ', i: '\\sigma ', t: 'abc' }, { l: 'Δ', i: '\\Delta ', t: 'abc' }]) },
   ];
   root.KEYPAGES = PAGES;

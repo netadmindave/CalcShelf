@@ -348,7 +348,7 @@
       return tex.replace(re, () => v);
     }
     async runTex(tex, approx) {
-      const shown = this.ansShown(tex);
+      const shown = this.ansShown(tex).replace(/ᴇ\s*[-−]/g, 'ᴇ{-}');   // 1.5ᴇ-3 shows its sign, not a subtraction
       this.setBusy(true);
       const r = /\\pm/.test(tex) ? await evaluateUnc(this.app, tex) : await evaluate(this.app, tex, { approx });
       if (r.ok && !r.unc && !r.done && !r.printed && r.kind === 'expr') {

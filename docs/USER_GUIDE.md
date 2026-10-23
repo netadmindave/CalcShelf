@@ -55,7 +55,7 @@ You type into the entry line at the bottom. Results stack up above it, the newes
 
 ### Keypad
 
-The toolbar above the keypad has these keys:
+The toolbar above the keypad has these keys (**esc** and **tab** are the larger ones):
 
 | Key | Does |
 |---|---|
@@ -65,7 +65,8 @@ The toolbar above the keypad has these keys:
 | **▤** | Opens the catalog. |
 | **const** | Opens Constants & formulas. |
 | **‹ ›** | Moves the cursor. |
-| **⌫** | Deletes. |
+
+The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²**, **x⁻¹** and **⌫** on the right. Hold **⌫** to keep deleting. The other keypad pages have a ⌫ key too.
 
 **Keypad pages.** The strip below the keypad switches between them:
 
@@ -94,6 +95,8 @@ The **≈** key evaluates to a decimal instead of an exact answer. **enter** eva
   - **Define a function:** use `f(x):=x^2+1`, or **menu → Actions → Define**.
   - **See what's defined:** use **menu → Actions → Variables**.
 - **ans** recalls the last answer. **Long-press enter** to choose **Entry**, which recalls the last entry for editing, or **≈**.
+- **In the history, ans shows its value.** `ans×2` after 5 is saved as `5×2`.
+- **EE works as on a TI calculator.** It types a small capital **ᴇ**, and the exponent goes on the same line: `6.02ᴇ23`, `1.5ᴇ−3` (use **(−)** for the minus). The number and its exponent count as one number, so `1/2ᴇ3` is 1/2000.
 
 ### Results and history
 

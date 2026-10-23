@@ -155,14 +155,14 @@
       if (Math.abs(m) >= 1000) { e += 3; m = +(x / Math.pow(10, e)).toPrecision(digits); }
       const ms = g(String(m).includes('e') ? m.toFixed(Math.max(0, digits - 1)) : String(m));
       if (e === 0) return ms;
-      if (opts.editable) return ms + '\\times10^{' + e + '}';
+      if (opts.editable) return ms + 'ᴇ' + e;   // TI-style, read back by tex2giac
       return ms + '\\mathrm{E}{' + e + '}';
     }
     if (opts.sci || (ax !== 0 && (ax >= 1e12 || ax < 1e-4))) {
       s = x.toExponential(Math.max(0, digits - 1));
       let [m, e] = s.split('e');
       if (m.includes('.')) m = m.replace(/0+$/, '').replace(/\.$/, '.');
-      if (opts.editable) return m + '\\times10^{' + (e[0] === '+' ? e.slice(1) : e) + '}';
+      if (opts.editable) return m + 'ᴇ' + (e[0] === '+' ? e.slice(1) : e);
       return m + '\\mathrm{E}{' + (e[0] === '+' ? e.slice(1) : e) + '}';
     }
     s = x.toPrecision(digits);
@@ -395,7 +395,7 @@
           return '(' + s + (A.length % 2 ? J(A[A.length - 1]) : 'NaN') + ')';
         }
         if (n.f === 'when' || n.f === 'ifte') return '((' + J(n.args[0]) + ')?(' + J(n.args[1]) + '):(' + (n.args[2] ? J(n.args[2]) : 'NaN') + '))';
-        const f = JSF[n.f];
+        const f = Object.prototype.hasOwnProperty.call(JSF, n.f) ? JSF[n.f] : null;
         if (!f) throw new Error('no JS for ' + n.f);
         return f + '(' + n.args.map(J).join(',') + ')';
       }
@@ -419,6 +419,7 @@
   }
   /** Compile a Giac expression string to f(v1, v2, …). Throws if it can't. */
   function compile(src, vars = ['x']) {
+    if (!vars.every((v) => /^[A-Za-z_]\w*$/.test(v))) throw new Error('bad variable name');
     const ast = typeof src === 'string' ? parse(src) : src;
     const body = toJS(ast, vars);
     // eslint-disable-next-line no-new-func

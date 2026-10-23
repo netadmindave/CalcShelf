@@ -1,3 +1,4 @@
+import re
 import asyncio, sys
 from playwright.async_api import async_playwright
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8091'
@@ -11,7 +12,7 @@ async def main():
         E=lambda js: pg.evaluate(js)
         await pg.goto(BASE+'/index.html'); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2500)
         page = pg.locator('.kpage[data-id="num"]')
-        key = lambda lab: page.locator('.key', has=pg.locator('.kf', has_text=lab)).first
+        key = lambda lab: page.locator('.key', has=pg.locator('.kf', has_text=re.compile('^' + re.escape(lab) + '$'))).first
         async def tap(*labs):
             for l in labs: await key(l).click(); await pg.wait_for_timeout(80)
         async def swipe(lab, dy):
