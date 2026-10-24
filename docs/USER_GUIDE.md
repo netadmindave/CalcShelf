@@ -7,6 +7,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
   - [Keypad](#keypad) · [Entering math](#entering-math) · [Results and history](#results-and-history) · [Uncertainty](#uncertainty-propagation) · [Units](#units) · [Menus and catalog](#menus-and-catalog) · [Settings](#settings)
 - [Other tabs: Graphs, Lists & Spreadsheet, Notes, Program Editor, Unit Converter](#other-tabs)
 - [Constants, formulas, trig and conversions](#constants-formulas-trig-and-conversions)
+- [Modules: Optics, Machinist and your own](#modules)
 - [TI-36X Pro](#ti-36x-pro)
 - [Emulated calculators](#emulated-calculators)
   - [Adding, switching, several at once](#adding-and-switching) · [What every emulator page has](#what-every-emulator-page-has)
@@ -23,7 +24,8 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Tap a tab** to go to it.
 - **Tap the open tab** to get its menu: rename, move, close, export history, and so on.
 - **Long-press a tab** to rename it.
-- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, or **Guide & manuals**.
+- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, **Guide & manuals**, or a module such as **Optics** or **Machinist**.
+- **More tabs than fit?** Swipe the tab bar sideways. Its ends fade when there are more tabs past the edge.
 - **Guide & manuals** (also in the main menu ☰) holds this whole guide, and links to the official manuals of every calculator CalcShelf runs. Those open in your browser.
 - **Screen rotation:** the CAS and the TI-36X Pro stay upright, and the TI-92, TI-92 Plus and Voyage 200 always run in landscape. The other tabs turn with the phone.
 
@@ -33,6 +35,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Constants & formulas**
 - **Trigonometry & triangle solver**
 - **Conversion tool**
+- **Modules:** install, open and remove modules
 - **Add an emulated calculator** (or **Replace OS or change calculator**)
 - **Rename tabs**
 - **Back up** and **Restore from backup**
@@ -216,7 +219,10 @@ Open this from **const** on the toolbar, or from the main menu. It has four tabs
   - Each one can be shown in several units.
   - Search by name, for example *Planck*, *BK7* or *dn/dT*.
   - Tap a constant to insert it, or to open it in the conversion tool.
-- **Formulas:** solvable formulas by category. Fill in all but one variable, and CalcShelf solves for the one you leave blank.
+- **Formulas:** solvable formulas by category. Pick the unknown, fill in the other variables, and tap **Solve**.
+  - Each variable with a unit has a unit menu. It starts on **units**, which uses your numbers as you type them, so keep them consistent (all SI, for example).
+  - Pick a unit, such as **mm** or **in**, and CalcShelf converts that value. Pick one for the unknown to get the answer in that unit.
+  - Angles start in the calculator's angle mode; pick **°** or **rad** to override it.
 - **Trig:**
   - **Triangle solver:** SSS, SAS, ASA, AAS, and the ambiguous SSA case, which shows both triangles. It gives the area, perimeter, heights and the circumradius and inradius, with a scaled drawing.
   - **Identities:** about 40 identities and an exact-value table. Insert any one, or have the CAS verify it.
@@ -224,6 +230,51 @@ Open this from **const** on the toolbar, or from the main menu. It has four tabs
 - **Convert:** the same tool as the Unit Converter tab.
 
 <p><img src="img/trig.png" width="240" alt="Triangle solver"></p>
+
+---
+
+## Modules
+
+A module is a tab for one subject: formulas, calculators, tables, constants and reference text. Everything works inside the module's tab, using the CAS, so you don't go back to the CAS tab. CalcShelf comes with two:
+
+- **Optics:** light and photons, geometric optics, diffraction, Gaussian beams, cavities and thin films, fibers, frequency combs, detection, materials and data. It holds every optics formula and constant from the library, the optics tools (Δν ↔ Δλ, Gaussian beam, dispersion, etalon, thin film), and calculators such as wavelength ↔ frequency ↔ photon energy, a Gaussian beam with its plot, a cavity, a step-index fiber and a comb beat note.
+- **Machinist:**
+  - **Speeds & feeds:** spindle speed, surface speed, feed rate, chip load, removal rate and cutting time, with a cutting-speed table.
+  - **Threads:** unified, metric and NPT tap drills, pitch ↔ TPI, tap drills for a thread percentage, thread dimensions and three-wire measurement.
+  - **Drills:** every number, letter, fractional and metric drill with its inch and mm size, plus clearance holes, drill point length and countersink depth.
+  - **Shop math:** decimal to fraction, inch ↔ mm, bolt circles, sine bar, taper, chord and sagitta, bar stock weight and surface finish.
+  - **G & M codes:** G codes, M codes, address letters and canned-cycle formats.
+
+<p><img src="img/optics-module.png" width="240" alt="Optics module"> <img src="img/machinist-module.png" width="240" alt="Machinist module: nearest drills"></p>
+
+**Using a module.**
+
+- **Open it:** tap **+** and pick it under **Modules**.
+- **Find things:** the chips at the top are its sections. The search box searches the whole module.
+- **Calculators** compute as they open. Change a value or its unit and tap **Calculate**. Each result has a unit menu where it makes sense, and **Copy**.
+- **Formulas** solve for any variable, with unit menus as in the library.
+- **Tables:** type to filter. In size tables such as the drill charts, type a number to see the 12 nearest sizes. Chips choose inches or mm.
+- **Constants** can be shown in other units and stored in a CAS variable.
+
+**Adding modules.** CalcShelf asks Android for no permissions, so your browser downloads modules and CalcShelf imports them.
+
+1. Tap **+** → **Manage modules…** → **Browse modules ↗**. The module repository opens in your browser.
+2. Download the module's `.json` file.
+3. Back in CalcShelf, tap **Import a module file…** and pick it.
+4. Check its name and contents, and tap **Install**.
+
+**Managing modules.** **Manage modules…** (also **Modules** in the main menu) lists the installed modules. From there you can:
+
+- **Open** a module.
+- **Save file:** save a copy of a module.
+- **Remove** a module you imported.
+- **Change the repository address:** any `https://` address works.
+
+A module you import with the same name as a built-in one replaces it; removing it brings the built-in one back.
+
+**Safety.** Modules are data only. CalcShelf checks each file, draws every screen itself, and only lets a module's expressions compute: they can't change your variables or settings, read files or reach the internet. A module's numbers are only as good as its author's data, so install modules from people you trust.
+
+**Making your own.** See [docs/MODULES.md](MODULES.md) for the format, and start from the example module in the repository's `modules` folder.
 
 ---
 

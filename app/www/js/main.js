@@ -14,6 +14,7 @@
     notes: { name: 'Notes', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M6 4h9l4 4v12H6z"/><path d="M9 11h7M9 15h5"/></svg>', make: (a, s) => new Notes.NotesPage(a, s) },
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
     guide: { name: 'Guide & manuals', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a1.6 1.6 0 0 0-1.6-1.6H5z"/><path d="M19 4.5h-5.5a1 1 0 0 0-1 1"/><path d="M19 4.5v13.9h-5.9a1.6 1.6 0 0 0-1.6 1.6"/></svg>', make: (a, s) => new Guide.GuidePage(a, s) },
+    module: { name: 'Module', icon: Modules.ICONS.module, make: (a, s) => new Modules.ModulePage(a, s), menu: false },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
   };
@@ -119,6 +120,7 @@
       const s = await DB.get('settings'); if (s) Object.assign(this.settings, s);
       if (s && !s.fmt) this.settings.fmt = s.sci ? 'sci' : 'norm';
       Units.defineUser(this.settings.userUnits || []);
+      Modules.load();
       this.applyTheme();
       this.cas = new CAS('js/cas-worker.js');
       this.cas.onBusy = (b) => document.body.classList.toggle('cas-busy', b);
@@ -201,6 +203,7 @@
     addPage(kind, state = {}, quiet) {
       const def = APPS[kind]; if (!def) return;
       if (this.isUnique(kind) || kind === 'guide') { const i = this.pages.findIndex((x) => x.kind === kind); if (i >= 0) { if (!quiet) this.select(i); return this.pages[i]; } }
+      if (kind === 'module') { const i = this.pages.findIndex((x) => x.kind === 'module' && x.id === state.id); if (i >= 0) { if (!quiet) this.select(i); return this.pages[i]; } }
       const p = def.make(this, state);
       p.kind = kind;
       this.pages.push(p); $('#pages').append(p.root); p.root.hidden = true;
@@ -230,7 +233,7 @@
     /** the tab's name: what the user typed, else CAS / the calculator's model number / the app's short name */
     tabName(p) {
       if (typeof p.name === 'string' && p.name) return p.name;   // (before 2.7.4 a Program tab saved its name field here by mistake)
-      if (p.kind === 'emu') return p.defaultName;
+      if (p.kind === 'emu' || p.kind === 'module') return p.defaultName;
       const same = this.pages.filter((x) => x.kind === p.kind);
       const n = same.indexOf(p);
       return DEFAULT_NAMES[p.kind] + (n > 0 ? ' ' + (n + 1) : '');
@@ -239,7 +242,7 @@
       const t = $('#tabs'); t.innerHTML = '';
       this.pages.forEach((p, i) => {
         const name = this.tabName(p);
-        const b = el('button', { class: 'tab' + (i === this.active ? ' on' : ''), role: 'tab', html: APPS[p.kind].icon + '<span class="tn"></span>', 'aria-label': name, title: name + (i === this.active ? ' — tap for tab options' : '') });
+        const b = el('button', { class: 'tab' + (i === this.active ? ' on' : ''), role: 'tab', html: (p.icon || APPS[p.kind].icon) + '<span class="tn"></span>', 'aria-label': name, title: name + (i === this.active ? ' — tap for tab options' : '') });
         b.querySelector('.tn').textContent = name;
         let lp, fired = false;
         b.onclick = () => { if (fired) { fired = false; return; } if (i === this.active) this.pageMenu(i); else this.select(i); };
@@ -289,6 +292,12 @@
         else row(APPS.emu.icon, 'Emulated calculator', emu ? 'Open as “' + this.tabName(emu) + '” — change the model with Replace OS' : 'TI-36X Pro, TI-Nspire CX II CAS, TI-89, TI-92, Voyage 200, TI-84 Plus … TI-81, HP 48GX/48SX, HP 49g+/49G', () => { if (emu) { Sheet.close(); this.select(this.pages.indexOf(emu)); this.emuChooser(); } else this.emuChooser(true); });
         b.append(L, el('h3', { text: 'More pages', style: { fontSize: '14px', color: 'var(--ink2)', margin: '16px 2px 4px' } }));
         const M = el('ul', { class: 'mlist' }); b.append(M);
+        // modules: one tab each, plus importing and managing them
+        b.append(el('h3', { text: 'Modules', style: { fontSize: '14px', color: 'var(--ink2)', margin: '16px 2px 4px' } }));
+        const D = el('ul', { class: 'mlist' }); b.append(D);
+        const mrow = (icon, label, sub, fn) => { const x = el('button', { class: 'mi', html: icon.replace('class="ic"', 'class="ic" style="width:22px;height:22px"') + '<span style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="lbl"></span><span class="sub"></span></span>', onclick: fn }); x.querySelector('.lbl').textContent = label; x.querySelector('.sub').textContent = sub; D.append(el('li', {}, x)); };
+        for (const x of Modules.list) mrow(Modules.ICONS[x.m.icon], x.m.name, x.m.description.split(/(?<=\.)\s/)[0] || 'Version ' + x.m.version, () => { Sheet.close(); this.addPage('module', { id: x.m.id }); });
+        mrow(Modules.ICONS.module, 'Manage modules…', 'Import a module file, browse a module repository, remove modules', () => Modules.manage(this));
         for (const [k, a] of Object.entries(APPS)) if (a.menu !== false && !UNIQUE.has(k)) M.append(el('li', {}, el('button', { class: 'mi', html: a.icon.replace('class="ic"', 'class="ic" style="width:22px;height:22px"') + '<span class="lbl">' + a.name + '</span>', onclick: () => { Sheet.close(); this.addPage(k); } })));
       });
     },
@@ -605,12 +614,15 @@
     },
     applyTheme() { const t = this.settings.theme; if (t === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t); },
     saveSettings() { DB.set('settings', this.settings); },
+    /** after a module is installed or removed, its open tabs draw it again */
+    refreshModulePages(id) { this.pages.forEach((p) => { if (p.kind === 'module' && p.id === id) p.render(); }); this.renderTabs(); },
     rerender() { this.pages.forEach((p) => p.renderAll && p.kind === 'calc' && p.renderAll()); },
     docMenu() {
       Sheet.open('CalcShelf', (b) => {
         const L = el('ul', { class: 'mlist' });
         const item = (label, sub, fn) => L.append(el('li', {}, el('button', { class: 'mi', onclick: fn }, el('span', { class: 'lbl', text: label }), sub ? el('span', { class: 'sub', text: sub }) : null)));
         item('Guide & manuals', 'The CalcShelf user guide, and the manuals of the real calculators', () => { Sheet.close(); this.addPage('guide'); });
+        item('Modules', 'Optics, Machinist and modules you import', () => Modules.manage(this));
         item('Settings', 'Angle, digits, number format (Normal / Sci / Eng), theme', () => Sheet.push('Settings', (bb) => this.settingsUI(bb)));
         item('Constants & formulas', 'CODATA constants and solvable formulas', () => { Sheet.close(); Library.open(this, 'const'); });
         item('Trigonometry & triangle solver', 'Identities, trig formulas, solve any triangle', () => { Sheet.close(); Library.open(this, 'trig'); });

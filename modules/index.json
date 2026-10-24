@@ -1,0 +1,26 @@
+{
+ "format": "calcshelf-module-index",
+ "modules": [
+  {
+   "id": "optics",
+   "name": "Optics",
+   "version": "1.0.0",
+   "file": "optics.json",
+   "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Every formula solves for any of its variables."
+  },
+  {
+   "id": "machinist",
+   "name": "Machinist",
+   "version": "1.0.0",
+   "file": "machinist.json",
+   "description": "Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, and a G-code and M-code reference."
+  },
+  {
+   "id": "example",
+   "name": "Example module",
+   "version": "1.0.0",
+   "file": "example.json",
+   "description": "One of each kind of item a CalcShelf module can hold. Copy this file to start your own module."
+  }
+ ]
+}

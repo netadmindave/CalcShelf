@@ -16,13 +16,14 @@
   /* ---------------------------------------------------------------- a small Markdown renderer for our own guide */
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const slug = (s) => s.toLowerCase().replace(/<[^>]+>/g, '').replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-');
+  let UNTRUSTED = false;     // module text: no HTML lines, and only https:// and #anchor links
   function inline(s) {
     const codes = [];
     s = s.replace(/`([^`]+)`/g, (m, c) => { codes.push('<code>' + esc(c) + '</code>'); return '\u0000' + (codes.length - 1) + '\u0000'; });
     s = esc(s)
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
       .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?=[^*\w]|$)/g, '$1<i>$2</i>')
-      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => '<a href="' + u.replace(/"/g, '') + '" data-link="' + u.replace(/"/g, '') + '">' + t + '</a>');
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => (UNTRUSTED && !/^(https:\/\/|#[\w-]+$)/.test(u) ? t : '<a href="' + u.replace(/"/g, '') + '" data-link="' + u.replace(/"/g, '') + '">' + t + '</a>'));
     return s.replace(/\u0000(\d+)\u0000/g, (m, k) => codes[+k]);
   }
   /** our guide only uses <img> and <p> wrappers as HTML: keep the pictures, drop everything else */
@@ -35,7 +36,11 @@
     });
     return out.length ? '<div class="gd-imgs">' + out.join('') + '</div>' : '';
   }
-  function markdown(md) {
+  function markdown(md, opts = {}) {
+    UNTRUSTED = !!opts.untrusted;
+    try { return markdownBody(md); } finally { UNTRUSTED = false; }
+  }
+  function markdownBody(md) {
     const lines = md.replace(/\r/g, '').split('\n'), html = [];
     let i = 0;
     const list = (indent) => {
@@ -59,7 +64,7 @@
       if ((m = L.match(/^(#{1,4})\s+(.*)$/))) { const t = m[2]; html.push('<h' + m[1].length + ' id="' + slug(t) + '">' + inline(t) + '</h' + m[1].length + '>'); i++; continue; }
       if (/^---+\s*$/.test(L)) { html.push('<hr>'); i++; continue; }
       if (/^```/.test(L)) { const code = []; i++; while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]); i++; html.push('<pre><code>' + esc(code.join('\n')) + '</code></pre>'); continue; }
-      if (/^\s*</.test(L)) { const h = htmlImgs(L); if (h) html.push(h); i++; continue; }
+      if (/^\s*</.test(L)) { const h = UNTRUSTED ? '' : htmlImgs(L); if (h) html.push(h); i++; continue; }
       if (/^\|/.test(L)) {
         const rows = []; while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++]);
         const cells = (r) => r.replace(/^\||\|\s*$/g, '').split(/(?<!\\)\|/).map((c) => inline(c.trim().replace(/\\\|/g, '|')));
@@ -105,7 +110,7 @@
         const u = a.getAttribute('data-link');
         if (u.startsWith('#')) { const t = this.body.querySelector('[id="' + u.slice(1) + '"]'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
         else if (/^https?:/.test(u)) openLink(u);
-        else if (/\.md$/.test(u)) openLink('https://github.com/netadmindave/CalcShelf/blob/main/' + u.replace(/^\.\.\//, '').replace(/^(?!docs\/)(USER_GUIDE|BUILDING)/, 'docs/$1'));
+        else if (/\.md$/.test(u)) openLink('https://github.com/netadmindave/CalcShelf/blob/main/' + u.replace(/^\.\.\//, '').replace(/^(?!docs\/)(USER_GUIDE|BUILDING|MODULES)/, 'docs/$1'));
         else toast(u);
       });
       this.top = el('button', { class: 'gd-top', text: '↑', 'aria-label': 'Back to the contents', onclick: () => this.body.scrollTo({ top: 0, behavior: 'smooth' }) });

@@ -343,3 +343,27 @@ details.ugrp .chips { padding: 0 2px 10px; }
 .strip .sk { height: 42px; font-size: 15px; }
 .strip .sk svg { width: 22px; height: 22px; }
 .strip .sk.wide { font-size: 17px; font-weight: 700; }
+
+/* formula solver and module calculators: a unit picker beside the value */
+.fs-unit { flex: none; max-width: 46%; font: 15px var(--font); padding: 8px 6px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); appearance: auto; }
+
+/* module tabs */
+.md-top { padding: 8px 10px 0; flex: none; }
+.md-secs { padding-bottom: 6px; }
+.md-search { margin: 0 0 4px; }
+.md-text { margin: 8px 0; } .md-doc { font-size: 15px; }
+.md-row { margin: 6px 0; } .md-pair { display: flex; gap: 6px; align-items: center; } .md-pair .md-in { margin: 0; flex: 1; min-width: 0; }
+.md-res { margin-top: 10px; }
+.md-out { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.md-out:last-child { border-bottom: 0; }
+.md-ol { flex: 1 1 100%; font-size: 13px; color: var(--ink2); }
+.md-ov { font-size: 19px; overflow-x: auto; max-width: 100%; }
+.md-ov.err { font-size: 14px; color: var(--err, #c33); }
+.md-tbl table { font-size: 14px; } .md-tbl td { white-space: nowrap; } .md-tbl th { position: sticky; top: 0; }
+.md-head { display: flex; gap: 12px; align-items: center; }
+.md-ic .ic, span.md-ic svg { width: 26px; height: 26px; flex: none; }
+
+/* the tab bar scrolls sideways with a finger when the tabs don't fit; the ends fade to show there are more */
+.tabs { touch-action: pan-x; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 14px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 10px, #000 calc(100% - 14px), transparent 100%); }
+.tabs .tab { flex: none; }

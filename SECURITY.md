@@ -11,11 +11,16 @@ CalcShelf is an offline app. It asks Android for **no permissions**, so it can't
 - **Files you open** (backups, OS files, ROMs, calculator programs) are read by the app's own code or by the emulator cores, which run as WebAssembly inside the app's web view.
 - **The CAS** (Giac) runs in secure mode, in a separate worker, with no access to files.
 - **The emulator pages** exchange messages with the app only, and check where every message comes from.
+- **Modules** are data only: a JSON file with formulas, calculators, tables, constants and text. CalcShelf draws every screen itself, shows Markdown text without any HTML, and opens only https:// links, in the browser. Before a module's expression goes to the CAS, CalcShelf checks that it only computes: no assignment, strings, loops, programs, settings, files or input and output, and a 10-second limit. A module's inputs get private names, so it can't change your variables. The app never downloads modules; your browser does, and you import the file.
 - **Formulas from backups or files** are rendered by MathLive with its HTML-styling commands removed. HTML in them is shown as text, never run.
 
 ## Restoring a backup someone else made
 
 A backup restores tabs, history, variables and definitions. They are calculator data, and are shown and evaluated as such. Still, only restore backups from people you trust, as with any file.
+
+## Checked for 2.7.6
+
+- **Modules:** a module with an assignment, a blocked command, HTML or a non-https link is refused, or the HTML and link are left out (tests/modules276.py).
 
 ## Checked for 2.7.5
 

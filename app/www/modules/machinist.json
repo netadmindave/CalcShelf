@@ -1,0 +1,7179 @@
+{
+ "format": "calcshelf-module",
+ "formatVersion": 1,
+ "id": "machinist",
+ "name": "Machinist",
+ "tab": "Machinist",
+ "version": "1.0.0",
+ "icon": "machinist",
+ "author": "CalcShelf",
+ "license": "GPL-3.0-or-later",
+ "homepage": "https://github.com/netadmindave/CalcShelf/tree/main/modules",
+ "description": "Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, and a G-code and M-code reference.",
+ "sections": [
+  {
+   "title": "Speeds & feeds",
+   "items": [
+    {
+     "type": "calc",
+     "title": "Spindle speed from surface speed",
+     "tex": "N=\\frac{12\\,V_c}{\\pi D}",
+     "inputs": [
+      {
+       "id": "Vc",
+       "label": "Surface speed",
+       "unit": "ft/min",
+       "default": "300",
+       "units": [
+        "ft/min",
+        "m/min"
+       ]
+      },
+      {
+       "id": "D",
+       "label": "Tool or work diameter",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Spindle speed",
+       "expr": "12*Vc/(pi*D)",
+       "unit": "rpm",
+       "units": [
+        "rpm"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Spindle speed for a material",
+     "tex": "N=\\frac{12\\,V_c}{\\pi D}",
+     "note": "The middle of the starting range in the cutting-speed table. Adjust for the tool maker’s data, rigidity and coolant.",
+     "inputs": [
+      {
+       "id": "Vc",
+       "label": "Material and tool",
+       "options": [
+        {
+         "label": "Aluminum alloys — HSS",
+         "value": "425"
+        },
+        {
+         "label": "Aluminum alloys — carbide",
+         "value": "1050"
+        },
+        {
+         "label": "Brass, bronze (free-cutting) — HSS",
+         "value": "225"
+        },
+        {
+         "label": "Brass, bronze (free-cutting) — carbide",
+         "value": "600"
+        },
+        {
+         "label": "Copper — HSS",
+         "value": "150"
+        },
+        {
+         "label": "Copper — carbide",
+         "value": "450"
+        },
+        {
+         "label": "Gray cast iron — HSS",
+         "value": "75"
+        },
+        {
+         "label": "Gray cast iron — carbide",
+         "value": "350"
+        },
+        {
+         "label": "Low-carbon steel (1018, 12L14) — HSS",
+         "value": "100"
+        },
+        {
+         "label": "Low-carbon steel (1018, 12L14) — carbide",
+         "value": "475"
+        },
+        {
+         "label": "Medium-carbon steel (1045) — HSS",
+         "value": "75"
+        },
+        {
+         "label": "Medium-carbon steel (1045) — carbide",
+         "value": "400"
+        },
+        {
+         "label": "Alloy steel (4140, annealed) — HSS",
+         "value": "65"
+        },
+        {
+         "label": "Alloy steel (4140, annealed) — carbide",
+         "value": "350"
+        },
+        {
+         "label": "Tool steel (annealed) — HSS",
+         "value": "45"
+        },
+        {
+         "label": "Tool steel (annealed) — carbide",
+         "value": "225"
+        },
+        {
+         "label": "Stainless 303, 416 — HSS",
+         "value": "80"
+        },
+        {
+         "label": "Stainless 303, 416 — carbide",
+         "value": "400"
+        },
+        {
+         "label": "Stainless 304, 316 — HSS",
+         "value": "55"
+        },
+        {
+         "label": "Stainless 304, 316 — carbide",
+         "value": "300"
+        },
+        {
+         "label": "Titanium 6Al-4V — HSS",
+         "value": "30"
+        },
+        {
+         "label": "Titanium 6Al-4V — carbide",
+         "value": "150"
+        },
+        {
+         "label": "Inconel 718 — HSS",
+         "value": "15"
+        },
+        {
+         "label": "Inconel 718 — carbide",
+         "value": "90"
+        },
+        {
+         "label": "Plastics (acetal, nylon, PEEK) — HSS",
+         "value": "550"
+        },
+        {
+         "label": "Plastics (acetal, nylon, PEEK) — carbide",
+         "value": "1000"
+        }
+       ],
+       "default": 9
+      },
+      {
+       "id": "D",
+       "label": "Tool or work diameter",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Surface speed",
+       "expr": "Vc",
+       "unit": "ft/min",
+       "units": [
+        "ft/min",
+        "m/min"
+       ],
+       "digits": 4
+      },
+      {
+       "label": "Spindle speed",
+       "expr": "12*Vc/(pi*D)",
+       "unit": "rpm",
+       "units": [
+        "rpm"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Surface speed from spindle speed",
+     "tex": "V_c=\\frac{\\pi DN}{12}",
+     "inputs": [
+      {
+       "id": "N",
+       "label": "Spindle speed",
+       "unit": "rpm",
+       "default": "2000",
+       "units": [
+        "rpm"
+       ]
+      },
+      {
+       "id": "D",
+       "label": "Diameter",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Surface speed",
+       "expr": "pi*D*N/12",
+       "unit": "ft/min",
+       "units": [
+        "ft/min",
+        "m/min"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Milling feed rate",
+     "tex": "F=N\\,f_z\\,z",
+     "inputs": [
+      {
+       "id": "N",
+       "label": "Spindle speed",
+       "unit": "rpm",
+       "default": "3000",
+       "units": [
+        "rpm"
+       ]
+      },
+      {
+       "id": "fz",
+       "label": "Chip load per tooth",
+       "unit": "in",
+       "default": "0.002",
+       "units": [
+        "in",
+        "mm",
+        "thou"
+       ]
+      },
+      {
+       "id": "z",
+       "label": "Number of teeth (flutes)",
+       "default": "4"
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Feed rate",
+       "expr": "N*fz*z",
+       "unit": "in/min",
+       "units": [
+        "in/min",
+        "mm/min"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Chip load from feed rate",
+     "tex": "f_z=\\frac{F}{N\\,z}",
+     "inputs": [
+      {
+       "id": "F",
+       "label": "Feed rate",
+       "unit": "in/min",
+       "default": "24",
+       "units": [
+        "in/min",
+        "mm/min"
+       ]
+      },
+      {
+       "id": "N",
+       "label": "Spindle speed",
+       "unit": "rpm",
+       "default": "3000",
+       "units": [
+        "rpm"
+       ]
+      },
+      {
+       "id": "z",
+       "label": "Number of teeth",
+       "default": "4"
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Chip load per tooth",
+       "expr": "F/(N*z)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm",
+        "thou"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Drilling and turning feed",
+     "tex": "F=N\\,f_r",
+     "inputs": [
+      {
+       "id": "N",
+       "label": "Spindle speed",
+       "unit": "rpm",
+       "default": "1000",
+       "units": [
+        "rpm"
+       ]
+      },
+      {
+       "id": "fr",
+       "label": "Feed per revolution",
+       "unit": "in",
+       "default": "0.004",
+       "units": [
+        "in",
+        "mm",
+        "thou"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Feed rate",
+       "expr": "N*fr",
+       "unit": "in/min",
+       "units": [
+        "in/min",
+        "mm/min"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Material removal rate (milling)",
+     "tex": "Q=a_e\\,a_p\\,F",
+     "inputs": [
+      {
+       "id": "ae",
+       "label": "Width of cut (WOC)",
+       "unit": "in",
+       "default": "0.25",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "ap",
+       "label": "Depth of cut (DOC)",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "F",
+       "label": "Feed rate",
+       "unit": "in/min",
+       "default": "30",
+       "units": [
+        "in/min",
+        "mm/min"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Removal rate",
+       "expr": "ae*ap*F",
+       "unit": "in³/min",
+       "units": [
+        "in³/min",
+        "cm³/min",
+        "mm³/min"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Cutting time",
+     "tex": "t=\\frac{L}{f_r N}",
+     "inputs": [
+      {
+       "id": "L",
+       "label": "Length of cut",
+       "unit": "in",
+       "default": "4",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "fr",
+       "label": "Feed per revolution",
+       "unit": "in",
+       "default": "0.008",
+       "units": [
+        "in",
+        "mm",
+        "thou"
+       ]
+      },
+      {
+       "id": "N",
+       "label": "Spindle speed",
+       "unit": "rpm",
+       "default": "800",
+       "units": [
+        "rpm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Time",
+       "expr": "L/(fr*N)",
+       "unit": "min",
+       "units": [
+        "min",
+        "s"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "Cutting speeds (starting values)",
+     "columns": [
+      "Material",
+      "HSS (ft/min)",
+      "Carbide (ft/min)",
+      "HSS (m/min)",
+      "Carbide (m/min)"
+     ],
+     "rows": [
+      [
+       "Aluminum alloys",
+       "250–600",
+       "600–1500",
+       "76–183",
+       "183–457"
+      ],
+      [
+       "Brass, bronze (free-cutting)",
+       "150–300",
+       "400–800",
+       "46–91",
+       "122–244"
+      ],
+      [
+       "Copper",
+       "100–200",
+       "300–600",
+       "30–61",
+       "91–183"
+      ],
+      [
+       "Gray cast iron",
+       "50–100",
+       "250–450",
+       "15–30",
+       "76–137"
+      ],
+      [
+       "Low-carbon steel (1018, 12L14)",
+       "80–120",
+       "350–600",
+       "24–37",
+       "107–183"
+      ],
+      [
+       "Medium-carbon steel (1045)",
+       "60–90",
+       "300–500",
+       "18–27",
+       "91–152"
+      ],
+      [
+       "Alloy steel (4140, annealed)",
+       "50–80",
+       "250–450",
+       "15–24",
+       "76–137"
+      ],
+      [
+       "Tool steel (annealed)",
+       "30–60",
+       "150–300",
+       "9–18",
+       "46–91"
+      ],
+      [
+       "Stainless 303, 416",
+       "60–100",
+       "300–500",
+       "18–30",
+       "91–152"
+      ],
+      [
+       "Stainless 304, 316",
+       "40–70",
+       "200–400",
+       "12–21",
+       "61–122"
+      ],
+      [
+       "Titanium 6Al-4V",
+       "20–40",
+       "100–200",
+       "6–12",
+       "30–61"
+      ],
+      [
+       "Inconel 718",
+       "10–20",
+       "60–120",
+       "3–6",
+       "18–37"
+      ],
+      [
+       "Plastics (acetal, nylon, PEEK)",
+       "300–800",
+       "500–1500",
+       "91–244",
+       "152–457"
+      ]
+     ],
+     "note": "Typical starting ranges for turning and milling. Drilling usually runs at the low end and tapping lower still. Follow the tool maker’s figures where you have them."
+    }
+   ]
+  },
+  {
+   "title": "Threads",
+   "items": [
+    {
+     "type": "table",
+     "title": "Unified (inch) tap drills",
+     "columns": [
+      "Thread",
+      "Major dia (in)",
+      "Tap drill",
+      "Drill (in)",
+      "Drill (mm)",
+      "≈ thread"
+     ],
+     "rows": [
+      [
+       "#0-80 UNF",
+       ".0600",
+       "3/64",
+       ".0469",
+       "1.19",
+       "81 %"
+      ],
+      [
+       "#1-64 UNC",
+       ".0730",
+       "#53",
+       ".0595",
+       "1.51",
+       "67 %"
+      ],
+      [
+       "#1-72 UNF",
+       ".0730",
+       "#53",
+       ".0595",
+       "1.51",
+       "75 %"
+      ],
+      [
+       "#2-56 UNC",
+       ".0860",
+       "#50",
+       ".0700",
+       "1.78",
+       "69 %"
+      ],
+      [
+       "#2-64 UNF",
+       ".0860",
+       "#50",
+       ".0700",
+       "1.78",
+       "79 %"
+      ],
+      [
+       "#3-48 UNC",
+       ".0990",
+       "#47",
+       ".0785",
+       "1.99",
+       "76 %"
+      ],
+      [
+       "#3-56 UNF",
+       ".0990",
+       "#45",
+       ".0820",
+       "2.08",
+       "73 %"
+      ],
+      [
+       "#4-40 UNC",
+       ".1120",
+       "#43",
+       ".0890",
+       "2.26",
+       "71 %"
+      ],
+      [
+       "#4-48 UNF",
+       ".1120",
+       "#42",
+       ".0935",
+       "2.37",
+       "68 %"
+      ],
+      [
+       "#5-40 UNC",
+       ".1250",
+       "#38",
+       ".1015",
+       "2.58",
+       "72 %"
+      ],
+      [
+       "#5-44 UNF",
+       ".1250",
+       "#37",
+       ".1040",
+       "2.64",
+       "71 %"
+      ],
+      [
+       "#6-32 UNC",
+       ".1380",
+       "#36",
+       ".1065",
+       "2.71",
+       "78 %"
+      ],
+      [
+       "#6-40 UNF",
+       ".1380",
+       "#33",
+       ".1130",
+       "2.87",
+       "77 %"
+      ],
+      [
+       "#8-32 UNC",
+       ".1640",
+       "#29",
+       ".1360",
+       "3.45",
+       "69 %"
+      ],
+      [
+       "#8-36 UNF",
+       ".1640",
+       "#29",
+       ".1360",
+       "3.45",
+       "78 %"
+      ],
+      [
+       "#10-24 UNC",
+       ".1900",
+       "#25",
+       ".1495",
+       "3.80",
+       "75 %"
+      ],
+      [
+       "#10-32 UNF",
+       ".1900",
+       "#21",
+       ".1590",
+       "4.04",
+       "76 %"
+      ],
+      [
+       "#12-24 UNC",
+       ".2160",
+       "#16",
+       ".1770",
+       "4.50",
+       "72 %"
+      ],
+      [
+       "#12-28 UNF",
+       ".2160",
+       "#14",
+       ".1820",
+       "4.62",
+       "73 %"
+      ],
+      [
+       "1/4-20 UNC",
+       ".2500",
+       "#7",
+       ".2010",
+       "5.11",
+       "75 %"
+      ],
+      [
+       "1/4-28 UNF",
+       ".2500",
+       "#3",
+       ".2130",
+       "5.41",
+       "80 %"
+      ],
+      [
+       "5/16-18 UNC",
+       ".3125",
+       "F",
+       ".2570",
+       "6.53",
+       "77 %"
+      ],
+      [
+       "5/16-24 UNF",
+       ".3125",
+       "I",
+       ".2720",
+       "6.91",
+       "75 %"
+      ],
+      [
+       "3/8-16 UNC",
+       ".3750",
+       "5/16",
+       ".3125",
+       "7.94",
+       "77 %"
+      ],
+      [
+       "3/8-24 UNF",
+       ".3750",
+       "Q",
+       ".3320",
+       "8.43",
+       "79 %"
+      ],
+      [
+       "7/16-14 UNC",
+       ".4375",
+       "U",
+       ".3680",
+       "9.35",
+       "75 %"
+      ],
+      [
+       "7/16-20 UNF",
+       ".4375",
+       "25/64",
+       ".3906",
+       "9.92",
+       "72 %"
+      ],
+      [
+       "1/2-13 UNC",
+       ".5000",
+       "27/64",
+       ".4219",
+       "10.72",
+       "78 %"
+      ],
+      [
+       "1/2-20 UNF",
+       ".5000",
+       "29/64",
+       ".4531",
+       "11.51",
+       "72 %"
+      ],
+      [
+       "9/16-12 UNC",
+       ".5625",
+       "31/64",
+       ".4844",
+       "12.30",
+       "72 %"
+      ],
+      [
+       "9/16-18 UNF",
+       ".5625",
+       "33/64",
+       ".5156",
+       "13.10",
+       "65 %"
+      ],
+      [
+       "5/8-11 UNC",
+       ".6250",
+       "17/32",
+       ".5313",
+       "13.49",
+       "79 %"
+      ],
+      [
+       "5/8-18 UNF",
+       ".6250",
+       "37/64",
+       ".5781",
+       "14.68",
+       "65 %"
+      ],
+      [
+       "3/4-10 UNC",
+       ".7500",
+       "21/32",
+       ".6563",
+       "16.67",
+       "72 %"
+      ],
+      [
+       "3/4-16 UNF",
+       ".7500",
+       "11/16",
+       ".6875",
+       "17.46",
+       "77 %"
+      ],
+      [
+       "7/8-9 UNC",
+       ".8750",
+       "49/64",
+       ".7656",
+       "19.45",
+       "76 %"
+      ],
+      [
+       "7/8-14 UNF",
+       ".8750",
+       "13/16",
+       ".8125",
+       "20.64",
+       "67 %"
+      ],
+      [
+       "1-8 UNC",
+       "1.0000",
+       "7/8",
+       ".8750",
+       "22.22",
+       "77 %"
+      ],
+      [
+       "1-12 UNF",
+       "1.0000",
+       "59/64",
+       ".9219",
+       "23.42",
+       "72 %"
+      ],
+      [
+       "1-14 UNS",
+       "1.0000",
+       "15/16",
+       ".9375",
+       "23.81",
+       "67 %"
+      ],
+      [
+       "1-1/8-7 UNC",
+       "1.1250",
+       "63/64",
+       ".9844",
+       "25.00",
+       "76 %"
+      ],
+      [
+       "1-1/8-12 UNF",
+       "1.1250",
+       "1-3/64",
+       "1.0469",
+       "26.59",
+       "72 %"
+      ],
+      [
+       "1-1/4-7 UNC",
+       "1.2500",
+       "1-7/64",
+       "1.1094",
+       "28.18",
+       "76 %"
+      ],
+      [
+       "1-1/4-12 UNF",
+       "1.2500",
+       "1-11/64",
+       "1.1719",
+       "29.77",
+       "72 %"
+      ],
+      [
+       "1-3/8-6 UNC",
+       "1.3750",
+       "1-7/32",
+       "1.2188",
+       "30.96",
+       "72 %"
+      ],
+      [
+       "1-3/8-12 UNF",
+       "1.3750",
+       "1-19/64",
+       "1.2969",
+       "32.94",
+       "72 %"
+      ],
+      [
+       "1-1/2-6 UNC",
+       "1.5000",
+       "1-11/32",
+       "1.3438",
+       "34.13",
+       "72 %"
+      ],
+      [
+       "1-1/2-12 UNF",
+       "1.5000",
+       "1-27/64",
+       "1.4219",
+       "36.12",
+       "72 %"
+      ]
+     ],
+     "near": [
+      {
+       "col": 3,
+       "label": "in"
+      },
+      {
+       "col": 4,
+       "label": "mm"
+      }
+     ],
+     "note": "Tap drills for about 75 % thread (Starrett chart); the last column is the thread depth that drill gives, from % = (D − drill) · TPI / 0.01299."
+    },
+    {
+     "type": "table",
+     "title": "Metric (ISO) tap drills",
+     "columns": [
+      "Thread",
+      "Series",
+      "Tap drill (mm)",
+      "Drill (in)",
+      "D − P (mm)",
+      "≈ thread",
+      "TPI equivalent"
+     ],
+     "rows": [
+      [
+       "M1.6 × 0.35",
+       "coarse",
+       "1.25",
+       ".0492",
+       "1.25",
+       "77 %",
+       "72.57"
+      ],
+      [
+       "M2 × 0.4",
+       "coarse",
+       "1.60",
+       ".0630",
+       "1.60",
+       "77 %",
+       "63.50"
+      ],
+      [
+       "M2.5 × 0.45",
+       "coarse",
+       "2.05",
+       ".0807",
+       "2.05",
+       "77 %",
+       "56.44"
+      ],
+      [
+       "M3 × 0.5",
+       "coarse",
+       "2.50",
+       ".0984",
+       "2.50",
+       "77 %",
+       "50.80"
+      ],
+      [
+       "M3.5 × 0.6",
+       "coarse",
+       "2.90",
+       ".1142",
+       "2.90",
+       "77 %",
+       "42.33"
+      ],
+      [
+       "M4 × 0.7",
+       "coarse",
+       "3.30",
+       ".1299",
+       "3.30",
+       "77 %",
+       "36.29"
+      ],
+      [
+       "M5 × 0.8",
+       "coarse",
+       "4.20",
+       ".1654",
+       "4.20",
+       "77 %",
+       "31.75"
+      ],
+      [
+       "M6 × 1",
+       "coarse",
+       "5.00",
+       ".1969",
+       "5.00",
+       "77 %",
+       "25.40"
+      ],
+      [
+       "M7 × 1",
+       "coarse",
+       "6.00",
+       ".2362",
+       "6.00",
+       "77 %",
+       "25.40"
+      ],
+      [
+       "M8 × 1.25",
+       "coarse",
+       "6.80",
+       ".2677",
+       "6.75",
+       "74 %",
+       "20.32"
+      ],
+      [
+       "M10 × 1.5",
+       "coarse",
+       "8.50",
+       ".3346",
+       "8.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M12 × 1.75",
+       "coarse",
+       "10.20",
+       ".4016",
+       "10.25",
+       "79 %",
+       "14.51"
+      ],
+      [
+       "M14 × 2",
+       "coarse",
+       "12.00",
+       ".4724",
+       "12.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M16 × 2",
+       "coarse",
+       "14.00",
+       ".5512",
+       "14.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M18 × 2.5",
+       "coarse",
+       "15.50",
+       ".6102",
+       "15.50",
+       "77 %",
+       "10.16"
+      ],
+      [
+       "M20 × 2.5",
+       "coarse",
+       "17.50",
+       ".6890",
+       "17.50",
+       "77 %",
+       "10.16"
+      ],
+      [
+       "M22 × 2.5",
+       "coarse",
+       "19.50",
+       ".7677",
+       "19.50",
+       "77 %",
+       "10.16"
+      ],
+      [
+       "M24 × 3",
+       "coarse",
+       "21.00",
+       ".8268",
+       "21.00",
+       "77 %",
+       "8.47"
+      ],
+      [
+       "M27 × 3",
+       "coarse",
+       "24.00",
+       ".9449",
+       "24.00",
+       "77 %",
+       "8.47"
+      ],
+      [
+       "M30 × 3.5",
+       "coarse",
+       "26.50",
+       "1.0433",
+       "26.50",
+       "77 %",
+       "7.26"
+      ],
+      [
+       "M33 × 3.5",
+       "coarse",
+       "29.50",
+       "1.1614",
+       "29.50",
+       "77 %",
+       "7.26"
+      ],
+      [
+       "M36 × 4",
+       "coarse",
+       "32.00",
+       "1.2598",
+       "32.00",
+       "77 %",
+       "6.35"
+      ],
+      [
+       "M39 × 4",
+       "coarse",
+       "35.00",
+       "1.3780",
+       "35.00",
+       "77 %",
+       "6.35"
+      ],
+      [
+       "M8 × 1",
+       "fine",
+       "7.00",
+       ".2756",
+       "7.00",
+       "77 %",
+       "25.40"
+      ],
+      [
+       "M10 × 1.25",
+       "fine",
+       "8.80",
+       ".3465",
+       "8.75",
+       "74 %",
+       "20.32"
+      ],
+      [
+       "M10 × 1",
+       "fine",
+       "9.00",
+       ".3543",
+       "9.00",
+       "77 %",
+       "25.40"
+      ],
+      [
+       "M12 × 1.5",
+       "fine",
+       "10.50",
+       ".4134",
+       "10.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M12 × 1.25",
+       "fine",
+       "10.80",
+       ".4252",
+       "10.75",
+       "74 %",
+       "20.32"
+      ],
+      [
+       "M14 × 1.5",
+       "fine",
+       "12.50",
+       ".4921",
+       "12.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M16 × 1.5",
+       "fine",
+       "14.50",
+       ".5709",
+       "14.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M18 × 1.5",
+       "fine",
+       "16.50",
+       ".6496",
+       "16.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M20 × 1.5",
+       "fine",
+       "18.50",
+       ".7283",
+       "18.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M22 × 1.5",
+       "fine",
+       "20.50",
+       ".8071",
+       "20.50",
+       "77 %",
+       "16.93"
+      ],
+      [
+       "M24 × 2",
+       "fine",
+       "22.00",
+       ".8661",
+       "22.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M27 × 2",
+       "fine",
+       "25.00",
+       ".9843",
+       "25.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M30 × 2",
+       "fine",
+       "28.00",
+       "1.1024",
+       "28.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M33 × 2",
+       "fine",
+       "31.00",
+       "1.2205",
+       "31.00",
+       "77 %",
+       "12.70"
+      ],
+      [
+       "M36 × 3",
+       "fine",
+       "33.00",
+       "1.2992",
+       "33.00",
+       "77 %",
+       "8.47"
+      ],
+      [
+       "M39 × 3",
+       "fine",
+       "36.00",
+       "1.4173",
+       "36.00",
+       "77 %",
+       "8.47"
+      ]
+     ],
+     "near": [
+      {
+       "col": 2,
+       "label": "mm"
+      },
+      {
+       "col": 3,
+       "label": "in"
+      }
+     ],
+     "note": "Tap drills from Starrett’s chart (M8 × 1.25 uses the common 6.8 mm). % thread = (D − drill) / P × 76.98."
+    },
+    {
+     "type": "table",
+     "title": "Pipe tap drills (NPT)",
+     "columns": [
+      "Thread",
+      "Tap drill",
+      "Drill (in)",
+      "Drill (mm)"
+     ],
+     "rows": [
+      [
+       "1/16-27 NPT",
+       "1/4",
+       ".2500",
+       "6.35"
+      ],
+      [
+       "1/8-27 NPT",
+       "11/32",
+       ".3438",
+       "8.73"
+      ],
+      [
+       "1/4-18 NPT",
+       "7/16",
+       ".4375",
+       "11.11"
+      ],
+      [
+       "3/8-18 NPT",
+       "37/64",
+       ".5781",
+       "14.68"
+      ],
+      [
+       "1/2-14 NPT",
+       "23/32",
+       ".7188",
+       "18.26"
+      ],
+      [
+       "3/4-14 NPT",
+       "59/64",
+       ".9219",
+       "23.42"
+      ],
+      [
+       "1-11.5 NPT",
+       "1-5/32",
+       "1.1563",
+       "29.37"
+      ],
+      [
+       "1-1/4-11.5 NPT",
+       "1-1/2",
+       "1.5000",
+       "38.10"
+      ],
+      [
+       "1-1/2-11.5 NPT",
+       "1-3/4",
+       "1.7500",
+       "44.45"
+      ],
+      [
+       "2-11.5 NPT",
+       "2-7/32",
+       "2.2188",
+       "56.36"
+      ],
+      [
+       "2-1/2-8 NPT",
+       "2-21/32",
+       "2.6563",
+       "67.47"
+      ],
+      [
+       "3-8 NPT",
+       "3-1/4",
+       "3.2500",
+       "82.55"
+      ],
+      [
+       "3-1/2-8 NPT",
+       "3-3/4",
+       "3.7500",
+       "95.25"
+      ],
+      [
+       "4-8 NPT",
+       "4-1/4",
+       "4.2500",
+       "107.95"
+      ]
+     ],
+     "note": "Drill sizes for tapping without reaming (Starrett chart). With a taper pipe reamer, drill one size smaller."
+    },
+    {
+     "type": "table",
+     "title": "Thread pitch and TPI",
+     "columns": [
+      "Thread",
+      "TPI",
+      "Pitch (mm)",
+      "Pitch (in)"
+     ],
+     "rows": [
+      [
+       "4 TPI",
+       "4",
+       "6.3500",
+       ".2500"
+      ],
+      [
+       "4.5 TPI",
+       "4.5",
+       "5.6444",
+       ".2222"
+      ],
+      [
+       "5 TPI",
+       "5",
+       "5.0800",
+       ".2000"
+      ],
+      [
+       "6 TPI",
+       "6",
+       "4.2333",
+       ".1667"
+      ],
+      [
+       "7 TPI",
+       "7",
+       "3.6286",
+       ".1429"
+      ],
+      [
+       "8 TPI",
+       "8",
+       "3.1750",
+       ".1250"
+      ],
+      [
+       "9 TPI",
+       "9",
+       "2.8222",
+       ".1111"
+      ],
+      [
+       "10 TPI",
+       "10",
+       "2.5400",
+       ".1000"
+      ],
+      [
+       "11 TPI",
+       "11",
+       "2.3091",
+       ".0909"
+      ],
+      [
+       "11.5 TPI",
+       "11.5",
+       "2.2087",
+       ".0870"
+      ],
+      [
+       "12 TPI",
+       "12",
+       "2.1167",
+       ".0833"
+      ],
+      [
+       "13 TPI",
+       "13",
+       "1.9538",
+       ".0769"
+      ],
+      [
+       "14 TPI",
+       "14",
+       "1.8143",
+       ".0714"
+      ],
+      [
+       "16 TPI",
+       "16",
+       "1.5875",
+       ".0625"
+      ],
+      [
+       "18 TPI",
+       "18",
+       "1.4111",
+       ".0556"
+      ],
+      [
+       "19 TPI",
+       "19",
+       "1.3368",
+       ".0526"
+      ],
+      [
+       "20 TPI",
+       "20",
+       "1.2700",
+       ".0500"
+      ],
+      [
+       "24 TPI",
+       "24",
+       "1.0583",
+       ".0417"
+      ],
+      [
+       "27 TPI",
+       "27",
+       "0.9407",
+       ".0370"
+      ],
+      [
+       "28 TPI",
+       "28",
+       "0.9071",
+       ".0357"
+      ],
+      [
+       "32 TPI",
+       "32",
+       "0.7937",
+       ".0313"
+      ],
+      [
+       "36 TPI",
+       "36",
+       "0.7056",
+       ".0278"
+      ],
+      [
+       "40 TPI",
+       "40",
+       "0.6350",
+       ".0250"
+      ],
+      [
+       "44 TPI",
+       "44",
+       "0.5773",
+       ".0227"
+      ],
+      [
+       "48 TPI",
+       "48",
+       "0.5292",
+       ".0208"
+      ],
+      [
+       "56 TPI",
+       "56",
+       "0.4536",
+       ".0179"
+      ],
+      [
+       "64 TPI",
+       "64",
+       "0.3969",
+       ".0156"
+      ],
+      [
+       "72 TPI",
+       "72",
+       "0.3528",
+       ".0139"
+      ],
+      [
+       "80 TPI",
+       "80",
+       "0.3175",
+       ".0125"
+      ],
+      [
+       "0.2 mm",
+       "127.000",
+       "0.20",
+       ".0079"
+      ],
+      [
+       "0.25 mm",
+       "101.600",
+       "0.25",
+       ".0098"
+      ],
+      [
+       "0.3 mm",
+       "84.667",
+       "0.30",
+       ".0118"
+      ],
+      [
+       "0.35 mm",
+       "72.571",
+       "0.35",
+       ".0138"
+      ],
+      [
+       "0.4 mm",
+       "63.500",
+       "0.40",
+       ".0157"
+      ],
+      [
+       "0.45 mm",
+       "56.444",
+       "0.45",
+       ".0177"
+      ],
+      [
+       "0.5 mm",
+       "50.800",
+       "0.50",
+       ".0197"
+      ],
+      [
+       "0.6 mm",
+       "42.333",
+       "0.60",
+       ".0236"
+      ],
+      [
+       "0.7 mm",
+       "36.286",
+       "0.70",
+       ".0276"
+      ],
+      [
+       "0.75 mm",
+       "33.867",
+       "0.75",
+       ".0295"
+      ],
+      [
+       "0.8 mm",
+       "31.750",
+       "0.80",
+       ".0315"
+      ],
+      [
+       "1 mm",
+       "25.400",
+       "1.00",
+       ".0394"
+      ],
+      [
+       "1.25 mm",
+       "20.320",
+       "1.25",
+       ".0492"
+      ],
+      [
+       "1.5 mm",
+       "16.933",
+       "1.50",
+       ".0591"
+      ],
+      [
+       "1.75 mm",
+       "14.514",
+       "1.75",
+       ".0689"
+      ],
+      [
+       "2 mm",
+       "12.700",
+       "2.00",
+       ".0787"
+      ],
+      [
+       "2.5 mm",
+       "10.160",
+       "2.50",
+       ".0984"
+      ],
+      [
+       "3 mm",
+       "8.467",
+       "3.00",
+       ".1181"
+      ],
+      [
+       "3.5 mm",
+       "7.257",
+       "3.50",
+       ".1378"
+      ],
+      [
+       "4 mm",
+       "6.350",
+       "4.00",
+       ".1575"
+      ],
+      [
+       "4.5 mm",
+       "5.644",
+       "4.50",
+       ".1772"
+      ],
+      [
+       "5 mm",
+       "5.080",
+       "5.00",
+       ".1969"
+      ],
+      [
+       "5.5 mm",
+       "4.618",
+       "5.50",
+       ".2165"
+      ],
+      [
+       "6 mm",
+       "4.233",
+       "6.00",
+       ".2362"
+      ]
+     ],
+     "near": [
+      {
+       "col": 2,
+       "label": "mm pitch"
+      },
+      {
+       "col": 1,
+       "label": "TPI"
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "TPI to pitch",
+     "tex": "P=\\frac{25.4}{TPI}\\ \\mathrm{mm}",
+     "inputs": [
+      {
+       "id": "t",
+       "label": "Threads per inch",
+       "default": "13"
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Pitch",
+       "expr": "1/t",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 6
+      },
+      {
+       "label": "Pitch in millimetres",
+       "expr": "25.4/t",
+       "unit": "mm",
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Pitch to TPI",
+     "tex": "TPI=\\frac{25.4}{P}",
+     "inputs": [
+      {
+       "id": "p",
+       "label": "Pitch",
+       "unit": "mm",
+       "default": "1.5",
+       "units": [
+        "mm",
+        "in"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Threads per inch",
+       "expr": "25.4/p",
+       "digits": 6
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Tap drill for a thread percentage (inch)",
+     "tex": "d=D-\\frac{0.01299\\cdot\\%}{TPI}",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Major diameter",
+       "unit": "in",
+       "default": "0.25",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "t",
+       "label": "Threads per inch",
+       "default": "20"
+      },
+      {
+       "id": "pc",
+       "label": "Thread percentage",
+       "unit": "%",
+       "default": "75"
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Tap drill",
+       "expr": "D-0.01299*pc/t",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 4
+      }
+     ],
+     "note": "Then look up the nearest drill in the Drills table. 60–75 % is usual; tough materials take less."
+    },
+    {
+     "type": "calc",
+     "title": "Thread percentage from a drill (inch)",
+     "tex": "\\%=\\frac{(D-d)\\,TPI}{0.01299}",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Major diameter",
+       "unit": "in",
+       "default": "0.25",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "t",
+       "label": "Threads per inch",
+       "default": "20"
+      },
+      {
+       "id": "d",
+       "label": "Drill diameter",
+       "unit": "in",
+       "default": "0.201",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Thread percentage",
+       "expr": "(D-d)*t/0.01299",
+       "unit": "%",
+       "digits": 3
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Tap drill for a thread percentage (metric)",
+     "tex": "d=D-\\frac{\\%\\cdot P}{76.98}",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Major diameter",
+       "unit": "mm",
+       "default": "10",
+       "units": [
+        "mm",
+        "in"
+       ]
+      },
+      {
+       "id": "p",
+       "label": "Pitch",
+       "unit": "mm",
+       "default": "1.5",
+       "units": [
+        "mm",
+        "in"
+       ]
+      },
+      {
+       "id": "pc",
+       "label": "Thread percentage",
+       "unit": "%",
+       "default": "75"
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Tap drill",
+       "expr": "D-pc*p/76.98",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 4
+      },
+      {
+       "label": "A D − P drill gives",
+       "expr": "76.98",
+       "unit": "%",
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Unified thread dimensions",
+     "tex": "d_2=D-0.649519P,\\ H=0.866025P",
+     "note": "Basic (nominal) dimensions for a 60° thread, P = 1/TPI. Tolerances by class are not included.",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Major diameter",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "t",
+       "label": "Threads per inch",
+       "default": "13"
+      }
+     ],
+     "outputs": [
+      {
+       "id": "P",
+       "label": "Pitch",
+       "expr": "1/t",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Pitch diameter",
+       "expr": "D-0.649519*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Minor diameter, internal",
+       "expr": "D-1.082532*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Minor diameter, external (UNR root)",
+       "expr": "D-1.190750*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Thread height, external",
+       "expr": "0.613435*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Thread height, internal",
+       "expr": "0.541266*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Fundamental triangle height H",
+       "expr": "0.866025*P",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Compound infeed at 29.5° for the full external depth",
+       "expr": "0.613435*P/cos(29.5*pi/180)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Metric thread dimensions",
+     "tex": "d_2=d-0.649519P",
+     "note": "Basic ISO dimensions (ISO 724). Tolerances by class are not included.",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Major diameter",
+       "unit": "mm",
+       "default": "10",
+       "units": [
+        "mm",
+        "in"
+       ]
+      },
+      {
+       "id": "p",
+       "label": "Pitch",
+       "unit": "mm",
+       "default": "1.5",
+       "units": [
+        "mm",
+        "in"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Pitch diameter",
+       "expr": "D-0.649519*p",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Minor diameter, internal D₁",
+       "expr": "D-1.082532*p",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Minor diameter, external d₃",
+       "expr": "D-1.226869*p",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Thread height, external",
+       "expr": "0.613435*p",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Fundamental triangle height H",
+       "expr": "0.866025*p",
+       "unit": "mm",
+       "units": [
+        "mm",
+        "in"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Three-wire thread measurement",
+     "tex": "M=E+3W-0.866025P",
+     "note": "For 60° threads. E is the pitch diameter you want; the best wire touches at the pitch line.",
+     "inputs": [
+      {
+       "id": "E",
+       "label": "Pitch diameter E",
+       "unit": "in",
+       "default": "0.4500",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "t",
+       "label": "Threads per inch",
+       "default": "13"
+      },
+      {
+       "id": "W",
+       "label": "Wire diameter used",
+       "unit": "in",
+       "default": "0.0444",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Measurement over wires M",
+       "expr": "E+3*W-0.866025/t",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Best wire size",
+       "expr": "0.57735/t",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Smallest and largest wire that work",
+       "expr": "[0.505182/t, 1.010363/t]",
+       "unit": "in",
+       "format": "list",
+       "digits": 5
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Drills",
+   "items": [
+    {
+     "type": "table",
+     "title": "All drills by size",
+     "columns": [
+      "Drill",
+      "Type",
+      "Inch",
+      "mm"
+     ],
+     "rows": [
+      [
+       "0.3 mm",
+       "Metric",
+       ".0118",
+       "0.300"
+      ],
+      [
+       "#80",
+       "Number",
+       ".0135",
+       "0.343"
+      ],
+      [
+       "#79",
+       "Number",
+       ".0145",
+       "0.368"
+      ],
+      [
+       "1/64\"",
+       "Fraction",
+       ".0156",
+       "0.397"
+      ],
+      [
+       "0.4 mm",
+       "Metric",
+       ".0157",
+       "0.400"
+      ],
+      [
+       "#78",
+       "Number",
+       ".0160",
+       "0.406"
+      ],
+      [
+       "#77",
+       "Number",
+       ".0180",
+       "0.457"
+      ],
+      [
+       "0.5 mm",
+       "Metric",
+       ".0197",
+       "0.500"
+      ],
+      [
+       "#76",
+       "Number",
+       ".0200",
+       "0.508"
+      ],
+      [
+       "#75",
+       "Number",
+       ".0210",
+       "0.533"
+      ],
+      [
+       "#74",
+       "Number",
+       ".0225",
+       "0.571"
+      ],
+      [
+       "0.6 mm",
+       "Metric",
+       ".0236",
+       "0.600"
+      ],
+      [
+       "#73",
+       "Number",
+       ".0240",
+       "0.610"
+      ],
+      [
+       "#72",
+       "Number",
+       ".0250",
+       "0.635"
+      ],
+      [
+       "#71",
+       "Number",
+       ".0260",
+       "0.660"
+      ],
+      [
+       "0.7 mm",
+       "Metric",
+       ".0276",
+       "0.700"
+      ],
+      [
+       "#70",
+       "Number",
+       ".0280",
+       "0.711"
+      ],
+      [
+       "#69",
+       "Number",
+       ".0292",
+       "0.742"
+      ],
+      [
+       "#68",
+       "Number",
+       ".0310",
+       "0.787"
+      ],
+      [
+       "1/32\"",
+       "Fraction",
+       ".0313",
+       "0.794"
+      ],
+      [
+       "0.8 mm",
+       "Metric",
+       ".0315",
+       "0.800"
+      ],
+      [
+       "#67",
+       "Number",
+       ".0320",
+       "0.813"
+      ],
+      [
+       "#66",
+       "Number",
+       ".0330",
+       "0.838"
+      ],
+      [
+       "#65",
+       "Number",
+       ".0350",
+       "0.889"
+      ],
+      [
+       "0.9 mm",
+       "Metric",
+       ".0354",
+       "0.900"
+      ],
+      [
+       "#64",
+       "Number",
+       ".0360",
+       "0.914"
+      ],
+      [
+       "#63",
+       "Number",
+       ".0370",
+       "0.940"
+      ],
+      [
+       "#62",
+       "Number",
+       ".0380",
+       "0.965"
+      ],
+      [
+       "#61",
+       "Number",
+       ".0390",
+       "0.991"
+      ],
+      [
+       "1.0 mm",
+       "Metric",
+       ".0394",
+       "1.000"
+      ],
+      [
+       "#60",
+       "Number",
+       ".0400",
+       "1.016"
+      ],
+      [
+       "#59",
+       "Number",
+       ".0410",
+       "1.041"
+      ],
+      [
+       "#58",
+       "Number",
+       ".0420",
+       "1.067"
+      ],
+      [
+       "#57",
+       "Number",
+       ".0430",
+       "1.092"
+      ],
+      [
+       "1.1 mm",
+       "Metric",
+       ".0433",
+       "1.100"
+      ],
+      [
+       "#56",
+       "Number",
+       ".0465",
+       "1.181"
+      ],
+      [
+       "3/64\"",
+       "Fraction",
+       ".0469",
+       "1.191"
+      ],
+      [
+       "1.2 mm",
+       "Metric",
+       ".0472",
+       "1.200"
+      ],
+      [
+       "1.3 mm",
+       "Metric",
+       ".0512",
+       "1.300"
+      ],
+      [
+       "#55",
+       "Number",
+       ".0520",
+       "1.321"
+      ],
+      [
+       "#54",
+       "Number",
+       ".0550",
+       "1.397"
+      ],
+      [
+       "1.4 mm",
+       "Metric",
+       ".0551",
+       "1.400"
+      ],
+      [
+       "1.5 mm",
+       "Metric",
+       ".0591",
+       "1.500"
+      ],
+      [
+       "#53",
+       "Number",
+       ".0595",
+       "1.511"
+      ],
+      [
+       "1/16\"",
+       "Fraction",
+       ".0625",
+       "1.587"
+      ],
+      [
+       "1.6 mm",
+       "Metric",
+       ".0630",
+       "1.600"
+      ],
+      [
+       "#52",
+       "Number",
+       ".0635",
+       "1.613"
+      ],
+      [
+       "1.7 mm",
+       "Metric",
+       ".0669",
+       "1.700"
+      ],
+      [
+       "#51",
+       "Number",
+       ".0670",
+       "1.702"
+      ],
+      [
+       "#50",
+       "Number",
+       ".0700",
+       "1.778"
+      ],
+      [
+       "1.8 mm",
+       "Metric",
+       ".0709",
+       "1.800"
+      ],
+      [
+       "#49",
+       "Number",
+       ".0730",
+       "1.854"
+      ],
+      [
+       "1.9 mm",
+       "Metric",
+       ".0748",
+       "1.900"
+      ],
+      [
+       "#48",
+       "Number",
+       ".0760",
+       "1.930"
+      ],
+      [
+       "5/64\"",
+       "Fraction",
+       ".0781",
+       "1.984"
+      ],
+      [
+       "#47",
+       "Number",
+       ".0785",
+       "1.994"
+      ],
+      [
+       "2.0 mm",
+       "Metric",
+       ".0787",
+       "2.000"
+      ],
+      [
+       "#46",
+       "Number",
+       ".0810",
+       "2.057"
+      ],
+      [
+       "#45",
+       "Number",
+       ".0820",
+       "2.083"
+      ],
+      [
+       "2.1 mm",
+       "Metric",
+       ".0827",
+       "2.100"
+      ],
+      [
+       "#44",
+       "Number",
+       ".0860",
+       "2.184"
+      ],
+      [
+       "2.2 mm",
+       "Metric",
+       ".0866",
+       "2.200"
+      ],
+      [
+       "#43",
+       "Number",
+       ".0890",
+       "2.261"
+      ],
+      [
+       "2.3 mm",
+       "Metric",
+       ".0906",
+       "2.300"
+      ],
+      [
+       "#42",
+       "Number",
+       ".0935",
+       "2.375"
+      ],
+      [
+       "3/32\"",
+       "Fraction",
+       ".0938",
+       "2.381"
+      ],
+      [
+       "2.4 mm",
+       "Metric",
+       ".0945",
+       "2.400"
+      ],
+      [
+       "#41",
+       "Number",
+       ".0960",
+       "2.438"
+      ],
+      [
+       "#40",
+       "Number",
+       ".0980",
+       "2.489"
+      ],
+      [
+       "2.5 mm",
+       "Metric",
+       ".0984",
+       "2.500"
+      ],
+      [
+       "#39",
+       "Number",
+       ".0995",
+       "2.527"
+      ],
+      [
+       "#38",
+       "Number",
+       ".1015",
+       "2.578"
+      ],
+      [
+       "2.6 mm",
+       "Metric",
+       ".1024",
+       "2.600"
+      ],
+      [
+       "#37",
+       "Number",
+       ".1040",
+       "2.642"
+      ],
+      [
+       "2.7 mm",
+       "Metric",
+       ".1063",
+       "2.700"
+      ],
+      [
+       "#36",
+       "Number",
+       ".1065",
+       "2.705"
+      ],
+      [
+       "7/64\"",
+       "Fraction",
+       ".1094",
+       "2.778"
+      ],
+      [
+       "#35",
+       "Number",
+       ".1100",
+       "2.794"
+      ],
+      [
+       "2.8 mm",
+       "Metric",
+       ".1102",
+       "2.800"
+      ],
+      [
+       "#34",
+       "Number",
+       ".1110",
+       "2.819"
+      ],
+      [
+       "#33",
+       "Number",
+       ".1130",
+       "2.870"
+      ],
+      [
+       "2.9 mm",
+       "Metric",
+       ".1142",
+       "2.900"
+      ],
+      [
+       "#32",
+       "Number",
+       ".1160",
+       "2.946"
+      ],
+      [
+       "3.0 mm",
+       "Metric",
+       ".1181",
+       "3.000"
+      ],
+      [
+       "#31",
+       "Number",
+       ".1200",
+       "3.048"
+      ],
+      [
+       "3.1 mm",
+       "Metric",
+       ".1220",
+       "3.100"
+      ],
+      [
+       "1/8\"",
+       "Fraction",
+       ".1250",
+       "3.175"
+      ],
+      [
+       "3.2 mm",
+       "Metric",
+       ".1260",
+       "3.200"
+      ],
+      [
+       "#30",
+       "Number",
+       ".1285",
+       "3.264"
+      ],
+      [
+       "3.3 mm",
+       "Metric",
+       ".1299",
+       "3.300"
+      ],
+      [
+       "3.4 mm",
+       "Metric",
+       ".1339",
+       "3.400"
+      ],
+      [
+       "#29",
+       "Number",
+       ".1360",
+       "3.454"
+      ],
+      [
+       "3.5 mm",
+       "Metric",
+       ".1378",
+       "3.500"
+      ],
+      [
+       "#28",
+       "Number",
+       ".1405",
+       "3.569"
+      ],
+      [
+       "9/64\"",
+       "Fraction",
+       ".1406",
+       "3.572"
+      ],
+      [
+       "3.6 mm",
+       "Metric",
+       ".1417",
+       "3.600"
+      ],
+      [
+       "#27",
+       "Number",
+       ".1440",
+       "3.658"
+      ],
+      [
+       "3.7 mm",
+       "Metric",
+       ".1457",
+       "3.700"
+      ],
+      [
+       "#26",
+       "Number",
+       ".1470",
+       "3.734"
+      ],
+      [
+       "#25",
+       "Number",
+       ".1495",
+       "3.797"
+      ],
+      [
+       "3.8 mm",
+       "Metric",
+       ".1496",
+       "3.800"
+      ],
+      [
+       "#24",
+       "Number",
+       ".1520",
+       "3.861"
+      ],
+      [
+       "3.9 mm",
+       "Metric",
+       ".1535",
+       "3.900"
+      ],
+      [
+       "#23",
+       "Number",
+       ".1540",
+       "3.912"
+      ],
+      [
+       "5/32\"",
+       "Fraction",
+       ".1563",
+       "3.969"
+      ],
+      [
+       "#22",
+       "Number",
+       ".1570",
+       "3.988"
+      ],
+      [
+       "4.0 mm",
+       "Metric",
+       ".1575",
+       "4.000"
+      ],
+      [
+       "#21",
+       "Number",
+       ".1590",
+       "4.039"
+      ],
+      [
+       "#20",
+       "Number",
+       ".1610",
+       "4.089"
+      ],
+      [
+       "4.1 mm",
+       "Metric",
+       ".1614",
+       "4.100"
+      ],
+      [
+       "4.2 mm",
+       "Metric",
+       ".1654",
+       "4.200"
+      ],
+      [
+       "#19",
+       "Number",
+       ".1660",
+       "4.216"
+      ],
+      [
+       "4.3 mm",
+       "Metric",
+       ".1693",
+       "4.300"
+      ],
+      [
+       "#18",
+       "Number",
+       ".1695",
+       "4.305"
+      ],
+      [
+       "11/64\"",
+       "Fraction",
+       ".1719",
+       "4.366"
+      ],
+      [
+       "#17",
+       "Number",
+       ".1730",
+       "4.394"
+      ],
+      [
+       "4.4 mm",
+       "Metric",
+       ".1732",
+       "4.400"
+      ],
+      [
+       "#16",
+       "Number",
+       ".1770",
+       "4.496"
+      ],
+      [
+       "4.5 mm",
+       "Metric",
+       ".1772",
+       "4.500"
+      ],
+      [
+       "#15",
+       "Number",
+       ".1800",
+       "4.572"
+      ],
+      [
+       "4.6 mm",
+       "Metric",
+       ".1811",
+       "4.600"
+      ],
+      [
+       "#14",
+       "Number",
+       ".1820",
+       "4.623"
+      ],
+      [
+       "#13",
+       "Number",
+       ".1850",
+       "4.699"
+      ],
+      [
+       "4.7 mm",
+       "Metric",
+       ".1850",
+       "4.700"
+      ],
+      [
+       "3/16\"",
+       "Fraction",
+       ".1875",
+       "4.762"
+      ],
+      [
+       "4.8 mm",
+       "Metric",
+       ".1890",
+       "4.800"
+      ],
+      [
+       "#12",
+       "Number",
+       ".1890",
+       "4.801"
+      ],
+      [
+       "#11",
+       "Number",
+       ".1910",
+       "4.851"
+      ],
+      [
+       "4.9 mm",
+       "Metric",
+       ".1929",
+       "4.900"
+      ],
+      [
+       "#10",
+       "Number",
+       ".1935",
+       "4.915"
+      ],
+      [
+       "#9",
+       "Number",
+       ".1960",
+       "4.978"
+      ],
+      [
+       "5.0 mm",
+       "Metric",
+       ".1969",
+       "5.000"
+      ],
+      [
+       "#8",
+       "Number",
+       ".1990",
+       "5.055"
+      ],
+      [
+       "5.1 mm",
+       "Metric",
+       ".2008",
+       "5.100"
+      ],
+      [
+       "#7",
+       "Number",
+       ".2010",
+       "5.105"
+      ],
+      [
+       "13/64\"",
+       "Fraction",
+       ".2031",
+       "5.159"
+      ],
+      [
+       "#6",
+       "Number",
+       ".2040",
+       "5.182"
+      ],
+      [
+       "5.2 mm",
+       "Metric",
+       ".2047",
+       "5.200"
+      ],
+      [
+       "#5",
+       "Number",
+       ".2055",
+       "5.220"
+      ],
+      [
+       "5.3 mm",
+       "Metric",
+       ".2087",
+       "5.300"
+      ],
+      [
+       "#4",
+       "Number",
+       ".2090",
+       "5.309"
+      ],
+      [
+       "5.4 mm",
+       "Metric",
+       ".2126",
+       "5.400"
+      ],
+      [
+       "#3",
+       "Number",
+       ".2130",
+       "5.410"
+      ],
+      [
+       "5.5 mm",
+       "Metric",
+       ".2165",
+       "5.500"
+      ],
+      [
+       "7/32\"",
+       "Fraction",
+       ".2188",
+       "5.556"
+      ],
+      [
+       "5.6 mm",
+       "Metric",
+       ".2205",
+       "5.600"
+      ],
+      [
+       "#2",
+       "Number",
+       ".2210",
+       "5.613"
+      ],
+      [
+       "5.7 mm",
+       "Metric",
+       ".2244",
+       "5.700"
+      ],
+      [
+       "#1",
+       "Number",
+       ".2280",
+       "5.791"
+      ],
+      [
+       "5.8 mm",
+       "Metric",
+       ".2283",
+       "5.800"
+      ],
+      [
+       "5.9 mm",
+       "Metric",
+       ".2323",
+       "5.900"
+      ],
+      [
+       "A",
+       "Letter",
+       ".2340",
+       "5.944"
+      ],
+      [
+       "15/64\"",
+       "Fraction",
+       ".2344",
+       "5.953"
+      ],
+      [
+       "6.0 mm",
+       "Metric",
+       ".2362",
+       "6.000"
+      ],
+      [
+       "B",
+       "Letter",
+       ".2380",
+       "6.045"
+      ],
+      [
+       "6.1 mm",
+       "Metric",
+       ".2402",
+       "6.100"
+      ],
+      [
+       "C",
+       "Letter",
+       ".2420",
+       "6.147"
+      ],
+      [
+       "6.2 mm",
+       "Metric",
+       ".2441",
+       "6.200"
+      ],
+      [
+       "D",
+       "Letter",
+       ".2460",
+       "6.248"
+      ],
+      [
+       "6.3 mm",
+       "Metric",
+       ".2480",
+       "6.300"
+      ],
+      [
+       "E",
+       "Letter",
+       ".2500",
+       "6.350"
+      ],
+      [
+       "1/4\"",
+       "Fraction",
+       ".2500",
+       "6.350"
+      ],
+      [
+       "6.4 mm",
+       "Metric",
+       ".2520",
+       "6.400"
+      ],
+      [
+       "6.5 mm",
+       "Metric",
+       ".2559",
+       "6.500"
+      ],
+      [
+       "F",
+       "Letter",
+       ".2570",
+       "6.528"
+      ],
+      [
+       "6.6 mm",
+       "Metric",
+       ".2598",
+       "6.600"
+      ],
+      [
+       "G",
+       "Letter",
+       ".2610",
+       "6.629"
+      ],
+      [
+       "6.7 mm",
+       "Metric",
+       ".2638",
+       "6.700"
+      ],
+      [
+       "17/64\"",
+       "Fraction",
+       ".2656",
+       "6.747"
+      ],
+      [
+       "H",
+       "Letter",
+       ".2660",
+       "6.756"
+      ],
+      [
+       "6.8 mm",
+       "Metric",
+       ".2677",
+       "6.800"
+      ],
+      [
+       "6.9 mm",
+       "Metric",
+       ".2717",
+       "6.900"
+      ],
+      [
+       "I",
+       "Letter",
+       ".2720",
+       "6.909"
+      ],
+      [
+       "7.0 mm",
+       "Metric",
+       ".2756",
+       "7.000"
+      ],
+      [
+       "J",
+       "Letter",
+       ".2770",
+       "7.036"
+      ],
+      [
+       "7.1 mm",
+       "Metric",
+       ".2795",
+       "7.100"
+      ],
+      [
+       "K",
+       "Letter",
+       ".2810",
+       "7.137"
+      ],
+      [
+       "9/32\"",
+       "Fraction",
+       ".2813",
+       "7.144"
+      ],
+      [
+       "7.2 mm",
+       "Metric",
+       ".2835",
+       "7.200"
+      ],
+      [
+       "7.3 mm",
+       "Metric",
+       ".2874",
+       "7.300"
+      ],
+      [
+       "L",
+       "Letter",
+       ".2900",
+       "7.366"
+      ],
+      [
+       "7.4 mm",
+       "Metric",
+       ".2913",
+       "7.400"
+      ],
+      [
+       "M",
+       "Letter",
+       ".2950",
+       "7.493"
+      ],
+      [
+       "7.5 mm",
+       "Metric",
+       ".2953",
+       "7.500"
+      ],
+      [
+       "19/64\"",
+       "Fraction",
+       ".2969",
+       "7.541"
+      ],
+      [
+       "7.6 mm",
+       "Metric",
+       ".2992",
+       "7.600"
+      ],
+      [
+       "N",
+       "Letter",
+       ".3020",
+       "7.671"
+      ],
+      [
+       "7.7 mm",
+       "Metric",
+       ".3031",
+       "7.700"
+      ],
+      [
+       "7.8 mm",
+       "Metric",
+       ".3071",
+       "7.800"
+      ],
+      [
+       "7.9 mm",
+       "Metric",
+       ".3110",
+       "7.900"
+      ],
+      [
+       "5/16\"",
+       "Fraction",
+       ".3125",
+       "7.938"
+      ],
+      [
+       "8.0 mm",
+       "Metric",
+       ".3150",
+       "8.000"
+      ],
+      [
+       "O",
+       "Letter",
+       ".3160",
+       "8.026"
+      ],
+      [
+       "8.1 mm",
+       "Metric",
+       ".3189",
+       "8.100"
+      ],
+      [
+       "8.2 mm",
+       "Metric",
+       ".3228",
+       "8.200"
+      ],
+      [
+       "P",
+       "Letter",
+       ".3230",
+       "8.204"
+      ],
+      [
+       "8.3 mm",
+       "Metric",
+       ".3268",
+       "8.300"
+      ],
+      [
+       "21/64\"",
+       "Fraction",
+       ".3281",
+       "8.334"
+      ],
+      [
+       "8.4 mm",
+       "Metric",
+       ".3307",
+       "8.400"
+      ],
+      [
+       "Q",
+       "Letter",
+       ".3320",
+       "8.433"
+      ],
+      [
+       "8.5 mm",
+       "Metric",
+       ".3346",
+       "8.500"
+      ],
+      [
+       "8.6 mm",
+       "Metric",
+       ".3386",
+       "8.600"
+      ],
+      [
+       "R",
+       "Letter",
+       ".3390",
+       "8.611"
+      ],
+      [
+       "8.7 mm",
+       "Metric",
+       ".3425",
+       "8.700"
+      ],
+      [
+       "11/32\"",
+       "Fraction",
+       ".3438",
+       "8.731"
+      ],
+      [
+       "8.8 mm",
+       "Metric",
+       ".3465",
+       "8.800"
+      ],
+      [
+       "S",
+       "Letter",
+       ".3480",
+       "8.839"
+      ],
+      [
+       "8.9 mm",
+       "Metric",
+       ".3504",
+       "8.900"
+      ],
+      [
+       "9.0 mm",
+       "Metric",
+       ".3543",
+       "9.000"
+      ],
+      [
+       "T",
+       "Letter",
+       ".3580",
+       "9.093"
+      ],
+      [
+       "9.1 mm",
+       "Metric",
+       ".3583",
+       "9.100"
+      ],
+      [
+       "23/64\"",
+       "Fraction",
+       ".3594",
+       "9.128"
+      ],
+      [
+       "9.2 mm",
+       "Metric",
+       ".3622",
+       "9.200"
+      ],
+      [
+       "9.3 mm",
+       "Metric",
+       ".3661",
+       "9.300"
+      ],
+      [
+       "U",
+       "Letter",
+       ".3680",
+       "9.347"
+      ],
+      [
+       "9.4 mm",
+       "Metric",
+       ".3701",
+       "9.400"
+      ],
+      [
+       "9.5 mm",
+       "Metric",
+       ".3740",
+       "9.500"
+      ],
+      [
+       "3/8\"",
+       "Fraction",
+       ".3750",
+       "9.525"
+      ],
+      [
+       "V",
+       "Letter",
+       ".3770",
+       "9.576"
+      ],
+      [
+       "9.6 mm",
+       "Metric",
+       ".3780",
+       "9.600"
+      ],
+      [
+       "9.7 mm",
+       "Metric",
+       ".3819",
+       "9.700"
+      ],
+      [
+       "9.8 mm",
+       "Metric",
+       ".3858",
+       "9.800"
+      ],
+      [
+       "W",
+       "Letter",
+       ".3860",
+       "9.804"
+      ],
+      [
+       "9.9 mm",
+       "Metric",
+       ".3898",
+       "9.900"
+      ],
+      [
+       "25/64\"",
+       "Fraction",
+       ".3906",
+       "9.922"
+      ],
+      [
+       "10.0 mm",
+       "Metric",
+       ".3937",
+       "10.000"
+      ],
+      [
+       "X",
+       "Letter",
+       ".3970",
+       "10.084"
+      ],
+      [
+       "Y",
+       "Letter",
+       ".4040",
+       "10.262"
+      ],
+      [
+       "13/32\"",
+       "Fraction",
+       ".4063",
+       "10.319"
+      ],
+      [
+       "Z",
+       "Letter",
+       ".4130",
+       "10.490"
+      ],
+      [
+       "10.5 mm",
+       "Metric",
+       ".4134",
+       "10.500"
+      ],
+      [
+       "27/64\"",
+       "Fraction",
+       ".4219",
+       "10.716"
+      ],
+      [
+       "11.0 mm",
+       "Metric",
+       ".4331",
+       "11.000"
+      ],
+      [
+       "7/16\"",
+       "Fraction",
+       ".4375",
+       "11.112"
+      ],
+      [
+       "11.5 mm",
+       "Metric",
+       ".4528",
+       "11.500"
+      ],
+      [
+       "29/64\"",
+       "Fraction",
+       ".4531",
+       "11.509"
+      ],
+      [
+       "15/32\"",
+       "Fraction",
+       ".4688",
+       "11.906"
+      ],
+      [
+       "12.0 mm",
+       "Metric",
+       ".4724",
+       "12.000"
+      ],
+      [
+       "31/64\"",
+       "Fraction",
+       ".4844",
+       "12.303"
+      ],
+      [
+       "12.5 mm",
+       "Metric",
+       ".4921",
+       "12.500"
+      ],
+      [
+       "1/2\"",
+       "Fraction",
+       ".5000",
+       "12.700"
+      ],
+      [
+       "13.0 mm",
+       "Metric",
+       ".5118",
+       "13.000"
+      ],
+      [
+       "33/64\"",
+       "Fraction",
+       ".5156",
+       "13.097"
+      ],
+      [
+       "17/32\"",
+       "Fraction",
+       ".5313",
+       "13.494"
+      ],
+      [
+       "13.5 mm",
+       "Metric",
+       ".5315",
+       "13.500"
+      ],
+      [
+       "35/64\"",
+       "Fraction",
+       ".5469",
+       "13.891"
+      ],
+      [
+       "14.0 mm",
+       "Metric",
+       ".5512",
+       "14.000"
+      ],
+      [
+       "9/16\"",
+       "Fraction",
+       ".5625",
+       "14.287"
+      ],
+      [
+       "14.5 mm",
+       "Metric",
+       ".5709",
+       "14.500"
+      ],
+      [
+       "37/64\"",
+       "Fraction",
+       ".5781",
+       "14.684"
+      ],
+      [
+       "15.0 mm",
+       "Metric",
+       ".5906",
+       "15.000"
+      ],
+      [
+       "19/32\"",
+       "Fraction",
+       ".5938",
+       "15.081"
+      ],
+      [
+       "39/64\"",
+       "Fraction",
+       ".6094",
+       "15.478"
+      ],
+      [
+       "15.5 mm",
+       "Metric",
+       ".6102",
+       "15.500"
+      ],
+      [
+       "5/8\"",
+       "Fraction",
+       ".6250",
+       "15.875"
+      ],
+      [
+       "16.0 mm",
+       "Metric",
+       ".6299",
+       "16.000"
+      ],
+      [
+       "41/64\"",
+       "Fraction",
+       ".6406",
+       "16.272"
+      ],
+      [
+       "16.5 mm",
+       "Metric",
+       ".6496",
+       "16.500"
+      ],
+      [
+       "21/32\"",
+       "Fraction",
+       ".6563",
+       "16.669"
+      ],
+      [
+       "17.0 mm",
+       "Metric",
+       ".6693",
+       "17.000"
+      ],
+      [
+       "43/64\"",
+       "Fraction",
+       ".6719",
+       "17.066"
+      ],
+      [
+       "11/16\"",
+       "Fraction",
+       ".6875",
+       "17.462"
+      ],
+      [
+       "17.5 mm",
+       "Metric",
+       ".6890",
+       "17.500"
+      ],
+      [
+       "45/64\"",
+       "Fraction",
+       ".7031",
+       "17.859"
+      ],
+      [
+       "18.0 mm",
+       "Metric",
+       ".7087",
+       "18.000"
+      ],
+      [
+       "23/32\"",
+       "Fraction",
+       ".7188",
+       "18.256"
+      ],
+      [
+       "18.5 mm",
+       "Metric",
+       ".7283",
+       "18.500"
+      ],
+      [
+       "47/64\"",
+       "Fraction",
+       ".7344",
+       "18.653"
+      ],
+      [
+       "19.0 mm",
+       "Metric",
+       ".7480",
+       "19.000"
+      ],
+      [
+       "3/4\"",
+       "Fraction",
+       ".7500",
+       "19.050"
+      ],
+      [
+       "49/64\"",
+       "Fraction",
+       ".7656",
+       "19.447"
+      ],
+      [
+       "19.5 mm",
+       "Metric",
+       ".7677",
+       "19.500"
+      ],
+      [
+       "25/32\"",
+       "Fraction",
+       ".7813",
+       "19.844"
+      ],
+      [
+       "20.0 mm",
+       "Metric",
+       ".7874",
+       "20.000"
+      ],
+      [
+       "51/64\"",
+       "Fraction",
+       ".7969",
+       "20.241"
+      ],
+      [
+       "13/16\"",
+       "Fraction",
+       ".8125",
+       "20.637"
+      ],
+      [
+       "21.0 mm",
+       "Metric",
+       ".8268",
+       "21.000"
+      ],
+      [
+       "53/64\"",
+       "Fraction",
+       ".8281",
+       "21.034"
+      ],
+      [
+       "27/32\"",
+       "Fraction",
+       ".8438",
+       "21.431"
+      ],
+      [
+       "55/64\"",
+       "Fraction",
+       ".8594",
+       "21.828"
+      ],
+      [
+       "22.0 mm",
+       "Metric",
+       ".8661",
+       "22.000"
+      ],
+      [
+       "7/8\"",
+       "Fraction",
+       ".8750",
+       "22.225"
+      ],
+      [
+       "57/64\"",
+       "Fraction",
+       ".8906",
+       "22.622"
+      ],
+      [
+       "23.0 mm",
+       "Metric",
+       ".9055",
+       "23.000"
+      ],
+      [
+       "29/32\"",
+       "Fraction",
+       ".9063",
+       "23.019"
+      ],
+      [
+       "59/64\"",
+       "Fraction",
+       ".9219",
+       "23.416"
+      ],
+      [
+       "15/16\"",
+       "Fraction",
+       ".9375",
+       "23.813"
+      ],
+      [
+       "24.0 mm",
+       "Metric",
+       ".9449",
+       "24.000"
+      ],
+      [
+       "61/64\"",
+       "Fraction",
+       ".9531",
+       "24.209"
+      ],
+      [
+       "31/32\"",
+       "Fraction",
+       ".9688",
+       "24.606"
+      ],
+      [
+       "25.0 mm",
+       "Metric",
+       ".9843",
+       "25.000"
+      ],
+      [
+       "63/64\"",
+       "Fraction",
+       ".9844",
+       "25.003"
+      ],
+      [
+       "1\"",
+       "Fraction",
+       "1.0000",
+       "25.400"
+      ],
+      [
+       "26.0 mm",
+       "Metric",
+       "1.0236",
+       "26.000"
+      ],
+      [
+       "27.0 mm",
+       "Metric",
+       "1.0630",
+       "27.000"
+      ],
+      [
+       "28.0 mm",
+       "Metric",
+       "1.1024",
+       "28.000"
+      ],
+      [
+       "29.0 mm",
+       "Metric",
+       "1.1417",
+       "29.000"
+      ],
+      [
+       "30.0 mm",
+       "Metric",
+       "1.1811",
+       "30.000"
+      ],
+      [
+       "31.0 mm",
+       "Metric",
+       "1.2205",
+       "31.000"
+      ],
+      [
+       "32.0 mm",
+       "Metric",
+       "1.2598",
+       "32.000"
+      ]
+     ],
+     "near": [
+      {
+       "col": 2,
+       "label": "inches"
+      },
+      {
+       "col": 3,
+       "label": "mm"
+      }
+     ],
+     "note": "Number, letter, fractional (to 1 in) and metric drills together, smallest first. Type a size to see the nearest drills."
+    },
+    {
+     "type": "table",
+     "title": "Number drills",
+     "columns": [
+      "Drill",
+      "Inch",
+      "mm"
+     ],
+     "rows": [
+      [
+       "#1",
+       ".2280",
+       "5.791"
+      ],
+      [
+       "#2",
+       ".2210",
+       "5.613"
+      ],
+      [
+       "#3",
+       ".2130",
+       "5.410"
+      ],
+      [
+       "#4",
+       ".2090",
+       "5.309"
+      ],
+      [
+       "#5",
+       ".2055",
+       "5.220"
+      ],
+      [
+       "#6",
+       ".2040",
+       "5.182"
+      ],
+      [
+       "#7",
+       ".2010",
+       "5.105"
+      ],
+      [
+       "#8",
+       ".1990",
+       "5.055"
+      ],
+      [
+       "#9",
+       ".1960",
+       "4.978"
+      ],
+      [
+       "#10",
+       ".1935",
+       "4.915"
+      ],
+      [
+       "#11",
+       ".1910",
+       "4.851"
+      ],
+      [
+       "#12",
+       ".1890",
+       "4.801"
+      ],
+      [
+       "#13",
+       ".1850",
+       "4.699"
+      ],
+      [
+       "#14",
+       ".1820",
+       "4.623"
+      ],
+      [
+       "#15",
+       ".1800",
+       "4.572"
+      ],
+      [
+       "#16",
+       ".1770",
+       "4.496"
+      ],
+      [
+       "#17",
+       ".1730",
+       "4.394"
+      ],
+      [
+       "#18",
+       ".1695",
+       "4.305"
+      ],
+      [
+       "#19",
+       ".1660",
+       "4.216"
+      ],
+      [
+       "#20",
+       ".1610",
+       "4.089"
+      ],
+      [
+       "#21",
+       ".1590",
+       "4.039"
+      ],
+      [
+       "#22",
+       ".1570",
+       "3.988"
+      ],
+      [
+       "#23",
+       ".1540",
+       "3.912"
+      ],
+      [
+       "#24",
+       ".1520",
+       "3.861"
+      ],
+      [
+       "#25",
+       ".1495",
+       "3.797"
+      ],
+      [
+       "#26",
+       ".1470",
+       "3.734"
+      ],
+      [
+       "#27",
+       ".1440",
+       "3.658"
+      ],
+      [
+       "#28",
+       ".1405",
+       "3.569"
+      ],
+      [
+       "#29",
+       ".1360",
+       "3.454"
+      ],
+      [
+       "#30",
+       ".1285",
+       "3.264"
+      ],
+      [
+       "#31",
+       ".1200",
+       "3.048"
+      ],
+      [
+       "#32",
+       ".1160",
+       "2.946"
+      ],
+      [
+       "#33",
+       ".1130",
+       "2.870"
+      ],
+      [
+       "#34",
+       ".1110",
+       "2.819"
+      ],
+      [
+       "#35",
+       ".1100",
+       "2.794"
+      ],
+      [
+       "#36",
+       ".1065",
+       "2.705"
+      ],
+      [
+       "#37",
+       ".1040",
+       "2.642"
+      ],
+      [
+       "#38",
+       ".1015",
+       "2.578"
+      ],
+      [
+       "#39",
+       ".0995",
+       "2.527"
+      ],
+      [
+       "#40",
+       ".0980",
+       "2.489"
+      ],
+      [
+       "#41",
+       ".0960",
+       "2.438"
+      ],
+      [
+       "#42",
+       ".0935",
+       "2.375"
+      ],
+      [
+       "#43",
+       ".0890",
+       "2.261"
+      ],
+      [
+       "#44",
+       ".0860",
+       "2.184"
+      ],
+      [
+       "#45",
+       ".0820",
+       "2.083"
+      ],
+      [
+       "#46",
+       ".0810",
+       "2.057"
+      ],
+      [
+       "#47",
+       ".0785",
+       "1.994"
+      ],
+      [
+       "#48",
+       ".0760",
+       "1.930"
+      ],
+      [
+       "#49",
+       ".0730",
+       "1.854"
+      ],
+      [
+       "#50",
+       ".0700",
+       "1.778"
+      ],
+      [
+       "#51",
+       ".0670",
+       "1.702"
+      ],
+      [
+       "#52",
+       ".0635",
+       "1.613"
+      ],
+      [
+       "#53",
+       ".0595",
+       "1.511"
+      ],
+      [
+       "#54",
+       ".0550",
+       "1.397"
+      ],
+      [
+       "#55",
+       ".0520",
+       "1.321"
+      ],
+      [
+       "#56",
+       ".0465",
+       "1.181"
+      ],
+      [
+       "#57",
+       ".0430",
+       "1.092"
+      ],
+      [
+       "#58",
+       ".0420",
+       "1.067"
+      ],
+      [
+       "#59",
+       ".0410",
+       "1.041"
+      ],
+      [
+       "#60",
+       ".0400",
+       "1.016"
+      ],
+      [
+       "#61",
+       ".0390",
+       "0.991"
+      ],
+      [
+       "#62",
+       ".0380",
+       "0.965"
+      ],
+      [
+       "#63",
+       ".0370",
+       "0.940"
+      ],
+      [
+       "#64",
+       ".0360",
+       "0.914"
+      ],
+      [
+       "#65",
+       ".0350",
+       "0.889"
+      ],
+      [
+       "#66",
+       ".0330",
+       "0.838"
+      ],
+      [
+       "#67",
+       ".0320",
+       "0.813"
+      ],
+      [
+       "#68",
+       ".0310",
+       "0.787"
+      ],
+      [
+       "#69",
+       ".0292",
+       "0.742"
+      ],
+      [
+       "#70",
+       ".0280",
+       "0.711"
+      ],
+      [
+       "#71",
+       ".0260",
+       "0.660"
+      ],
+      [
+       "#72",
+       ".0250",
+       "0.635"
+      ],
+      [
+       "#73",
+       ".0240",
+       "0.610"
+      ],
+      [
+       "#74",
+       ".0225",
+       "0.571"
+      ],
+      [
+       "#75",
+       ".0210",
+       "0.533"
+      ],
+      [
+       "#76",
+       ".0200",
+       "0.508"
+      ],
+      [
+       "#77",
+       ".0180",
+       "0.457"
+      ],
+      [
+       "#78",
+       ".0160",
+       "0.406"
+      ],
+      [
+       "#79",
+       ".0145",
+       "0.368"
+      ],
+      [
+       "#80",
+       ".0135",
+       "0.343"
+      ]
+     ],
+     "near": [
+      {
+       "col": 1,
+       "label": "inches"
+      },
+      {
+       "col": 2,
+       "label": "mm"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "Letter drills",
+     "columns": [
+      "Drill",
+      "Inch",
+      "mm"
+     ],
+     "rows": [
+      [
+       "A",
+       ".2340",
+       "5.944"
+      ],
+      [
+       "B",
+       ".2380",
+       "6.045"
+      ],
+      [
+       "C",
+       ".2420",
+       "6.147"
+      ],
+      [
+       "D",
+       ".2460",
+       "6.248"
+      ],
+      [
+       "E",
+       ".2500",
+       "6.350"
+      ],
+      [
+       "F",
+       ".2570",
+       "6.528"
+      ],
+      [
+       "G",
+       ".2610",
+       "6.629"
+      ],
+      [
+       "H",
+       ".2660",
+       "6.756"
+      ],
+      [
+       "I",
+       ".2720",
+       "6.909"
+      ],
+      [
+       "J",
+       ".2770",
+       "7.036"
+      ],
+      [
+       "K",
+       ".2810",
+       "7.137"
+      ],
+      [
+       "L",
+       ".2900",
+       "7.366"
+      ],
+      [
+       "M",
+       ".2950",
+       "7.493"
+      ],
+      [
+       "N",
+       ".3020",
+       "7.671"
+      ],
+      [
+       "O",
+       ".3160",
+       "8.026"
+      ],
+      [
+       "P",
+       ".3230",
+       "8.204"
+      ],
+      [
+       "Q",
+       ".3320",
+       "8.433"
+      ],
+      [
+       "R",
+       ".3390",
+       "8.611"
+      ],
+      [
+       "S",
+       ".3480",
+       "8.839"
+      ],
+      [
+       "T",
+       ".3580",
+       "9.093"
+      ],
+      [
+       "U",
+       ".3680",
+       "9.347"
+      ],
+      [
+       "V",
+       ".3770",
+       "9.576"
+      ],
+      [
+       "W",
+       ".3860",
+       "9.804"
+      ],
+      [
+       "X",
+       ".3970",
+       "10.084"
+      ],
+      [
+       "Y",
+       ".4040",
+       "10.262"
+      ],
+      [
+       "Z",
+       ".4130",
+       "10.490"
+      ]
+     ],
+     "near": [
+      {
+       "col": 1,
+       "label": "inches"
+      },
+      {
+       "col": 2,
+       "label": "mm"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "Fractional drills and decimal equivalents",
+     "columns": [
+      "Fraction",
+      "Inch",
+      "mm"
+     ],
+     "rows": [
+      [
+       "1/64\"",
+       ".0156",
+       "0.397"
+      ],
+      [
+       "1/32\"",
+       ".0313",
+       "0.794"
+      ],
+      [
+       "3/64\"",
+       ".0469",
+       "1.191"
+      ],
+      [
+       "1/16\"",
+       ".0625",
+       "1.587"
+      ],
+      [
+       "5/64\"",
+       ".0781",
+       "1.984"
+      ],
+      [
+       "3/32\"",
+       ".0938",
+       "2.381"
+      ],
+      [
+       "7/64\"",
+       ".1094",
+       "2.778"
+      ],
+      [
+       "1/8\"",
+       ".1250",
+       "3.175"
+      ],
+      [
+       "9/64\"",
+       ".1406",
+       "3.572"
+      ],
+      [
+       "5/32\"",
+       ".1563",
+       "3.969"
+      ],
+      [
+       "11/64\"",
+       ".1719",
+       "4.366"
+      ],
+      [
+       "3/16\"",
+       ".1875",
+       "4.762"
+      ],
+      [
+       "13/64\"",
+       ".2031",
+       "5.159"
+      ],
+      [
+       "7/32\"",
+       ".2188",
+       "5.556"
+      ],
+      [
+       "15/64\"",
+       ".2344",
+       "5.953"
+      ],
+      [
+       "1/4\"",
+       ".2500",
+       "6.350"
+      ],
+      [
+       "17/64\"",
+       ".2656",
+       "6.747"
+      ],
+      [
+       "9/32\"",
+       ".2813",
+       "7.144"
+      ],
+      [
+       "19/64\"",
+       ".2969",
+       "7.541"
+      ],
+      [
+       "5/16\"",
+       ".3125",
+       "7.938"
+      ],
+      [
+       "21/64\"",
+       ".3281",
+       "8.334"
+      ],
+      [
+       "11/32\"",
+       ".3438",
+       "8.731"
+      ],
+      [
+       "23/64\"",
+       ".3594",
+       "9.128"
+      ],
+      [
+       "3/8\"",
+       ".3750",
+       "9.525"
+      ],
+      [
+       "25/64\"",
+       ".3906",
+       "9.922"
+      ],
+      [
+       "13/32\"",
+       ".4063",
+       "10.319"
+      ],
+      [
+       "27/64\"",
+       ".4219",
+       "10.716"
+      ],
+      [
+       "7/16\"",
+       ".4375",
+       "11.112"
+      ],
+      [
+       "29/64\"",
+       ".4531",
+       "11.509"
+      ],
+      [
+       "15/32\"",
+       ".4688",
+       "11.906"
+      ],
+      [
+       "31/64\"",
+       ".4844",
+       "12.303"
+      ],
+      [
+       "1/2\"",
+       ".5000",
+       "12.700"
+      ],
+      [
+       "33/64\"",
+       ".5156",
+       "13.097"
+      ],
+      [
+       "17/32\"",
+       ".5313",
+       "13.494"
+      ],
+      [
+       "35/64\"",
+       ".5469",
+       "13.891"
+      ],
+      [
+       "9/16\"",
+       ".5625",
+       "14.287"
+      ],
+      [
+       "37/64\"",
+       ".5781",
+       "14.684"
+      ],
+      [
+       "19/32\"",
+       ".5938",
+       "15.081"
+      ],
+      [
+       "39/64\"",
+       ".6094",
+       "15.478"
+      ],
+      [
+       "5/8\"",
+       ".6250",
+       "15.875"
+      ],
+      [
+       "41/64\"",
+       ".6406",
+       "16.272"
+      ],
+      [
+       "21/32\"",
+       ".6563",
+       "16.669"
+      ],
+      [
+       "43/64\"",
+       ".6719",
+       "17.066"
+      ],
+      [
+       "11/16\"",
+       ".6875",
+       "17.462"
+      ],
+      [
+       "45/64\"",
+       ".7031",
+       "17.859"
+      ],
+      [
+       "23/32\"",
+       ".7188",
+       "18.256"
+      ],
+      [
+       "47/64\"",
+       ".7344",
+       "18.653"
+      ],
+      [
+       "3/4\"",
+       ".7500",
+       "19.050"
+      ],
+      [
+       "49/64\"",
+       ".7656",
+       "19.447"
+      ],
+      [
+       "25/32\"",
+       ".7813",
+       "19.844"
+      ],
+      [
+       "51/64\"",
+       ".7969",
+       "20.241"
+      ],
+      [
+       "13/16\"",
+       ".8125",
+       "20.637"
+      ],
+      [
+       "53/64\"",
+       ".8281",
+       "21.034"
+      ],
+      [
+       "27/32\"",
+       ".8438",
+       "21.431"
+      ],
+      [
+       "55/64\"",
+       ".8594",
+       "21.828"
+      ],
+      [
+       "7/8\"",
+       ".8750",
+       "22.225"
+      ],
+      [
+       "57/64\"",
+       ".8906",
+       "22.622"
+      ],
+      [
+       "29/32\"",
+       ".9063",
+       "23.019"
+      ],
+      [
+       "59/64\"",
+       ".9219",
+       "23.416"
+      ],
+      [
+       "15/16\"",
+       ".9375",
+       "23.813"
+      ],
+      [
+       "61/64\"",
+       ".9531",
+       "24.209"
+      ],
+      [
+       "31/32\"",
+       ".9688",
+       "24.606"
+      ],
+      [
+       "63/64\"",
+       ".9844",
+       "25.003"
+      ],
+      [
+       "1\"",
+       "1.0000",
+       "25.400"
+      ]
+     ],
+     "near": [
+      {
+       "col": 1,
+       "label": "inches"
+      },
+      {
+       "col": 2,
+       "label": "mm"
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "Metric drills",
+     "columns": [
+      "Drill",
+      "Inch",
+      "mm"
+     ],
+     "rows": [
+      [
+       "0.3 mm",
+       ".0118",
+       "0.30"
+      ],
+      [
+       "0.4 mm",
+       ".0157",
+       "0.40"
+      ],
+      [
+       "0.5 mm",
+       ".0197",
+       "0.50"
+      ],
+      [
+       "0.6 mm",
+       ".0236",
+       "0.60"
+      ],
+      [
+       "0.7 mm",
+       ".0276",
+       "0.70"
+      ],
+      [
+       "0.8 mm",
+       ".0315",
+       "0.80"
+      ],
+      [
+       "0.9 mm",
+       ".0354",
+       "0.90"
+      ],
+      [
+       "1.0 mm",
+       ".0394",
+       "1.00"
+      ],
+      [
+       "1.1 mm",
+       ".0433",
+       "1.10"
+      ],
+      [
+       "1.2 mm",
+       ".0472",
+       "1.20"
+      ],
+      [
+       "1.3 mm",
+       ".0512",
+       "1.30"
+      ],
+      [
+       "1.4 mm",
+       ".0551",
+       "1.40"
+      ],
+      [
+       "1.5 mm",
+       ".0591",
+       "1.50"
+      ],
+      [
+       "1.6 mm",
+       ".0630",
+       "1.60"
+      ],
+      [
+       "1.7 mm",
+       ".0669",
+       "1.70"
+      ],
+      [
+       "1.8 mm",
+       ".0709",
+       "1.80"
+      ],
+      [
+       "1.9 mm",
+       ".0748",
+       "1.90"
+      ],
+      [
+       "2.0 mm",
+       ".0787",
+       "2.00"
+      ],
+      [
+       "2.1 mm",
+       ".0827",
+       "2.10"
+      ],
+      [
+       "2.2 mm",
+       ".0866",
+       "2.20"
+      ],
+      [
+       "2.3 mm",
+       ".0906",
+       "2.30"
+      ],
+      [
+       "2.4 mm",
+       ".0945",
+       "2.40"
+      ],
+      [
+       "2.5 mm",
+       ".0984",
+       "2.50"
+      ],
+      [
+       "2.6 mm",
+       ".1024",
+       "2.60"
+      ],
+      [
+       "2.7 mm",
+       ".1063",
+       "2.70"
+      ],
+      [
+       "2.8 mm",
+       ".1102",
+       "2.80"
+      ],
+      [
+       "2.9 mm",
+       ".1142",
+       "2.90"
+      ],
+      [
+       "3.0 mm",
+       ".1181",
+       "3.00"
+      ],
+      [
+       "3.1 mm",
+       ".1220",
+       "3.10"
+      ],
+      [
+       "3.2 mm",
+       ".1260",
+       "3.20"
+      ],
+      [
+       "3.3 mm",
+       ".1299",
+       "3.30"
+      ],
+      [
+       "3.4 mm",
+       ".1339",
+       "3.40"
+      ],
+      [
+       "3.5 mm",
+       ".1378",
+       "3.50"
+      ],
+      [
+       "3.6 mm",
+       ".1417",
+       "3.60"
+      ],
+      [
+       "3.7 mm",
+       ".1457",
+       "3.70"
+      ],
+      [
+       "3.8 mm",
+       ".1496",
+       "3.80"
+      ],
+      [
+       "3.9 mm",
+       ".1535",
+       "3.90"
+      ],
+      [
+       "4.0 mm",
+       ".1575",
+       "4.00"
+      ],
+      [
+       "4.1 mm",
+       ".1614",
+       "4.10"
+      ],
+      [
+       "4.2 mm",
+       ".1654",
+       "4.20"
+      ],
+      [
+       "4.3 mm",
+       ".1693",
+       "4.30"
+      ],
+      [
+       "4.4 mm",
+       ".1732",
+       "4.40"
+      ],
+      [
+       "4.5 mm",
+       ".1772",
+       "4.50"
+      ],
+      [
+       "4.6 mm",
+       ".1811",
+       "4.60"
+      ],
+      [
+       "4.7 mm",
+       ".1850",
+       "4.70"
+      ],
+      [
+       "4.8 mm",
+       ".1890",
+       "4.80"
+      ],
+      [
+       "4.9 mm",
+       ".1929",
+       "4.90"
+      ],
+      [
+       "5.0 mm",
+       ".1969",
+       "5.00"
+      ],
+      [
+       "5.1 mm",
+       ".2008",
+       "5.10"
+      ],
+      [
+       "5.2 mm",
+       ".2047",
+       "5.20"
+      ],
+      [
+       "5.3 mm",
+       ".2087",
+       "5.30"
+      ],
+      [
+       "5.4 mm",
+       ".2126",
+       "5.40"
+      ],
+      [
+       "5.5 mm",
+       ".2165",
+       "5.50"
+      ],
+      [
+       "5.6 mm",
+       ".2205",
+       "5.60"
+      ],
+      [
+       "5.7 mm",
+       ".2244",
+       "5.70"
+      ],
+      [
+       "5.8 mm",
+       ".2283",
+       "5.80"
+      ],
+      [
+       "5.9 mm",
+       ".2323",
+       "5.90"
+      ],
+      [
+       "6.0 mm",
+       ".2362",
+       "6.00"
+      ],
+      [
+       "6.1 mm",
+       ".2402",
+       "6.10"
+      ],
+      [
+       "6.2 mm",
+       ".2441",
+       "6.20"
+      ],
+      [
+       "6.3 mm",
+       ".2480",
+       "6.30"
+      ],
+      [
+       "6.4 mm",
+       ".2520",
+       "6.40"
+      ],
+      [
+       "6.5 mm",
+       ".2559",
+       "6.50"
+      ],
+      [
+       "6.6 mm",
+       ".2598",
+       "6.60"
+      ],
+      [
+       "6.7 mm",
+       ".2638",
+       "6.70"
+      ],
+      [
+       "6.8 mm",
+       ".2677",
+       "6.80"
+      ],
+      [
+       "6.9 mm",
+       ".2717",
+       "6.90"
+      ],
+      [
+       "7.0 mm",
+       ".2756",
+       "7.00"
+      ],
+      [
+       "7.1 mm",
+       ".2795",
+       "7.10"
+      ],
+      [
+       "7.2 mm",
+       ".2835",
+       "7.20"
+      ],
+      [
+       "7.3 mm",
+       ".2874",
+       "7.30"
+      ],
+      [
+       "7.4 mm",
+       ".2913",
+       "7.40"
+      ],
+      [
+       "7.5 mm",
+       ".2953",
+       "7.50"
+      ],
+      [
+       "7.6 mm",
+       ".2992",
+       "7.60"
+      ],
+      [
+       "7.7 mm",
+       ".3031",
+       "7.70"
+      ],
+      [
+       "7.8 mm",
+       ".3071",
+       "7.80"
+      ],
+      [
+       "7.9 mm",
+       ".3110",
+       "7.90"
+      ],
+      [
+       "8.0 mm",
+       ".3150",
+       "8.00"
+      ],
+      [
+       "8.1 mm",
+       ".3189",
+       "8.10"
+      ],
+      [
+       "8.2 mm",
+       ".3228",
+       "8.20"
+      ],
+      [
+       "8.3 mm",
+       ".3268",
+       "8.30"
+      ],
+      [
+       "8.4 mm",
+       ".3307",
+       "8.40"
+      ],
+      [
+       "8.5 mm",
+       ".3346",
+       "8.50"
+      ],
+      [
+       "8.6 mm",
+       ".3386",
+       "8.60"
+      ],
+      [
+       "8.7 mm",
+       ".3425",
+       "8.70"
+      ],
+      [
+       "8.8 mm",
+       ".3465",
+       "8.80"
+      ],
+      [
+       "8.9 mm",
+       ".3504",
+       "8.90"
+      ],
+      [
+       "9.0 mm",
+       ".3543",
+       "9.00"
+      ],
+      [
+       "9.1 mm",
+       ".3583",
+       "9.10"
+      ],
+      [
+       "9.2 mm",
+       ".3622",
+       "9.20"
+      ],
+      [
+       "9.3 mm",
+       ".3661",
+       "9.30"
+      ],
+      [
+       "9.4 mm",
+       ".3701",
+       "9.40"
+      ],
+      [
+       "9.5 mm",
+       ".3740",
+       "9.50"
+      ],
+      [
+       "9.6 mm",
+       ".3780",
+       "9.60"
+      ],
+      [
+       "9.7 mm",
+       ".3819",
+       "9.70"
+      ],
+      [
+       "9.8 mm",
+       ".3858",
+       "9.80"
+      ],
+      [
+       "9.9 mm",
+       ".3898",
+       "9.90"
+      ],
+      [
+       "10.0 mm",
+       ".3937",
+       "10.00"
+      ],
+      [
+       "10.5 mm",
+       ".4134",
+       "10.50"
+      ],
+      [
+       "11.0 mm",
+       ".4331",
+       "11.00"
+      ],
+      [
+       "11.5 mm",
+       ".4528",
+       "11.50"
+      ],
+      [
+       "12.0 mm",
+       ".4724",
+       "12.00"
+      ],
+      [
+       "12.5 mm",
+       ".4921",
+       "12.50"
+      ],
+      [
+       "13.0 mm",
+       ".5118",
+       "13.00"
+      ],
+      [
+       "13.5 mm",
+       ".5315",
+       "13.50"
+      ],
+      [
+       "14.0 mm",
+       ".5512",
+       "14.00"
+      ],
+      [
+       "14.5 mm",
+       ".5709",
+       "14.50"
+      ],
+      [
+       "15.0 mm",
+       ".5906",
+       "15.00"
+      ],
+      [
+       "15.5 mm",
+       ".6102",
+       "15.50"
+      ],
+      [
+       "16.0 mm",
+       ".6299",
+       "16.00"
+      ],
+      [
+       "16.5 mm",
+       ".6496",
+       "16.50"
+      ],
+      [
+       "17.0 mm",
+       ".6693",
+       "17.00"
+      ],
+      [
+       "17.5 mm",
+       ".6890",
+       "17.50"
+      ],
+      [
+       "18.0 mm",
+       ".7087",
+       "18.00"
+      ],
+      [
+       "18.5 mm",
+       ".7283",
+       "18.50"
+      ],
+      [
+       "19.0 mm",
+       ".7480",
+       "19.00"
+      ],
+      [
+       "19.5 mm",
+       ".7677",
+       "19.50"
+      ],
+      [
+       "20.0 mm",
+       ".7874",
+       "20.00"
+      ],
+      [
+       "21.0 mm",
+       ".8268",
+       "21.00"
+      ],
+      [
+       "22.0 mm",
+       ".8661",
+       "22.00"
+      ],
+      [
+       "23.0 mm",
+       ".9055",
+       "23.00"
+      ],
+      [
+       "24.0 mm",
+       ".9449",
+       "24.00"
+      ],
+      [
+       "25.0 mm",
+       ".9843",
+       "25.00"
+      ],
+      [
+       "26.0 mm",
+       "1.0236",
+       "26.00"
+      ],
+      [
+       "27.0 mm",
+       "1.0630",
+       "27.00"
+      ],
+      [
+       "28.0 mm",
+       "1.1024",
+       "28.00"
+      ],
+      [
+       "29.0 mm",
+       "1.1417",
+       "29.00"
+      ],
+      [
+       "30.0 mm",
+       "1.1811",
+       "30.00"
+      ],
+      [
+       "31.0 mm",
+       "1.2205",
+       "31.00"
+      ],
+      [
+       "32.0 mm",
+       "1.2598",
+       "32.00"
+      ]
+     ],
+     "near": [
+      {
+       "col": 2,
+       "label": "mm"
+      },
+      {
+       "col": 1,
+       "label": "inches"
+      }
+     ],
+     "note": "0.3–10 mm in 0.1 mm steps, 10–20 mm in 0.5 mm steps, 20–32 mm in 1 mm steps."
+    },
+    {
+     "type": "table",
+     "title": "Clearance holes, inch screws",
+     "columns": [
+      "Screw",
+      "Major dia (in)",
+      "Close fit",
+      "Close (in)",
+      "Free fit",
+      "Free (in)"
+     ],
+     "rows": [
+      [
+       "#0",
+       ".0600",
+       "#52",
+       ".0635",
+       "#50",
+       ".0700"
+      ],
+      [
+       "#1",
+       ".0730",
+       "#48",
+       ".0760",
+       "#46",
+       ".0810"
+      ],
+      [
+       "#2",
+       ".0860",
+       "#43",
+       ".0890",
+       "#41",
+       ".0960"
+      ],
+      [
+       "#3",
+       ".0990",
+       "#37",
+       ".1040",
+       "#35",
+       ".1100"
+      ],
+      [
+       "#4",
+       ".1120",
+       "#32",
+       ".1160",
+       "#30",
+       ".1285"
+      ],
+      [
+       "#5",
+       ".1250",
+       "#30",
+       ".1285",
+       "#29",
+       ".1360"
+      ],
+      [
+       "#6",
+       ".1380",
+       "#27",
+       ".1440",
+       "#25",
+       ".1495"
+      ],
+      [
+       "#8",
+       ".1640",
+       "#18",
+       ".1695",
+       "#16",
+       ".1770"
+      ],
+      [
+       "#10",
+       ".1900",
+       "#9",
+       ".1960",
+       "#7",
+       ".2010"
+      ],
+      [
+       "#12",
+       ".2160",
+       "#2",
+       ".2210",
+       "#1",
+       ".2280"
+      ],
+      [
+       "1/4",
+       ".2500",
+       "F",
+       ".2570",
+       "H",
+       ".2660"
+      ],
+      [
+       "5/16",
+       ".3125",
+       "P",
+       ".3230",
+       "Q",
+       ".3320"
+      ],
+      [
+       "3/8",
+       ".3750",
+       "W",
+       ".3860",
+       "X",
+       ".3970"
+      ],
+      [
+       "7/16",
+       ".4375",
+       "29/64",
+       ".4531",
+       "15/32",
+       ".4688"
+      ],
+      [
+       "1/2",
+       ".5000",
+       "33/64",
+       ".5156",
+       "17/32",
+       ".5313"
+      ],
+      [
+       "5/8",
+       ".6250",
+       "41/64",
+       ".6406",
+       "21/32",
+       ".6563"
+      ],
+      [
+       "3/4",
+       ".7500",
+       "49/64",
+       ".7656",
+       "25/32",
+       ".7813"
+      ],
+      [
+       "7/8",
+       ".8750",
+       "57/64",
+       ".8906",
+       "29/32",
+       ".9063"
+      ],
+      [
+       "1",
+       "1.0000",
+       "1-1/64",
+       "1.0156",
+       "1-1/32",
+       "1.0313"
+      ]
+     ]
+    },
+    {
+     "type": "table",
+     "title": "Clearance holes, metric screws (ISO 273)",
+     "columns": [
+      "Screw",
+      "Fine (mm)",
+      "Medium (mm)",
+      "Coarse (mm)"
+     ],
+     "rows": [
+      [
+       "M1.6",
+       "1.7",
+       "1.8",
+       "2.0"
+      ],
+      [
+       "M2",
+       "2.2",
+       "2.4",
+       "2.6"
+      ],
+      [
+       "M2.5",
+       "2.7",
+       "2.9",
+       "3.1"
+      ],
+      [
+       "M3",
+       "3.2",
+       "3.4",
+       "3.6"
+      ],
+      [
+       "M4",
+       "4.3",
+       "4.5",
+       "4.8"
+      ],
+      [
+       "M5",
+       "5.3",
+       "5.5",
+       "5.8"
+      ],
+      [
+       "M6",
+       "6.4",
+       "6.6",
+       "7.0"
+      ],
+      [
+       "M8",
+       "8.4",
+       "9.0",
+       "10.0"
+      ],
+      [
+       "M10",
+       "10.5",
+       "11.0",
+       "12.0"
+      ],
+      [
+       "M12",
+       "13.0",
+       "13.5",
+       "14.5"
+      ],
+      [
+       "M14",
+       "15.0",
+       "15.5",
+       "16.5"
+      ],
+      [
+       "M16",
+       "17.0",
+       "17.5",
+       "18.5"
+      ],
+      [
+       "M20",
+       "21.0",
+       "22.0",
+       "24.0"
+      ],
+      [
+       "M24",
+       "25.0",
+       "26.0",
+       "28.0"
+      ],
+      [
+       "M30",
+       "31.0",
+       "33.0",
+       "35.0"
+      ]
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Drill point length",
+     "tex": "L=\\frac{D/2}{\\tan(\\theta/2)}",
+     "angles": "deg",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Drill diameter",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "a",
+       "label": "Point angle",
+       "unit": "°",
+       "default": "118",
+       "units": [
+        "°"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Length of the point",
+       "expr": "D/2/tan(a/2)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Countersink depth",
+     "tex": "h=\\frac{(D_c-d)/2}{\\tan(\\theta/2)}",
+     "angles": "deg",
+     "note": "Depth from the surface to reach the countersink diameter D_c. Use d = 0 for a sharp point.",
+     "inputs": [
+      {
+       "id": "Dc",
+       "label": "Countersink diameter at the surface",
+       "unit": "in",
+       "default": "0.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "d",
+       "label": "Diameter at the bottom (0 for a point)",
+       "unit": "in",
+       "default": "0",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "a",
+       "label": "Countersink angle",
+       "options": [
+        {
+         "label": "82° (inch flat-head screws)",
+         "value": "82"
+        },
+        {
+         "label": "90° (metric screws, chamfers)",
+         "value": "90"
+        },
+        {
+         "label": "100°",
+         "value": "100"
+        },
+        {
+         "label": "120°",
+         "value": "120"
+        },
+        {
+         "label": "60° (centre drills)",
+         "value": "60"
+        }
+       ],
+       "default": 0
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Depth",
+       "expr": "(Dc-d)/2/tan(a/2)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 4
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Shop math",
+   "items": [
+    {
+     "type": "calc",
+     "title": "Decimal to nearest fraction",
+     "tex": "\\frac{\\mathrm{round}(xn)}{n}",
+     "inputs": [
+      {
+       "id": "x",
+       "label": "Size",
+       "unit": "in",
+       "default": "0.3125",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "n",
+       "label": "Nearest",
+       "options": [
+        {
+         "label": "1/64",
+         "value": "64"
+        },
+        {
+         "label": "1/32",
+         "value": "32"
+        },
+        {
+         "label": "1/16",
+         "value": "16"
+        },
+        {
+         "label": "1/8",
+         "value": "8"
+        },
+        {
+         "label": "1/128",
+         "value": "128"
+        }
+       ],
+       "default": 0
+      }
+     ],
+     "outputs": [
+      {
+       "id": "f",
+       "label": "Nearest fraction",
+       "expr": "round(x*n)/n",
+       "unit": "in",
+       "format": "exact"
+      },
+      {
+       "label": "Difference (size − fraction)",
+       "expr": "x-f",
+       "unit": "in",
+       "units": [
+        "in",
+        "thou",
+        "mm"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Inch and metric",
+     "tex": "1\\,\\mathrm{in}=25.4\\,\\mathrm{mm}",
+     "inputs": [
+      {
+       "id": "x",
+       "label": "Length",
+       "unit": "in",
+       "default": "1",
+       "units": [
+        "in",
+        "mm",
+        "thou",
+        "ft",
+        "µm",
+        "cm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Inches",
+       "expr": "x",
+       "unit": "in",
+       "digits": 6
+      },
+      {
+       "label": "Millimetres",
+       "expr": "x*25.4",
+       "unit": "mm",
+       "digits": 6
+      },
+      {
+       "label": "Thousandths",
+       "expr": "x*1000",
+       "unit": "thou",
+       "digits": 6
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Bolt circle",
+     "tex": "x_k=x_0+\\frac D2\\cos\\left(\\theta_0+\\frac{360k}{N}\\right)",
+     "angles": "deg",
+     "note": "Hole centres, starting at angle θ₀ from the +X axis and going counter-clockwise.",
+     "inputs": [
+      {
+       "id": "N",
+       "label": "Number of holes",
+       "default": "6"
+      },
+      {
+       "id": "D",
+       "label": "Bolt circle diameter",
+       "unit": "in",
+       "default": "4",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "a0",
+       "label": "Angle of the first hole θ₀",
+       "unit": "°",
+       "default": "0",
+       "units": [
+        "°"
+       ]
+      },
+      {
+       "id": "X0",
+       "label": "Centre X",
+       "unit": "in",
+       "default": "0",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "Y0",
+       "label": "Centre Y",
+       "unit": "in",
+       "default": "0",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Hole centres [hole, X, Y]",
+       "expr": "seq([k, round(10000*(X0+D/2*cos(a0+360*(k-1)/N)))/10000, round(10000*(Y0+D/2*sin(a0+360*(k-1)/N)))/10000], k, 1, N)",
+       "format": "list"
+      },
+      {
+       "label": "Distance between neighbouring holes",
+       "expr": "D*sin(180/N)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Sine bar height",
+     "tex": "h=L\\sin\\theta",
+     "angles": "deg",
+     "inputs": [
+      {
+       "id": "L",
+       "label": "Sine bar length",
+       "unit": "in",
+       "default": "5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "a",
+       "label": "Angle",
+       "unit": "°",
+       "default": "30",
+       "units": [
+        "°"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Gauge block stack",
+       "expr": "L*sin(a)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Sine bar angle",
+     "tex": "\\theta=\\arcsin\\frac hL",
+     "angles": "deg",
+     "inputs": [
+      {
+       "id": "L",
+       "label": "Sine bar length",
+       "unit": "in",
+       "default": "5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "h",
+       "label": "Gauge block stack",
+       "unit": "in",
+       "default": "2.5",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Angle",
+       "expr": "asin(h/L)",
+       "unit": "°",
+       "units": [
+        "°"
+       ],
+       "digits": 6
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Taper",
+     "tex": "TPF=\\frac{12(D-d)}{L}",
+     "angles": "deg",
+     "inputs": [
+      {
+       "id": "D",
+       "label": "Large diameter",
+       "unit": "in",
+       "default": "1",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "d",
+       "label": "Small diameter",
+       "unit": "in",
+       "default": "0.75",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "L",
+       "label": "Length of the taper",
+       "unit": "in",
+       "default": "3",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Taper per foot",
+       "expr": "12*(D-d)/L",
+       "unit": "in/ft",
+       "digits": 5
+      },
+      {
+       "label": "Taper per inch",
+       "expr": "(D-d)/L",
+       "unit": "in/in",
+       "digits": 5
+      },
+      {
+       "label": "Included angle",
+       "expr": "2*atan((D-d)/(2*L))",
+       "unit": "°",
+       "units": [
+        "°"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Compound (half) angle to set",
+       "expr": "atan((D-d)/(2*L))",
+       "unit": "°",
+       "units": [
+        "°"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Chord, radius and sagitta",
+     "tex": "s=R-\\sqrt{R^2-c^2/4}",
+     "inputs": [
+      {
+       "id": "R",
+       "label": "Radius",
+       "unit": "in",
+       "default": "2",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "c",
+       "label": "Chord length",
+       "unit": "in",
+       "default": "3",
+       "units": [
+        "in",
+        "mm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Sagitta (arc height)",
+       "expr": "R-sqrt(R^2-c^2/4)",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      },
+      {
+       "label": "Arc length",
+       "expr": "2*R*asin(c/(2*R))",
+       "unit": "in",
+       "units": [
+        "in",
+        "mm"
+       ],
+       "digits": 5
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Bar stock weight",
+     "tex": "W=kd^2L\\rho",
+     "inputs": [
+      {
+       "id": "k",
+       "label": "Shape",
+       "options": [
+        {
+         "label": "Round (d = diameter)",
+         "value": "pi/4"
+        },
+        {
+         "label": "Hexagon (d = across flats)",
+         "value": "sqrt(3)/2"
+        },
+        {
+         "label": "Square (d = side)",
+         "value": "1"
+        }
+       ],
+       "default": 0
+      },
+      {
+       "id": "d",
+       "label": "Size d",
+       "unit": "in",
+       "default": "1",
+       "units": [
+        "in",
+        "mm"
+       ]
+      },
+      {
+       "id": "L",
+       "label": "Length",
+       "unit": "in",
+       "default": "12",
+       "units": [
+        "in",
+        "mm",
+        "ft",
+        "m"
+       ]
+      },
+      {
+       "id": "rho",
+       "label": "Material",
+       "options": [
+        {
+         "label": "Steel (0.2836 lb/in³)",
+         "value": "0.2836"
+        },
+        {
+         "label": "Stainless steel (0.289)",
+         "value": "0.289"
+        },
+        {
+         "label": "Aluminum (0.0975)",
+         "value": "0.0975"
+        },
+        {
+         "label": "Brass (0.307)",
+         "value": "0.307"
+        },
+        {
+         "label": "Copper (0.323)",
+         "value": "0.323"
+        },
+        {
+         "label": "Cast iron (0.260)",
+         "value": "0.26"
+        },
+        {
+         "label": "Titanium (0.160)",
+         "value": "0.16"
+        },
+        {
+         "label": "Acetal (0.051)",
+         "value": "0.051"
+        }
+       ],
+       "default": 0
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Weight",
+       "expr": "k*d^2*L*rho",
+       "unit": "lb",
+       "units": [
+        "lb",
+        "kg",
+        "oz",
+        "g"
+       ],
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Surface finish Ra",
+     "tex": "R_a[\\mu\\mathrm m]=0.0254\\,R_a[\\mu\\mathrm{in}]",
+     "inputs": [
+      {
+       "id": "r",
+       "label": "Ra",
+       "unit": "µin",
+       "default": "63",
+       "units": [
+        "µin",
+        "µm"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Ra",
+       "expr": "r",
+       "unit": "µin",
+       "digits": 4
+      },
+      {
+       "label": "Ra",
+       "expr": "r*0.0254",
+       "unit": "µm",
+       "digits": 4
+      },
+      {
+       "label": "RMS (Rq ≈ 1.11 Ra, typical)",
+       "expr": "1.11*r",
+       "unit": "µin",
+       "units": [
+        "µin",
+        "µm"
+       ],
+       "digits": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "title": "G & M codes",
+   "items": [
+    {
+     "type": "table",
+     "title": "G codes",
+     "columns": [
+      "Code",
+      "Machine",
+      "Function",
+      "Notes"
+     ],
+     "rows": [
+      [
+       "G00",
+       "Both",
+       "Rapid move",
+       "Fastest traverse; not for cutting"
+      ],
+      [
+       "G01",
+       "Both",
+       "Linear move at feed F",
+       ""
+      ],
+      [
+       "G02",
+       "Both",
+       "Arc clockwise",
+       "With R (radius) or I J K (centre offsets)"
+      ],
+      [
+       "G03",
+       "Both",
+       "Arc counter-clockwise",
+       "With R or I J K"
+      ],
+      [
+       "G04",
+       "Both",
+       "Dwell",
+       "P in ms (P1000 = 1 s), or X/U in seconds, by control"
+      ],
+      [
+       "G09",
+       "Both",
+       "Exact stop (this block)",
+       ""
+      ],
+      [
+       "G10",
+       "Both",
+       "Set offsets from the program",
+       "L2 work offsets, L1/L10–L13 tool offsets (Fanuc)"
+      ],
+      [
+       "G15 / G16",
+       "Mill",
+       "Polar coordinates off / on",
+       ""
+      ],
+      [
+       "G17",
+       "Mill",
+       "XY plane",
+       "Default for arcs and cutter comp"
+      ],
+      [
+       "G18",
+       "Both",
+       "ZX plane",
+       "Default on lathes"
+      ],
+      [
+       "G19",
+       "Mill",
+       "YZ plane",
+       ""
+      ],
+      [
+       "G20",
+       "Both",
+       "Inch units",
+       ""
+      ],
+      [
+       "G21",
+       "Both",
+       "Metric units",
+       ""
+      ],
+      [
+       "G28",
+       "Both",
+       "Return to machine home",
+       "Through the point given; G91 G28 Z0 goes straight up"
+      ],
+      [
+       "G30",
+       "Both",
+       "Return to second reference point",
+       ""
+      ],
+      [
+       "G31",
+       "Both",
+       "Skip (probe) move",
+       "Stops when the probe trips"
+      ],
+      [
+       "G32",
+       "Lathe",
+       "Single threading pass",
+       "F = lead"
+      ],
+      [
+       "G40",
+       "Both",
+       "Cutter / nose-radius comp off",
+       ""
+      ],
+      [
+       "G41",
+       "Both",
+       "Cutter comp left",
+       "D offset on a mill"
+      ],
+      [
+       "G42",
+       "Both",
+       "Cutter comp right",
+       ""
+      ],
+      [
+       "G43",
+       "Mill",
+       "Tool length comp +",
+       "With H, usually H = tool number"
+      ],
+      [
+       "G44",
+       "Mill",
+       "Tool length comp −",
+       "Rarely used"
+      ],
+      [
+       "G49",
+       "Mill",
+       "Tool length comp off",
+       ""
+      ],
+      [
+       "G50",
+       "Lathe",
+       "Spindle speed limit (with S) / coordinate set",
+       "Fanuc lathe group A"
+      ],
+      [
+       "G50 / G51",
+       "Mill",
+       "Scaling off / on",
+       ""
+      ],
+      [
+       "G50.1 / G51.1",
+       "Mill",
+       "Mirror image off / on",
+       ""
+      ],
+      [
+       "G52",
+       "Both",
+       "Local coordinate shift",
+       "G52 X0 Y0 cancels"
+      ],
+      [
+       "G53",
+       "Both",
+       "Machine coordinates (this block)",
+       ""
+      ],
+      [
+       "G54–G59",
+       "Both",
+       "Work offsets 1–6",
+       ""
+      ],
+      [
+       "G54.1 P1–P48",
+       "Mill",
+       "Extra work offsets",
+       "G110–G129 on Haas"
+      ],
+      [
+       "G61",
+       "Both",
+       "Exact stop mode",
+       ""
+      ],
+      [
+       "G64",
+       "Both",
+       "Cutting (blending) mode",
+       ""
+      ],
+      [
+       "G65",
+       "Both",
+       "Macro call",
+       ""
+      ],
+      [
+       "G68 / G69",
+       "Mill",
+       "Rotation on / off",
+       ""
+      ],
+      [
+       "G70",
+       "Lathe",
+       "Finishing cycle",
+       "G70 P(ns) Q(nf)"
+      ],
+      [
+       "G71",
+       "Lathe",
+       "Rough turning cycle",
+       "G71 U(depth) R(retract) / G71 P Q U(X allow.) W(Z allow.) F"
+      ],
+      [
+       "G72",
+       "Lathe",
+       "Rough facing cycle",
+       ""
+      ],
+      [
+       "G73",
+       "Lathe",
+       "Pattern repeat cycle",
+       ""
+      ],
+      [
+       "G73",
+       "Mill",
+       "High-speed peck drilling",
+       "Chip-break; small retract"
+      ],
+      [
+       "G74",
+       "Lathe",
+       "Face grooving / Z peck drilling",
+       ""
+      ],
+      [
+       "G74",
+       "Mill",
+       "Left-hand tapping",
+       ""
+      ],
+      [
+       "G75",
+       "Lathe",
+       "Grooving cycle (X)",
+       ""
+      ],
+      [
+       "G76",
+       "Lathe",
+       "Multi-pass threading cycle",
+       "G76 P(mm rr aa) Q(min depth) R(finish) / G76 X Z R(taper) P(height) Q(1st depth) F(lead)"
+      ],
+      [
+       "G76",
+       "Mill",
+       "Fine boring",
+       "Spindle orients and shifts before retract"
+      ],
+      [
+       "G80",
+       "Both",
+       "Cancel canned cycle",
+       ""
+      ],
+      [
+       "G81",
+       "Mill",
+       "Drill (spot)",
+       "G81 X Y Z R F"
+      ],
+      [
+       "G82",
+       "Mill",
+       "Drill with dwell (counterbore, spot face)",
+       "G82 X Y Z R P F"
+      ],
+      [
+       "G83",
+       "Mill",
+       "Peck drill, full retract",
+       "G83 X Y Z R Q(peck) F"
+      ],
+      [
+       "G84",
+       "Mill",
+       "Tapping (right hand)",
+       "F = S × pitch (mm/min or in/min); M29 for rigid tapping on Fanuc"
+      ],
+      [
+       "G85",
+       "Mill",
+       "Bore, feed out",
+       ""
+      ],
+      [
+       "G86",
+       "Mill",
+       "Bore, spindle stop, rapid out",
+       ""
+      ],
+      [
+       "G87",
+       "Mill",
+       "Back bore",
+       ""
+      ],
+      [
+       "G88",
+       "Mill",
+       "Bore, dwell, manual out",
+       ""
+      ],
+      [
+       "G89",
+       "Mill",
+       "Bore, dwell, feed out",
+       ""
+      ],
+      [
+       "G90",
+       "Mill",
+       "Absolute positioning",
+       ""
+      ],
+      [
+       "G90",
+       "Lathe",
+       "Turning cycle (OD/ID)",
+       "Fanuc lathe group A"
+      ],
+      [
+       "G91",
+       "Mill",
+       "Incremental positioning",
+       "Lathes use U and W for incremental"
+      ],
+      [
+       "G92",
+       "Lathe",
+       "Threading cycle",
+       "Group A"
+      ],
+      [
+       "G92",
+       "Mill",
+       "Set work coordinates (shift)",
+       "Prefer G54–G59"
+      ],
+      [
+       "G94",
+       "Mill",
+       "Feed per minute",
+       ""
+      ],
+      [
+       "G94",
+       "Lathe",
+       "Facing cycle",
+       "Group A"
+      ],
+      [
+       "G95",
+       "Mill",
+       "Feed per revolution",
+       ""
+      ],
+      [
+       "G96",
+       "Lathe",
+       "Constant surface speed",
+       "S in ft/min (G20) or m/min (G21); limit with G50"
+      ],
+      [
+       "G97",
+       "Lathe",
+       "Constant spindle speed (RPM)",
+       ""
+      ],
+      [
+       "G98",
+       "Mill",
+       "Canned cycle: return to initial plane",
+       ""
+      ],
+      [
+       "G98",
+       "Lathe",
+       "Feed per minute",
+       "Group A"
+      ],
+      [
+       "G99",
+       "Mill",
+       "Canned cycle: return to R plane",
+       ""
+      ],
+      [
+       "G99",
+       "Lathe",
+       "Feed per revolution",
+       "Group A"
+      ]
+     ],
+     "note": "Fanuc-style codes; lathes use group A unless noted. Codes vary by control and builder, so check your machine’s manual before running a program."
+    },
+    {
+     "type": "table",
+     "title": "M codes",
+     "columns": [
+      "Code",
+      "Function",
+      "Notes"
+     ],
+     "rows": [
+      [
+       "M00",
+       "Program stop",
+       "Press cycle start to continue"
+      ],
+      [
+       "M01",
+       "Optional stop",
+       "Only with the optional-stop switch on"
+      ],
+      [
+       "M02",
+       "End of program",
+       ""
+      ],
+      [
+       "M03",
+       "Spindle on, clockwise",
+       "With S"
+      ],
+      [
+       "M04",
+       "Spindle on, counter-clockwise",
+       ""
+      ],
+      [
+       "M05",
+       "Spindle stop",
+       ""
+      ],
+      [
+       "M06",
+       "Tool change",
+       "With T"
+      ],
+      [
+       "M07",
+       "Mist coolant on",
+       "Varies; through-spindle on some machines"
+      ],
+      [
+       "M08",
+       "Flood coolant on",
+       ""
+      ],
+      [
+       "M09",
+       "Coolant off",
+       ""
+      ],
+      [
+       "M10 / M11",
+       "4th-axis or chuck clamp / unclamp",
+       "Varies by machine"
+      ],
+      [
+       "M19",
+       "Spindle orient",
+       ""
+      ],
+      [
+       "M29",
+       "Rigid tapping mode",
+       "Fanuc, before G84"
+      ],
+      [
+       "M30",
+       "End of program, rewind",
+       ""
+      ],
+      [
+       "M41 / M42",
+       "Low / high gear range",
+       "Lathes and some mills"
+      ],
+      [
+       "M48 / M49",
+       "Override switches enabled / locked",
+       ""
+      ],
+      [
+       "M97",
+       "Local subprogram call",
+       "Haas: M97 P(line)"
+      ],
+      [
+       "M98",
+       "Subprogram call",
+       "M98 P(program) L(repeats)"
+      ],
+      [
+       "M99",
+       "Subprogram return, or loop the main program",
+       ""
+      ]
+     ],
+     "note": "Common M codes. Many builders add their own above M50."
+    },
+    {
+     "type": "table",
+     "title": "Address letters",
+     "columns": [
+      "Letter",
+      "Meaning"
+     ],
+     "rows": [
+      [
+       "N",
+       "Line (sequence) number"
+      ],
+      [
+       "O",
+       "Program number"
+      ],
+      [
+       "G",
+       "Preparatory function (motion and modes)"
+      ],
+      [
+       "M",
+       "Machine function"
+      ],
+      [
+       "X Y Z",
+       "Linear axes"
+      ],
+      [
+       "U V W",
+       "Incremental X Y Z (lathes)"
+      ],
+      [
+       "A B C",
+       "Rotary axes"
+      ],
+      [
+       "I J K",
+       "Arc centre offsets from the start point"
+      ],
+      [
+       "R",
+       "Arc radius; R plane in canned cycles"
+      ],
+      [
+       "F",
+       "Feed rate"
+      ],
+      [
+       "S",
+       "Spindle speed (RPM, or surface speed with G96)"
+      ],
+      [
+       "T",
+       "Tool number (and offset on lathes: T0101)"
+      ],
+      [
+       "H",
+       "Tool length offset number"
+      ],
+      [
+       "D",
+       "Cutter radius (diameter) offset number"
+      ],
+      [
+       "P",
+       "Dwell time; subprogram number; parameter"
+      ],
+      [
+       "Q",
+       "Peck depth; parameter"
+      ],
+      [
+       "L",
+       "Repeat count"
+      ],
+      [
+       "E",
+       "Thread lead (some controls)"
+      ],
+      [
+       "%",
+       "Tape start and end"
+      ],
+      [
+       "( )",
+       "Comment"
+      ]
+     ]
+    },
+    {
+     "type": "text",
+     "title": "Canned cycle formats (mill)",
+     "md": "```\nG81 X Y Z R F         drill\nG82 X Y Z R P F       drill, dwell P at the bottom\nG83 X Y Z R Q F       peck drill, peck depth Q\nG73 X Y Z R Q F       chip-break peck\nG84 X Y Z R F         tap; F = S × pitch\nG80                   cancel\n```\nG98 returns to the start height between holes and G99 to the R plane. Z is the bottom of the hole and R the height where feeding starts."
+    },
+    {
+     "type": "text",
+     "title": "A typical program start",
+     "md": "```\n%\nO1001 (PART NAME)\nG20 G17 G40 G49 G80 G90   (safe start: inch, XY, cancel comp and cycles, absolute)\nT1 M06                    (tool 1)\nG54 G00 X0 Y0             (work offset, rapid to start)\nS2000 M03                 (spindle on)\nG43 H01 Z1.0 M08          (length offset, coolant)\n...\nM09\nG91 G28 Z0                (home Z)\nM30\n%\n```\nAn example only: check the safe-start line and the homing moves for your control."
+    }
+   ]
+  }
+ ]
+}

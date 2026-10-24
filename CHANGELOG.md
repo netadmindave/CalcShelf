@@ -2,6 +2,18 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## 2.7.6
+
+- **Modules:** tabs built from a module file, each for one subject. A module holds formulas, calculators (with unit menus and plots), searchable tables, constants, reference text and the app's own tools, and everything works inside its tab using the CAS. Open them from **+ → Modules**.
+  - **Optics** (built in): every optics formula and constant from the library, the five optics tools, and calculators for wavelength ↔ frequency ↔ photon energy, power in dBm, a Gaussian beam with a plot of w(z), beam widths, a cavity, a step-index fiber, a fiber link and a comb beat note. The optics formulas also stay in the library and the conversion tool.
+  - **Machinist** (built in): speeds and feeds with a cutting-speed table; unified, metric and NPT tap drills; pitch ↔ TPI; tap drills for a thread percentage; thread dimensions and three-wire measurement; number, letter, fractional and metric drills with inch and mm sizes and a nearest-size search; inch and metric clearance holes; drill point and countersink depth; decimal to fraction, bolt circles, sine bar, taper, chord and sagitta, bar stock weight and surface finish; G codes, M codes and address letters.
+  - **Adding modules:** **Manage modules → Browse modules** opens a module repository in your browser (by default the [modules folder](modules) on GitHub, or any https:// address you set). Download a module there, then **Import a module file**. CalcShelf shows what the module holds before installing it, and still asks Android for no permissions.
+  - **Data only:** a module can't run code. CalcShelf checks the file and every expression before the CAS sees it. See [SECURITY.md](SECURITY.md).
+  - **[docs/MODULES.md](docs/MODULES.md)** explains how to make a module, and `modules/example.json` uses every kind of item.
+- **Formula solver unit menus:** every variable with a unit has a menu. It starts on **units** (your numbers as typed) and offers the units of the same kind, so you can enter a radius in inches and get an area in cm².
+- **The tab bar scrolls sideways** with a finger when the tabs don't fit, and its ends fade to show there are more.
+- **Fix:** a Sellmeier entry with two terms defined a broken n(λ) function; every term count works now.
+
 ## 2.7.5
 
 - **CAS keypad:** the toolbar keys are full size, with wider **esc** and **tab**, and **⌫** stays on the toolbar (hold it to keep deleting). A new top row on the 123 page has **√**, **π**, **x²**, **x⁻¹** and **|x|**.

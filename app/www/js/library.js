@@ -17,7 +17,7 @@
     if (s === 'e') return '\\exponentialE';
     return GiacFmt.giacToTex(s, { editable: true }) || s;
   }
-  function sellmeierGiac(c, v = 'l') { const t = (B, C) => `${B}*${v}^2/(${v}^2-${C})`; return `sqrt(1+${t(c[0], c[1])}+${t(c[2], c[3])}+${t(c[4], c[5])})`; }
+  function sellmeierGiac(c, v = 'l') { const t = []; for (let k = 0; k + 1 < c.length; k += 2) t.push(`${c[k]}*${v}^2/(${v}^2-${c[k + 1]})`); return `sqrt(1+${t.join('+')})`; }
 
   const Library = {
     tab: 'const', cat: 'All', q: '',
@@ -147,7 +147,7 @@
       const x = Number(v); return isFinite(x) && v !== '' ? [x] : null;
     },
     constActions(it) {
-      const app = this.app;
+      const app = this.app, inModule = !!(app.page && app.page.kind === 'module');   // a module tab has no entry line
       Sheet.push(it.n, (b) => {
         const nums = this.constNums(it);
         const canConvert = !it.sell && nums && it.u && (() => { try { Units.parse(it.u); return true; } catch (e) { return false; } })();
@@ -206,8 +206,7 @@
           });
           act('Graph n(λ)', '0.4–2.5 µm', () => { Sheet.close(); app.graphExpression(sellmeierGiac(it.sell, 'x')); const g = app.page; g.view = { xmin: 0.3, xmax: 2.6, ymin: 1.3, ymax: 2.0 }; g.zoomFit(); });
         } else {
-          act('Insert value', ' ', () => { Sheet.close(); app.insert(canConvert ? valTex(unit) : numTex(it.v)); });
-          insSub = L.lastChild.querySelector('.sub');
+          if (!inModule) { act('Insert value', ' ', () => { Sheet.close(); app.insert(canConvert ? valTex(unit) : numTex(it.v)); }); insSub = L.lastChild.querySelector('.sub'); }
           act('Store in a variable', 'Use it by name in any page', () => {
             const sug = (it.s.replace(/\\([a-zA-Z]+)/g, '$1').replace(/[^A-Za-z0-9]/g, '') || 'k').slice(0, 10);
             const name = prompt('Variable name' + (unit ? ' (value in ' + unit + ')' : ''), sug); if (!name) return;
@@ -222,60 +221,101 @@
         b.append(L, eqBox); drawHead();
       });
     },
-    solver(b, f) {
+    /** unit choices for a formula variable: '' is "units" (your numbers as they are), then units of the same kind */
+    unitChoices(unit) {
+      const deg = this.app.settings.angle === 'deg';
+      if (unit === 'rad') return { angle: true, opts: [['', 'units (' + (deg ? '°' : 'rad') + ', the angle mode)'], ['rad', 'rad'], ['°', '°'], ['mrad', 'mrad'], ['µrad', 'µrad']] };
+      if (!unit || /\s|dB/.test(unit)) return null;
+      let alts; try { Units.parse(unit); alts = Units.alternatives(unit, 1); } catch (e) { return null; }
+      if (!alts.includes(unit)) alts.unshift(unit);
+      return { angle: false, opts: [['', 'units'], ...alts.slice(0, 40).map((u) => [u, u])] };
+    },
+    /** value typed in unit c → the formula's own unit u, as Giac code; and back for a result */
+    toBase(raw, u, c) {
+      if (!c) return raw;
+      if (u === 'rad') { const mode = this.app.settings.angle === 'deg' ? '°' : 'rad'; if (c === mode) return raw; return '(' + raw + ')*' + Units.num(Units.convert(1, c, mode), 15); }
+      const b0 = Units.convert(0, c, u), a = Units.convert(1, c, u) - b0;
+      return '((' + raw + ')*' + Units.num(a, 15) + (b0 ? '+' + Units.num(b0, 15) : '') + ')';
+    },
+    fromBase(x, u, c) {
+      if (!c) return x;
+      if (u === 'rad') { const mode = this.app.settings.angle === 'deg' ? '°' : 'rad'; return c === mode ? x : Units.convert(x, mode, c); }
+      return Units.convert(x, u, c);
+    },
+    /** opts.insert === false hides "Insert equation" (in a module tab, where there is no entry line) */
+    solver(b, f, opts = {}) {
       const app = this.app;
       const t = el('div', { class: 'card', style: { fontSize: '20px', overflowX: 'auto' } }); renderTex(t, f.tex); b.append(t);
       if (f.note) b.append(el('p', { class: 'desc', text: f.note }));
-      b.append(el('p', { class: 'desc', text: 'Fill in the known values (numbers or expressions like 1550e-9 or pi/4), pick the unknown, then Solve.' + (app.settings.angle === 'deg' ? ' Angles are in degrees (Degree mode).' : '') }));
+      b.append(el('p', { class: 'desc', text: 'Fill in the known values (numbers or expressions like 1550e-9 or pi/4), pick the unknown, then Solve. With “units”, values are used as you type them, so keep them consistent (all SI, for example); pick a unit to convert.' }));
       let unknown = f.v[0][0];
-      const inputs = {};
+      const inputs = {}, units = {};
       const rows = el('div');
       const radios = [];
       for (const [name, desc, unit, def] of f.v) {
-        const inp = el('input', { type: 'text', value: def || '', inputmode: 'text', autocapitalize: 'off', spellcheck: 'false', placeholder: def ? '' : 'value' });
+        const inp = el('input', { type: 'text', value: def || '', inputmode: 'text', autocapitalize: 'off', spellcheck: 'false', placeholder: def ? '' : 'value', style: { flex: 1, minWidth: 0 } });
         inputs[name] = inp;
-        const unitTxt = unit === 'rad' && app.settings.angle === 'deg' ? '°' : unit;
+        const ch = this.unitChoices(unit);
+        let field = inp;
+        if (ch) {
+          const sel = el('select', { class: 'fs-unit', 'aria-label': 'Unit of ' + desc }, ch.opts.map(([v, l]) => el('option', { value: v, text: l })));
+          units[name] = sel;
+          sel.onchange = () => { if (name === unknown && out.dataset.base) this.showSolutions(f, unknown, inputs, units, out); };
+          field = el('div', { style: { display: 'flex', gap: '6px', alignItems: 'center' } }, inp, sel);
+        }
         const r = el('input', { type: 'radio', name: 'unk', checked: name === unknown, style: { width: '20px', height: '20px', accentColor: 'var(--acc)' } });
         r.onchange = () => { unknown = name; sync(); };
         radios.push([name, r, inp]);
         const lab = el('span', { style: { minWidth: '62px', fontSize: '17px' } }); renderTex(lab, GiacFmt.idTex(name.replace(/^g([A-C])$/, '$1')));
+        const plain = !ch && unit ? ' (' + unit + ')' : '';
         rows.append(el('div', { style: { display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', borderBottom: '1px solid var(--line)' } },
-          r, lab, el('label', { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '13px', color: 'var(--ink2)' } }, desc + (unitTxt ? ' (' + unitTxt + ')' : ''), inp)));
+          r, lab, el('label', { style: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '13px', color: 'var(--ink2)' } }, desc + plain, field)));
       }
       const sync = () => { for (const [n, r, inp] of radios) { inp.disabled = n === unknown; inp.style.opacity = n === unknown ? 0.45 : 1; if (n === unknown) inp.value = ''; } };
       sync();
       const out = el('div', { class: 'card', hidden: true, style: { fontSize: '19px' } });
-      b.append(rows, el('div', { class: 'btnrow' },
-        el('button', { class: 'btn pri', text: 'Solve', onclick: () => this.solve(f, unknown, inputs, out) }),
-        el('button', { class: 'btn', text: 'Insert equation', onclick: () => { Sheet.close(); app.insert(f.tex.replace(/\\tfrac/g, '\\frac')); } })), out);
+      const btns = el('div', { class: 'btnrow' }, el('button', { class: 'btn pri', text: 'Solve', onclick: () => this.solve(f, unknown, inputs, out, units) }));
+      if (opts.insert !== false) btns.append(el('button', { class: 'btn', text: 'Insert equation', onclick: () => { Sheet.close(); app.insert(f.tex.replace(/\\tfrac/g, '\\frac')); } }));
+      b.append(rows, btns, out);
     },
-    async solve(f, unknown, inputs, out) {
+    async solve(f, unknown, inputs, out, units = {}) {
       const app = this.app;
       // private names avoid clashes with Giac built-ins (phi, sigma, D, Re, …)
       const map = {}; f.v.forEach(([n], i) => { map[n] = 'zv' + i; });
       const eq = f.eq.replace(/\b[A-Za-z]\w*\b/g, (w) => map[w] || w);
       const knownVals = [], valOf = {};
-      for (const [n] of f.v) {
+      for (const [n, , u] of f.v) {
         if (n === unknown) continue;
         const raw = inputs[n].value.trim();
         if (!raw) { toast('Enter a value for ' + n + ', or make it the unknown'); return; }
-        const val = '(' + raw.replace(/×10\^?/g, 'e').replace(/,/g, '.').replace(/π/g, 'pi') + ')';
+        let val = '(' + raw.replace(/×10\^?/g, 'e').replace(/,/g, '.').replace(/π/g, 'pi') + ')';
+        try { val = this.toBase(val, u, units[n] ? units[n].value : ''); } catch (e) { toast(e.message); return; }
         valOf[map[n]] = val; knownVals.push(val);
       }
       const U = map[unknown];
       // put the known values straight into the equation text (subst() misbehaves in TI mode)
       const sub = eq.replace(/\bzv\d+\b/g, (z) => valOf[z] || z);
-      out.hidden = false; out.textContent = 'Solving…';
+      out.hidden = false; out.textContent = 'Solving…'; delete out.dataset.base;
       const sols = await this.findSolutions(sub, U, knownVals);
       if (!sols.length) { out.textContent = 'No real solution found for ' + unknown + ' with these values.'; return; }
+      out.dataset.base = JSON.stringify(sols);
+      this.showSolutions(f, unknown, inputs, units, out);
+    },
+    /** the solutions (kept in the formula's own units) shown in the unit picked for the unknown */
+    showSolutions(f, unknown, inputs, units, out) {
+      const app = this.app, sols = JSON.parse(out.dataset.base || '[]');
       out.innerHTML = '';
       const name = GiacFmt.idTex(unknown.replace(/^g([A-C])$/, '$1'));
-      for (const s of sols) {
+      const u = f.v.find((v) => v[0] === unknown)[2];
+      const c = units[unknown] ? units[unknown].value : '';
+      const shownUnit = c ? (c === '' ? '' : c) : u === 'rad' ? (app.settings.angle === 'deg' ? '°' : 'rad') : units[unknown] ? 'units' : u;
+      for (const s0 of sols) {
+        const s = c ? String(+this.fromBase(Number(s0), u, c).toPrecision(12)) : s0;
         const row = el('div', { style: { display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', padding: '4px 0' } });
         const m = el('span'); renderTex(m, name + '=' + (GiacFmt.giacToTex(s, { digits: Math.max(app.settings.digits, 8) }) || s));
-        const u = f.v.find((v) => v[0] === unknown)[2];
-        row.append(m, el('span', { class: 'sub', text: u === 'rad' && app.settings.angle === 'deg' ? '°' : u }), el('button', { class: 'chip', text: 'Use', onclick: () => { inputs[unknown].value = s; } }),
-          el('button', { class: 'chip', text: 'Store', onclick: () => { const nm = /^[A-Za-z]\w*$/.test(unknown) ? unknown : 'r'; const code = nm + ':=' + s; app.cas.eval(code).then(() => { app.cas.forget(nm); app.cas.remember(code); app.vars.add(nm); app.saveSoon(); toast('Stored ' + nm); }); } }));
+        row.append(m, el('span', { class: 'sub', text: shownUnit }), el('button', { class: 'chip', text: 'Use', onclick: () => { inputs[unknown].value = s; } }),
+          el('button', { class: 'chip', text: 'Store', onclick: () => { const nm = /^[A-Za-z]\w*$/.test(unknown) ? unknown : 'r'; const code = nm + ':=' + s; app.cas.eval(code).then(() => { app.cas.forget(nm); app.cas.remember(code); app.vars.add(nm); app.saveSoon(); toast('Stored ' + nm); }); } }),
+          el('button', { class: 'chip', text: 'Copy', onclick: () => { const t = s + (shownUnit && shownUnit !== 'units' ? ' ' + shownUnit : ''); try { navigator.clipboard.writeText(t); toast('Copied ' + t); } catch (e) { toast(t); } } }));
         out.append(row);
       }
     },
