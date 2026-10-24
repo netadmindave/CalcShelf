@@ -4,9 +4,9 @@
   {
    "id": "optics",
    "name": "Optics",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "file": "optics.json",
-   "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Every formula solves for any of its variables."
+   "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Every formula solves for any of its variables."
   },
   {
    "id": "machinist",

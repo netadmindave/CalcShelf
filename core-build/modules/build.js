@@ -16,6 +16,13 @@ const builtIn = ['optics', 'machinist'];
 fs.mkdirSync(path.join(WWW, 'modules'), { recursive: true });
 fs.mkdirSync(path.join(ROOT, 'modules'), { recursive: true });
 let bad = 0;
+// every name in a formula's equation is one of its variables or a Giac function or constant
+const KNOWN = new Set('exp ln log log10 sqrt sin cos tan asin acos atan sinh cosh tanh abs erf erfc floor ceil round min max pi e i'.split(' '));
+for (const [id, m] of Object.entries(mods)) for (const s of m.sections) for (const it of s.items) if (it.type === 'formula') {
+  const names = new Set(it.vars.map((v) => (Array.isArray(v) ? v[0] : v.name)));
+  for (const w of it.eq.match(/[A-Za-z_]\w*/g) || []) if (!names.has(w) && !KNOWN.has(w)) { console.error('✗', id, it.title, ': unknown name', w); bad++; }
+  for (const n of names) if (!new RegExp('\\b' + n + '\\b').test(it.eq)) { console.error('✗', id, it.title, ': variable not in the equation', n); bad++; }
+}
 for (const [id, m] of Object.entries(mods)) {
   let clean;
   try { clean = Modules.validate(JSON.parse(JSON.stringify(m))); } catch (e) { console.error('✗', id, e.message); bad++; continue; }

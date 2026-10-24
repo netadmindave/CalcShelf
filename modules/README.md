@@ -12,7 +12,7 @@ Modules add a tab to CalcShelf for one subject. Each one is a single `.json` fil
 
 | Module | Version | What it has | Download |
 |---|---|---|---|
-| **Optics** (built into CalcShelf) | 1.0.0 | Light and photons, geometric optics, diffraction, Gaussian beams, cavities and thin films, fibers, frequency combs, detection, materials and data; 76 formulas, 9 calculators, the five optics tools | [optics.json](https://raw.githubusercontent.com/netadmindave/CalcShelf/main/modules/optics.json) |
+| **Optics** (built into CalcShelf) | 1.1.0 | Light and photons, geometric optics, diffraction, Gaussian beams, cavities and thin films, fibers, frequency combs, detection, materials and data, plus formulas following Saleh & Teich’s *Fundamentals of Photonics* and Neamen’s *Semiconductor Physics and Devices*; 302 formulas, 9 calculators, the five optics tools | [optics.json](https://raw.githubusercontent.com/netadmindave/CalcShelf/main/modules/optics.json) |
 | **Machinist** (built into CalcShelf) | 1.0.0 | Speeds and feeds; thread pitch, tap drills (unified, metric, NPT), thread dimensions and three-wire measurement; number, letter, fractional and metric drills; clearance holes; shop math; G and M codes | [machinist.json](https://raw.githubusercontent.com/netadmindave/CalcShelf/main/modules/machinist.json) |
 | **Example module** | 1.0.0 | One of each kind of item. Copy it to start your own module | [example.json](https://raw.githubusercontent.com/netadmindave/CalcShelf/main/modules/example.json) |
 

@@ -11,9 +11,9 @@ module.exports = function optics({ FORMULAS, CONSTANTS }) {
 
   return {
     format: 'calcshelf-module', formatVersion: 1,
-    id: 'optics', name: 'Optics', tab: 'Optics', version: '1.0.0', icon: 'optics',
+    id: 'optics', name: 'Optics', tab: 'Optics', version: '1.1.0', icon: 'optics',
     author: 'CalcShelf', license: 'GPL-3.0-or-later', homepage: 'https://github.com/netadmindave/CalcShelf/tree/main/modules',
-    description: 'Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Every formula solves for any of its variables.',
+    description: 'Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Every formula solves for any of its variables.',
     sections: [
       { title: 'Light & photons', items: [
         { type: 'calc', title: 'Wavelength, frequency and photon energy', tex: '\\nu=\\frac c\\lambda,\\ E=h\\nu,\\ \\tilde\\nu=\\frac1\\lambda',
@@ -128,6 +128,7 @@ module.exports = function optics({ FORMULAS, CONSTANTS }) {
         consts('Optics: refractive index', 'Refractive indices'),
         consts('Optics: dn/dT & expansion', 'dn/dT and thermal expansion'),
       ] },
+      ...require('./optics_books')(),
       { title: 'Data', items: [
         consts('Optics: wavelengths', 'Laser and reference wavelengths'),
         { type: 'table', title: 'Telecom bands (ITU)', columns: ['Band', 'Name', 'From (nm)', 'To (nm)', 'From (THz)', 'To (THz)'],
