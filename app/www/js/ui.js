@@ -152,5 +152,45 @@
       });
     },
   };
-  root.UI = { $, el, DB, toast, Sheet, texHTML, renderTex, mathField, setOSKeyboard, download, haptic, Edit };
+  /* A key bar above the phone's number keyboard, which has no / key: it appears while a number field
+     (inputmode="decimal") has focus, for fractions (3/8, 1 3/8) and, in the conversion tool, units (3/8 in). */
+  const FracBar = (() => {
+    let bar = null, target = null, hideT = null;
+    const insert = (t) => {
+      const i = target; if (!i) return;
+      const v = i.value, a = i.selectionStart ?? v.length, b = i.selectionEnd ?? v.length;
+      i.value = v.slice(0, a) + t + v.slice(b);
+      try { i.setSelectionRange(a + t.length, a + t.length); } catch (e) { /* some inputs have no selection */ }
+      i.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const key = (label, fn, cls) => {
+      const k = el('button', { class: 'fb-key' + (cls ? ' ' + cls : ''), text: label, type: 'button', tabindex: '-1' });
+      // keep the focus (and the keyboard) on the field
+      k.addEventListener('mousedown', (e) => e.preventDefault());
+      k.addEventListener('touchend', (e) => { e.preventDefault(); fn(); });
+      k.addEventListener('click', fn);
+      return k;
+    };
+    const place = () => {
+      if (!bar || bar.hidden) return;
+      const vv = window.visualViewport;
+      const off = vv ? Math.max(0, window.innerHeight - vv.height - vv.offsetTop) : 0;
+      bar.style.bottom = off + 'px';
+    };
+    const build = (withUnits) => {
+      bar.innerHTML = '';
+      bar.append(key('/', () => insert('/')), key('␣', () => insert(' ')), key('−', () => insert('-')));
+      if (withUnits) for (const u of ['in', '"', 'ft', 'mm']) bar.append(key(u, () => insert(u === '"' ? '"' : (/\s$/.test(target.value) || !target.value ? '' : ' ') + u), 'fb-unit'));
+      bar.append(key('abc', () => { const i = target; i.setAttribute('inputmode', 'text'); i.blur(); setTimeout(() => i.focus(), 50); }, 'fb-abc'));
+    };
+    function show(i) {
+      if (!bar) { bar = el('div', { class: 'frac-bar', hidden: true }); document.body.append(bar); if (window.visualViewport) { visualViewport.addEventListener('resize', place); visualViewport.addEventListener('scroll', place); } }
+      clearTimeout(hideT); target = i; build(i.dataset.units === '1'); bar.hidden = false; place();
+    }
+    function hide() { hideT = setTimeout(() => { if (bar && !(document.activeElement && document.activeElement.getAttribute('inputmode') === 'decimal')) { bar.hidden = true; target = null; } }, 120); }
+    document.addEventListener('focusin', (e) => { const i = e.target; if (i && i.tagName === 'INPUT' && i.getAttribute('inputmode') === 'decimal') show(i); else if (bar) { bar.hidden = true; target = null; } });
+    document.addEventListener('focusout', (e) => { if (e.target === target) hide(); });
+    return { show, insert };
+  })();
+  root.UI = { $, el, DB, toast, Sheet, texHTML, renderTex, mathField, setOSKeyboard, download, haptic, Edit, FracBar };
 })(typeof self !== 'undefined' ? self : this);

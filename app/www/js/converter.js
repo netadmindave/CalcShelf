@@ -92,7 +92,7 @@
       const OTHER = '…other';
       const q = el('input', { class: 'search', type: 'search', placeholder: 'Find a quantity or unit (e.g. psi, viscosity, kWh)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
       const chips = el('div', { class: 'chips' });
-      const valI = el('input', { class: 'search cv-in', value: this.val, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Value' });
+      const valI = el('input', { class: 'search cv-in', value: this.val, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Value', 'data-units': '1' });
       const fromS = el('select', { class: 'search cv-in', 'aria-label': 'From unit' });
       const toS = el('select', { class: 'search cv-in', 'aria-label': 'To unit' });
       const mkOther = (lbl) => el('input', { class: 'search cv-in', hidden: true, placeholder: 'Type a unit, e.g. W/(m·K)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': lbl, style: { marginTop: '6px' } });
@@ -154,7 +154,12 @@
         const ph = Units.photonEquivalents(v, this.from);
         if (ph.length) { all.append(el('h4', { class: 'cv-h', text: 'As light (photon equivalents)' })); for (const p of ph) all.append(resultRow(app, p.value, p.unit, Units.SPEC_LABEL[p.kind], { sheet: this.sheet })); }
       };
-      valI.addEventListener('input', calc);
+      // a unit typed after the value shows in the From list straight away
+      valI.addEventListener('input', () => {
+        const t = splitValueUnit(valI.value);
+        if (t.unit && t.unit !== read(fromS, fromI)) { this.from = t.unit; try { const q0 = Units.quantityOf(Units.parse(t.unit).d, this.qty); if (q0 && q0[0] !== this.qty) { this.qty = q0[0]; drawChips(); } } catch (e) { /* keep */ } fill(); }
+        calc();
+      });
       // when the field is left, a typed unit moves into the From list
       valI.addEventListener('change', () => { const t = splitValueUnit(valI.value); if (t.unit) { valI.value = t.raw; this.from = t.unit; const q0 = Units.quantityOf(Units.parse(t.unit).d, this.qty); if (q0) this.qty = q0[0]; fill(); drawChips(); calc(); } });
       for (const [S, I] of [[fromS, fromI], [toS, toI]]) {

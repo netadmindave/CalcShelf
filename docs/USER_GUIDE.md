@@ -200,7 +200,8 @@ Add these from **+**.
   - A program can then be called from the CAS tab like any built-in function. The editor starts with a Fibonacci example.
 - **Unit Converter.** It has four parts:
   - **Units:** choose a quantity, then pick the From and To units from the dropdowns. For a unit that isn't listed, choose *Other unit…* and type it, for example W/(m·K).
-  - **Fractions and units in the value:** type `3/8`, `1 3/8`, `1-3/8` or `⅜`, and add a unit if you like: `3/8in`, `1-1/2"`, `12.7 mm`. A unit typed after the value becomes the From unit when you leave the field. `"` means inches and `'` feet.
+  - **Fractions and units in the value:** type `3/8`, `1 3/8`, `1-3/8` or `⅜`, and add a unit if you like: `3/8in`, `1-1/2"`, `12.7 mm`. A unit typed after the value becomes the From unit. `"` means inches and `'` feet.
+  - **The phone's number keyboard has no / key**, so while a number field is selected, a key bar above the keyboard adds **/**, a space and **−** (and in the conversion tool **in**, **"**, **ft** and **mm**). **abc** switches that field to the full keyboard.
   - **Optics** has five calculators:
     - **Δν ↔ Δλ:** enter a centre wavelength or frequency and a width Δλ or Δν, then pick the unit to show the width in. For example, an OSA resolution of 0.02 nm at 1550 nm is 2495.7 MHz. It also gives the coherence length, Q and the photon equivalents of the centre.
     - **Beam:** a Gaussian beam (wavelength, waist, M²) through free space, thin lenses, mirrors, glass slabs or any ABCD matrix. It plots w(z) and gives the new waist and its position. Add a target waist to see the coupling efficiency (mode matching).
