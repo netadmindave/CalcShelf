@@ -12,6 +12,8 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
   - **Adding modules:** **Manage modules → Browse modules** opens a module repository in your browser (by default the [modules folder](modules) on GitHub, or any https:// address you set). Download a module there, then **Import a module file**. CalcShelf shows what the module holds before installing it, and still asks Android for no permissions.
   - **Data only:** a module can't run code. CalcShelf checks the file and every expression before the CAS sees it. See [SECURITY.md](SECURITY.md).
   - **[docs/MODULES.md](docs/MODULES.md)** explains how to make a module, and `modules/example.json` uses every kind of item.
+- **All formulas** in every module tab: one list of all its formulas and calculators, by section or A–Z.
+- **Fractions and units typed with a value** in the conversion tool, module calculators and the formula solver: `3/8`, `1 3/8`, `1-3/8`, `⅜`, `3/8in`, `1-1/2"`, `12.7 mm`. In the conversion tool, a unit typed after the value becomes the From unit.
 - **Formula solver unit menus:** every variable with a unit has a menu. It starts on **units** (your numbers as typed) and offers the units of the same kind, so you can enter a radius in inches and get an area in cm².
 - **The tab bar scrolls sideways** with a finger when the tabs don't fit, and its ends fade to show there are more.
 - **Fix:** a Sellmeier entry with two terms defined a broken n(λ) function; every term count works now.

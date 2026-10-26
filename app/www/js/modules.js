@@ -341,8 +341,11 @@
           for (const x of it.inputs) {
             const f = fields[x.id];
             if (x.options) { vals[x.id] = '(' + x.options[+f.inp.value].value + ')'; continue; }
-            const c = userCode(f.inp.value); if (c == null) { toast('Enter ' + x.label); f.inp.focus(); return; }
-            vals[x.id] = toUnit(c, x.unit, f.sel ? f.sel.value : x.unit, it.angles);
+            // a unit typed after the value ("3/8 in", '1-1/2"') is used instead of the menu's
+            const tv = root.splitValueUnit ? root.splitValueUnit(f.inp.value) : { text: f.inp.value, unit: null };
+            const c = userCode(tv.text); if (c == null) { toast('Enter ' + x.label); f.inp.focus(); return; }
+            if (tv.unit) { if (!x.unit) throw new Error(x.label + ' has no unit; type just the number'); Units.convert(1, tv.unit, ANGLE.has(x.unit) ? 'rad' : x.unit); }
+            vals[x.id] = toUnit(c, x.unit, tv.unit || (f.sel ? f.sel.value : x.unit), it.angles);
           }
         } catch (e) { toast(e.message); return; }
         const codes = [];
@@ -445,7 +448,7 @@
   class ModulePage {
     constructor(app, state = {}) {
       this.app = app; this.kind = 'module'; this.noKeypad = true;
-      this.id = String(state.id || ''); this.sec = state.sec | 0; this.q = '';
+      this.id = String(state.id || ''); this.sec = state.sec === 'all' ? 'all' : state.sec | 0; this.allSort = state.sort === 'az' ? 'az' : 'sec'; this.q = '';
       this.root = el('div', { class: 'page guide modpage' });
       this.secs = el('div', { class: 'chips md-secs', role: 'tablist' });
       this.search = el('input', { class: 'search md-search', type: 'search', placeholder: 'Search this module', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
@@ -459,7 +462,7 @@
     get target() { return null; }
     get defaultName() { const m = this.m || Modules.get(this.id); return m ? m.tab : 'Module'; }
     get icon() { const m = this.m || Modules.get(this.id); return ICONS[m ? m.icon : 'module']; }
-    serialize() { return { id: this.id, sec: this.sec }; }
+    serialize() { return { id: this.id, sec: this.sec, sort: this.allSort }; }
     render() {
       this.m = Modules.get(this.id);
       this.secs.innerHTML = ''; this.body.innerHTML = '';
@@ -469,14 +472,39 @@
         return;
       }
       this.search.hidden = false;
-      if (this.sec >= this.m.sections.length) this.sec = 0;
+      if (this.sec !== 'all' && !(this.sec < this.m.sections.length)) this.sec = 0;
+      // "All formulas": every formula and calculator of the module in one list
+      const nForm = this.m.sections.reduce((t, x) => t + x.items.filter((i) => i.type === 'formula' || i.type === 'calc').length, 0);
+      if (nForm > 1) { const c = el('button', { class: 'chip md-all' + (this.sec === 'all' ? ' on' : ''), text: 'All formulas', role: 'tab' }); c.onclick = () => { this.sec = 'all'; this.search.value = this.q = ''; this.secs.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === c)); this.drawList(); this.app.saveSoon(); }; this.secs.append(c); }
+      else if (this.sec === 'all') this.sec = 0;
       this.m.sections.forEach((s, k) => { const c = el('button', { class: 'chip' + (k === this.sec ? ' on' : ''), text: s.title, role: 'tab' }); c.onclick = () => { this.sec = k; this.search.value = this.q = ''; this.secs.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === c)); this.drawList(); this.app.saveSoon(); }; this.secs.append(c); });
       this.drawList();
       this.app.renderTabs();
     }
+    /** every formula and calculator of the module, by section or A–Z */
+    drawAll() {
+      const m = this.m, b = this.body;
+      const all = m.sections.flatMap((sec) => sec.items.filter((it) => it.type === 'formula' || it.type === 'calc').map((it) => [it, sec]));
+      const seg = el('div', { class: 'seg', style: { margin: '6px 0 4px' } });
+      for (const [k, l] of [['sec', 'By section'], ['az', 'A–Z']]) { const x = el('button', { text: l, class: (this.allSort || 'sec') === k ? 'on' : '' }); x.onclick = () => { this.allSort = k; this.drawList(); this.app.saveSoon(); }; seg.append(x); }
+      const nf = all.filter((x) => x[0].type === 'formula').length, nc = all.length - nf;
+      b.append(el('p', { class: 'desc gd-pad', text: [nf ? nf + ' formula' + (nf > 1 ? 's' : '') : '', nc ? nc + ' calculator' + (nc > 1 ? 's' : '') : ''].filter(Boolean).join(' and ') + '.' + (nf ? ' Each formula solves for any of its variables.' : '') }), seg);
+      const rows = this.allSort === 'az' ? all.slice().sort((p, q) => p[0].title.localeCompare(q[0].title)) : all;
+      let L = null, cur = null;
+      for (const [it, sec] of rows) {
+        if (this.allSort !== 'az' && sec !== cur) { cur = sec; b.append(el('h4', { class: 'cv-h md-grp', text: sec.title })); L = null; }
+        if (!L) { L = el('ul', { class: 'mlist' }); b.append(L); }
+        const btn = el('button', { class: 'mi', style: { flexDirection: 'column', alignItems: 'flex-start', gap: '4px' } }, el('span', { class: 'lbl', text: it.title, style: { fontWeight: '600' } }));
+        if (it.tex) { const t = el('div', { style: { fontSize: '17px', maxWidth: '100%', overflowX: 'auto' } }); renderTex(t, it.tex); btn.append(t); }
+        btn.append(el('span', { class: 'sub', text: KIND[it.type] + (this.allSort === 'az' ? ' · ' + sec.title : '') }));
+        btn.onclick = () => this.openItem(it);
+        L.append(el('li', {}, btn));
+      }
+    }
     drawList() {
       const m = this.m, b = this.body; b.innerHTML = ''; b.scrollTop = 0;
       const s = this.q.trim().toLowerCase();
+      if (!s && this.sec === 'all') { this.drawAll(); return; }
       const pick = s ? m.sections.flatMap((sec) => sec.items.map((it) => [it, sec])) : m.sections[this.sec].items.map((it) => [it, m.sections[this.sec]]);
       if (!s && this.sec === 0 && m.description) b.append(el('p', { class: 'desc gd-pad', text: m.description }));
       let L = null, n = 0;

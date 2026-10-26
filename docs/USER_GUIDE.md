@@ -200,6 +200,7 @@ Add these from **+**.
   - A program can then be called from the CAS tab like any built-in function. The editor starts with a Fibonacci example.
 - **Unit Converter.** It has four parts:
   - **Units:** choose a quantity, then pick the From and To units from the dropdowns. For a unit that isn't listed, choose *Other unit…* and type it, for example W/(m·K).
+  - **Fractions and units in the value:** type `3/8`, `1 3/8`, `1-3/8` or `⅜`, and add a unit if you like: `3/8in`, `1-1/2"`, `12.7 mm`. A unit typed after the value becomes the From unit when you leave the field. `"` means inches and `'` feet.
   - **Optics** has five calculators:
     - **Δν ↔ Δλ:** enter a centre wavelength or frequency and a width Δλ or Δν, then pick the unit to show the width in. For example, an OSA resolution of 0.02 nm at 1550 nm is 2495.7 MHz. It also gives the coherence length, Q and the photon equivalents of the centre.
     - **Beam:** a Gaussian beam (wavelength, waist, M²) through free space, thin lenses, mirrors, glass slabs or any ABCD matrix. It plots w(z) and gives the new waist and its position. Add a target waist to see the coupling efficiency (mode matching).
@@ -251,6 +252,8 @@ A module is a tab for one subject: formulas, calculators, tables, constants and 
 
 - **Open it:** tap **+** and pick it under **Modules**.
 - **Find things:** the chips at the top are its sections. The search box searches the whole module.
+- **All formulas** (the first chip) lists every formula and calculator in the module, grouped by section or sorted A–Z.
+- **Values** can be fractions (`3/8`, `1 3/8`, `1-3/8`, `⅜`) and can carry their own unit, for example `3/8 in` or `9.525 mm` in a field that is in inches. The same works in the formula solver.
 - **Calculators** compute as they open. Change a value or its unit and tap **Calculate**. Each result has a unit menu where it makes sense, and **Copy**.
 - **Formulas** solve for any variable, with unit menus as in the library.
 - **Tables:** type to filter. In size tables such as the drill charts, type a number to see the 12 nearest sizes. Chips choose inches or mm.

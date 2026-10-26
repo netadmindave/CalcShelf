@@ -288,8 +288,11 @@
         if (n === unknown) continue;
         const raw = inputs[n].value.trim();
         if (!raw) { toast('Enter a value for ' + n + ', or make it the unknown'); return; }
-        let val = '(' + raw.replace(/×10\^?/g, 'e').replace(/,/g, '.').replace(/π/g, 'pi') + ')';
-        try { val = this.toBase(val, u, units[n] ? units[n].value : ''); } catch (e) { toast(e.message); return; }
+        // fractions (3/8, 1 3/8, ⅜) and a unit typed after the value ("3/8 in") work too
+        const tv = root.splitValueUnit ? root.splitValueUnit(raw) : { text: raw, unit: null };
+        if (tv.unit && !u) { toast(n + ' has no unit; type just the number'); return; }
+        let val = '(' + tv.text.replace(/×10\^?/g, 'e').replace(/(\d),(\d)/g, '$1.$2').replace(/π/g, 'pi') + ')';
+        try { val = this.toBase(val, u, tv.unit || (units[n] ? units[n].value : '')); } catch (e) { toast(e.message); return; }
         valOf[map[n]] = val; knownVals.push(val);
       }
       const U = map[unknown];

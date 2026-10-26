@@ -8,9 +8,29 @@
   const { el, toast, renderTex } = UI;
   const C0 = 299792458, H = 6.62607015e-34, E = 1.602176634e-19, KB = 1.380649e-23;
 
-  /** Evaluate a typed number: 1550e-9, 3/4, 2^10, 1.2×10^-3, pi/4, sqrt(2). Returns NaN if invalid. */
+  /** Fractions as a machinist writes them: ⅜ → (3/8), 1⅜ / 1 3/8 / 1-3/8 → (1+3/8). Other text is left alone. */
+  const VULGAR = { '½': '1/2', '⅓': '1/3', '⅔': '2/3', '¼': '1/4', '¾': '3/4', '⅕': '1/5', '⅖': '2/5', '⅗': '3/5', '⅘': '4/5', '⅙': '1/6', '⅚': '5/6', '⅛': '1/8', '⅜': '3/8', '⅝': '5/8', '⅞': '7/8' };
+  function mixedFractions(s) {
+    s = String(s || '').replace(/(\d)?\s*([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/g, (m, w, f) => '(' + (w ? w + '+' : '') + VULGAR[f] + ')').replace(/⁄/g, '/');
+    return s.replace(/^\s*([+-]?)(\d+)(?:\s+|-)(\d+)\s*\/\s*(\d+)\s*$/, (m, sg, w, n, d) => sg + '(' + w + '+' + n + '/' + d + ')');
+  }
+  /** A typed value with an optional unit after it: "3/8in", "3/8 in", '1-1/2"', "12.7 mm", "2.5e-3". Returns { text, unit }:
+   *  the number part (fractions made explicit) and the unit, or null when there is none (or it isn't a unit). */
+  const MARKS = { '"': 'in', '″': 'in', "'": 'ft', '′': 'ft', inch: 'in', inches: 'in', feet: 'ft', foot: 'ft' };
+  function splitValueUnit(s) {
+    s = String(s || '').trim();
+    const m = s.match(/^(.*?[\d.)½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])\s*([A-Za-zµμΩÅ°%"'″′][^\s]*)$/);
+    if (m) {
+      const u = MARKS[m[2]] || m[2].replace(/μ/g, 'µ');
+      let ok = false; try { Units.parse(u); ok = true; } catch (e) { /* not a unit: maybe pi or a variable */ }
+      if (ok && !/^(pi|e|sqrt|ln|log)$/i.test(m[2])) return { text: mixedFractions(m[1]), unit: u, raw: m[1].trim() };
+    }
+    return { text: mixedFractions(s), unit: null, raw: s };
+  }
+
+  /** Evaluate a typed number: 1550e-9, 3/4, 1 3/8, ⅜, 2^10, 1.2×10^-3, pi/4, sqrt(2). Returns NaN if invalid. */
   function evalNum(s) {
-    s = String(s || '').trim().replace(/×\s*10\^?/g, 'e').replace(/·/g, '*').replace(/−/g, '-').replace(/,/g, '.').replace(/π|\bpi\b/gi, '(' + Math.PI + ')').replace(/\^/g, '**').replace(/√\(?/g, 'sqrt(');
+    s = mixedFractions(String(s || '').trim()).trim().replace(/×\s*10\^?/g, 'e').replace(/·/g, '*').replace(/−/g, '-').replace(/,/g, '.').replace(/π|\bpi\b/gi, '(' + Math.PI + ')').replace(/\^/g, '**').replace(/√\(?/g, 'sqrt(');
     if (!s) return NaN;
     if (!/^[\d.eE+\-*/() sqrtlogn]*$/.test(s)) return NaN;
     try { const v = Function('"use strict";const sqrt=Math.sqrt,ln=Math.log,log=Math.log10;return (' + s + ')')(); return typeof v === 'number' ? v : NaN; } catch (e) { return NaN; }
@@ -114,8 +134,12 @@
       const calc = () => {
         this.val = valI.value; this.from = read(fromS, fromI); this.to = read(toS, toI);
         out.innerHTML = ''; all.innerHTML = '';
-        const v = evalNum(valI.value);
-        if (!isFinite(v)) { out.append(el('p', { class: 'desc', text: 'Enter a number, e.g. 1550, 2.5e-3 or 3/4.' })); return; }
+        // a unit typed after the value ("3/8in", '1-1/2"') is the From unit
+        const typed = splitValueUnit(valI.value);
+        if (typed.unit) this.from = typed.unit;
+        const v = evalNum(typed.text);
+        if (!isFinite(v)) { out.append(el('p', { class: 'desc', text: 'Enter a number, e.g. 1550, 2.5e-3, 3/4, 1 3/8 or 3/8 in.' })); return; }
+        if (typed.unit) { try { Units.convert(1, typed.unit, this.to); } catch (e) { try { this.to = Units.alternatives(typed.unit, v).find((u) => u !== typed.unit) || typed.unit; } catch (x) { /* keep */ } } }
         if (!this.from || !this.to) { out.append(el('p', { class: 'desc', text: 'Type the other unit.' })); return; }
         let pf;
         try { pf = Units.parse(this.from); } catch (e) { out.append(el('p', { class: 'desc err', text: e.message })); return; }
@@ -131,6 +155,8 @@
         if (ph.length) { all.append(el('h4', { class: 'cv-h', text: 'As light (photon equivalents)' })); for (const p of ph) all.append(resultRow(app, p.value, p.unit, Units.SPEC_LABEL[p.kind], { sheet: this.sheet })); }
       };
       valI.addEventListener('input', calc);
+      // when the field is left, a typed unit moves into the From list
+      valI.addEventListener('change', () => { const t = splitValueUnit(valI.value); if (t.unit) { valI.value = t.raw; this.from = t.unit; const q0 = Units.quantityOf(Units.parse(t.unit).d, this.qty); if (q0) this.qty = q0[0]; fill(); drawChips(); calc(); } });
       for (const [S, I] of [[fromS, fromI], [toS, toI]]) {
         S.addEventListener('change', () => { I.hidden = S.value !== OTHER; if (!I.hidden) { I.value = ''; I.focus(); } calc(); if (S === fromS && S.value !== OTHER) { fill(); calc(); } });
         I.addEventListener('input', calc);
@@ -288,5 +314,5 @@
     serialize() { return { tab: Converter.tab, units: { qty: Converter.qty, from: Converter.from, to: Converter.to, val: Converter.val }, ph: Converter.ph }; }
   }
 
-  root.Converter = Converter; root.ConverterPage = ConverterPage; root.evalNum = evalNum;
+  root.Converter = Converter; root.ConverterPage = ConverterPage; root.evalNum = evalNum; root.splitValueUnit = splitValueUnit; root.mixedFractions = mixedFractions;
 })(typeof self !== 'undefined' ? self : this);

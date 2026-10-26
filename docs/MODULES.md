@@ -93,7 +93,7 @@ A calculator with inputs and outputs. It calculates as soon as it opens if every
 - `id`: the name used in expressions. Letters and digits, starting with a letter.
 - `label`: what the user sees.
 - `unit`: the unit the expressions expect. Values are converted to it.
-- `units`: the units to offer in a menu beside the value. Without a list, the unit is only shown.
+- `units`: the units to offer in a menu beside the value. Without a list, the unit is only shown. Users can also type a unit after the value (`3/8 in`, `9.525 mm`), and fractions such as `1 3/8` or `1-3/8`.
 - `default`: the starting value, written as an expression.
 - `options`: a list of choices instead of a typed value. Each choice is `{ "label", "value" }`, and its `value` is an expression. `default` is the index of the choice selected at first.
 
