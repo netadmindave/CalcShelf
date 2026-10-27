@@ -253,7 +253,7 @@
       const rows = el('div');
       const radios = [];
       for (const [name, desc, unit, def] of f.v) {
-        const inp = el('input', { type: 'text', value: def || '', inputmode: 'text', autocapitalize: 'off', spellcheck: 'false', placeholder: def ? '' : 'value', style: { flex: 1, minWidth: 0 } });
+        const inp = el('input', { type: 'text', value: def || '', inputmode: 'text', autocapitalize: 'off', spellcheck: 'false', placeholder: def ? '' : 'value', 'data-kp': '1', 'data-units': unit ? '1' : '', style: { flex: 1, minWidth: 0 } });
         inputs[name] = inp;
         const ch = this.unitChoices(unit);
         let field = inp;

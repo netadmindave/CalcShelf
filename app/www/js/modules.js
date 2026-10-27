@@ -324,12 +324,12 @@
       for (const x of it.inputs) {
         let inp;
         if (x.options) inp = el('select', { class: 'search cv-in md-in', 'aria-label': x.label }, x.options.map((o, k) => el('option', { value: String(k), text: o.label, selected: k === x.default })));
-        else inp = el('input', { class: 'search cv-in md-in', value: x.default, inputmode: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': x.label });
+        else inp = el('input', { class: 'search cv-in md-in', value: x.default, inputmode: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'data-kp': '1', 'data-units': x.unit ? '1' : '', 'aria-label': x.label });
         const us = !x.options && unitOptions(x.unit, x.units);
         const sel = us && us.length > 1 ? el('select', { class: 'fs-unit', 'aria-label': 'Unit of ' + x.label }, us.map((u) => el('option', { value: u, text: u, selected: u === x.unit }))) : null;
         fields[x.id] = { inp, sel };
         b.append(el('label', { class: 'cv-lab md-row' }, el('span', { text: x.label + (!sel && x.unit ? ' (' + x.unit + ')' : '') }), el('div', { class: 'md-pair' }, inp, sel)));
-        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
       }
       const res = el('div', { class: 'card md-res', hidden: true });
       const outSel = {};

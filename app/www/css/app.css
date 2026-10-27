@@ -369,8 +369,14 @@ details.ugrp .chips { padding: 0 2px 10px; }
 .tabs .tab { flex: none; }
 .md-grp { margin: 14px 2px 2px; }
 
-/* the fraction key bar above the phone's number keyboard */
-.frac-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; display: flex; gap: 6px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); background: var(--bar); border-top: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-.fb-key { flex: 1 0 auto; min-width: 44px; height: 40px; border-radius: 10px; background: var(--card); color: var(--ink); font: 600 18px var(--font); box-shadow: 0 1px 0 var(--line); }
-.fb-key.fb-unit { font-size: 15px; color: var(--acc); }
-.fb-key.fb-abc { font-size: 14px; color: var(--ink2); }
+/* the CAS keypad for value fields (conversion tool, formula solver, module calculators …): it sits at the bottom
+   of the screen, above sheets and pages, with a row of fraction and unit keys */
+body.fieldkeys #strip { display: grid !important; position: fixed; left: 0; right: 0; bottom: var(--kph, 0px); z-index: 45; max-width: 760px; margin: 0 auto; }
+body.fieldkeys #kp { display: flex !important; position: fixed; left: 0; right: 0; bottom: 0; z-index: 45; max-width: 760px; margin: 0 auto; height: min(46dvh, 400px); }
+body.fieldkeys .app { padding-bottom: var(--fkh, 0px); }
+body.fieldkeys .sheet { bottom: var(--fkh, 0px); height: min(78dvh, calc(100dvh - var(--fkh, 0px) - 24px)); padding-bottom: 0; border-radius: 18px 18px 0 0; }
+.fkrow { position: fixed; left: 0; right: 0; bottom: calc(var(--kph, 0px) + var(--sth, 0px)); z-index: 45; max-width: 760px; margin: 0 auto; display: flex; gap: 4px; padding: 6px 6px 0; background: var(--kp); }
+.fk { flex: 1 1 0; min-width: 0; height: 38px; border-radius: 9px; background: var(--k); color: var(--k-ink); font: 600 17px var(--font); box-shadow: 0 1.5px 0 var(--k-edge); }
+.fk.fk-unit { font-size: 15px; color: var(--k-tpl-ink, var(--acc)); }
+.fk.fk-os { font-size: 18px; }
+.fk.fk-done { background: var(--acc); color: var(--acc-ink); font-size: 15px; flex-grow: 1.3; }

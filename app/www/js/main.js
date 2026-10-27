@@ -126,6 +126,7 @@
       this.cas.onBusy = (b) => document.body.classList.toggle('cas-busy', b);
       this.buildKeypad();
       this.bindStrip();
+      FieldKeys.init(this);
       $('#btn-doc').onclick = () => this.docMenu();
       $('#btn-addpage').onclick = () => this.addPageMenu();
       $('#scrim').onclick = () => Sheet.close();
@@ -212,6 +213,7 @@
       return p;
     },
     select(i) {
+      FieldKeys.off();
       this.active = i;
       // with several emulator tabs, the ones in the background stay laid out (invisible) so they keep running
       this.pages.forEach((p, k) => { const bg = k !== i && p.kind === 'emu' && this.settings.multiEmu; p.root.hidden = k !== i && !bg; p.root.classList.toggle('bgrun', bg); });
@@ -444,7 +446,7 @@
       if (k.ch) { let c = k.ch; if (this.shift) { c = c.toUpperCase(); this.setShift(false); } return this.typed(c); }
       if (k.i) {
         const p = this.page;
-        if (p && p.keyInsert && p.keyInsert(k.i)) return;
+        if (!FieldKeys.field && p && p.keyInsert && p.keyInsert(k.i)) return;
         this.insert(k.i);
       }
     },
@@ -462,6 +464,7 @@
       });
     },
     action(a) {
+      if (FieldKeys.field && FieldKeys.action(a)) return;   // a value field (converter, solver, module) has the keypad
       const p = this.page;
       switch (a) {
         case 'enter': if (p && p.enter) p.enter(false); break;

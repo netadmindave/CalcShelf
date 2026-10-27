@@ -13,7 +13,8 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
   - **Data only:** a module can't run code. CalcShelf checks the file and every expression before the CAS sees it. See [SECURITY.md](SECURITY.md).
   - **[docs/MODULES.md](docs/MODULES.md)** explains how to make a module, and `modules/example.json` uses every kind of item.
 - **All formulas** in every module tab: one list of all its formulas and calculators, by section or A–Z.
-- **Fractions and units typed with a value** in the conversion tool, module calculators and the formula solver: `3/8`, `1 3/8`, `1-3/8`, `⅜`, `3/8in`, `1-1/2"`, `12.7 mm`. In the conversion tool, a unit typed after the value becomes the From unit. A key bar above the number keyboard adds / and a space (and units in the conversion tool), since the phone's number keyboard has neither.
+- **Fractions and units typed with a value** in the conversion tool, module calculators and the formula solver: `3/8`, `1 3/8`, `1-3/8`, `⅜`, `3/8in`, `1-1/2"`, `12.7 mm`. In the conversion tool, a unit typed after the value becomes the From unit. 
+- **The CAS keypad for value fields:** the conversion tool, the formula solver, module calculators, the triangle solver and other value fields use the CAS keypad instead of the phone keyboard. A row above it has **/** and a space for fractions, unit keys (in, ", ft, mm) where a value can take a unit, **⌨** for the phone keyboard, and **done**. enter moves to the next field, then runs the form.
 - **Formula solver unit menus:** every variable with a unit has a menu. It starts on **units** (your numbers as typed) and offers the units of the same kind, so you can enter a radius in inches and get an area in cm².
 - **The tab bar scrolls sideways** with a finger when the tabs don't fit, and its ends fade to show there are more.
 - **Fix:** a Sellmeier entry with two terms defined a broken n(λ) function; every term count works now.
