@@ -639,6 +639,7 @@
 
   /** Translate LaTeX from the math editor to a Giac command string. */
   function tex2giac(tex, ctx = {}) {
+    tex = String(tex).replace(/\\char"207B\s?|⁻/g, '-');   // the (−) key's negation sign
     // MathLive re-serialises \operatorname{nCr} as \operatorname{\mathrm{nCr}}
     tex = String(tex).replace(/\\operatorname\{\\(?:mathrm|text|textrm)\{([^{}]*)\}\}/g, '\\operatorname{$1}');
     tex = eeToPow(tex);

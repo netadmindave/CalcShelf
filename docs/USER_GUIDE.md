@@ -70,7 +70,7 @@ The toolbar above the keypad has full-size keys (**esc** and **tab** are the wid
 | **‹ ›** | Moves the cursor. |
 | **⌫** | Deletes. Hold it to keep deleting. |
 
-The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²** (long-press for x³), **eˣ** (long-press for x⁻¹ or 1/x) and **units**, which opens the unit list (long-press for |x| or n!).
+The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²** (long-press for x³), **eˣ** (long-press for x⁻¹ or 1/x) and **units**, which opens the unit list (long-press for |x| or n!). **(−)** types the negation sign ⁻, raised and set tight against its number (3ᴇ⁻2), so it looks different from the **−** (minus) key.
 
 **Keypad pages.** The strip below the keypad switches between them:
 

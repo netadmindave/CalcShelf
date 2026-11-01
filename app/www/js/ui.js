@@ -44,6 +44,10 @@
   const Sheet = {
     stack: [], onClose: null,
     open(title, build, opts = {}) {
+      // a keypad key opens a sheet on pointerup; the tap's own click then lands on whatever the new sheet shows
+      // under the finger (the units key picked “fm”). So a sheet a keypad key opens ignores clicks for a moment.
+      if (!opts.push) this.openedAt = Date.now() - (this.keyTap || 0) < 120 ? Date.now() : 0;
+      if (!this._guard) { this._guard = true; $('#sheet').addEventListener('click', (e) => { if (Date.now() - (this.openedAt || 0) < 450) { e.stopPropagation(); e.preventDefault(); } }, true); }
       if (!opts.push) this.stack = [];
       this.stack.push({ title, build });
       this.render();

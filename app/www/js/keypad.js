@@ -29,7 +29,8 @@
       { ...K('sto▸', '\\to ', 'fn', A('Rcl', 'recallDef')), aa: 1 }, K('1', '1', 'num', S('"', '\\text{"#?"}')), K('2', '2', 'num', { l: 'x²', i: '^2', aa: 1 }), K('3', '3', 'num', A('Units', 'units')),
       { ...K('+', '+', 'op', A('Char', 'abcpage')), aa: 1 },
       { l: 'ans', a: 'ans', t: 'fn', s: S('i', '\\imaginaryI '), d: S('∞', '\\infty ') }, K('0', '0', 'num', S('<', '<'), S('≤', '\\le ')), K('.', '.', 'num', S('>', '>'), S('≥', '\\ge ')),
-      K('(−)', '-', 'num', A('Ans', 'ans'), S('±', '\\pm ')), { l: '≈', a: 'approx', t: 'enter', title: 'Decimal answer (≈)', s: A('Entry', 'entry'), d: A('enter', 'enter') },
+      K('(−)', '\\char"207B ', 'num', A('Ans', 'ans'), S('±', '\\pm ')),   // negation: a raised ⁻ as on a TI, unlike the minus key
+      { l: '≈', a: 'approx', t: 'enter', title: 'Decimal answer (≈)', s: A('Entry', 'entry'), d: A('enter', 'enter') },
     ] },
     { id: 'fn', label: 'f(x)', cols: 6, keys: [
       T('sin', '\\sin\\left(#0\\right)', 'fn'), T('cos', '\\cos\\left(#0\\right)', 'fn'), T('tan', '\\tan\\left(#0\\right)', 'fn'), T('ln', '\\ln\\left(#0\\right)', 'fn'), T('log', '\\log\\left(#0\\right)', 'fn'), T('$\\log_{\\square}', '\\log_{#?}\\left(#0\\right)', 'tpl'),

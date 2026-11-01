@@ -392,7 +392,7 @@
           if (k.d) b.append(el('span', { class: 'kd', text: k.d.l }));
           b.setAttribute('aria-label', (k.l.replace(/^\$/, '').replace(/\\[a-z]+/g, '').replace(/[{}^_]/g, '') || k.l) + (k.s ? ', 2nd ' + k.s.l : '') + (k.d ? ', diamond ' + k.d.l : ''));
           let y0 = 0, lp = null, done = false, rep = null;
-          const fire = (spec) => { done = true; b.classList.remove('pressed'); this.keyPress(spec, b); };
+          const fire = (spec) => { done = true; b.classList.remove('pressed'); Sheet.keyTap = Date.now(); this.keyPress(spec, b); };
           b.addEventListener('pointerdown', (e) => {
             b.classList.add('pressed'); if (this.settings.haptic) haptic();
             y0 = e.clientY; done = false; try { b.setPointerCapture(e.pointerId); } catch (x) { /* ignore */ }
@@ -410,6 +410,8 @@
           b.addEventListener('click', (e) => { e.preventDefault(); if (e.detail === 0) this.keyPress(k, b); });   // keyboard activation only
           b.addEventListener('mousedown', (e) => e.preventDefault());
           b.addEventListener('contextmenu', (e) => e.preventDefault());
+          // the key already acted on pointerup: no click afterwards, which would land on a sheet the key just opened
+          b.addEventListener('touchend', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
           g.append(b);
         }
         host.append(g);

@@ -350,6 +350,7 @@
     async runTex(tex, approx) {
       const shown = this.ansShown(tex).replace(/ᴇ\s*[-−]/g, 'ᴇ{-}');   // 1.5ᴇ-3 shows its sign, not a subtraction
       this.setBusy(true);
+      tex = tex.replace(/\\char"207B\s?/g, '-');   // (−) is shown raised but computes as a minus
       const r = /\\pm/.test(tex) ? await evaluateUnc(this.app, tex) : await evaluate(this.app, tex, { approx });
       if (r.ok && !r.unc && !r.done && !r.printed && r.kind === 'expr') {
         const out = String(r.out);

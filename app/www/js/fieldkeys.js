@@ -10,7 +10,7 @@
 
   /** LaTeX that a keypad key inserts → the plain text a value field takes */
   const PLAIN = {
-    '\\times ': '*', '\\cdot ': '*', '\\div ': '/', '\\pi ': 'pi', '\\exponentialE ': 'e', '\\exponentialE^{#?}': 'exp(', 'ᴇ': 'e',
+    '\\times ': '*', '\\char"207B ': '-', '\\cdot ': '*', '\\div ': '/', '\\pi ': 'pi', '\\exponentialE ': 'e', '\\exponentialE^{#?}': 'exp(', 'ᴇ': 'e',
     '^{#?}': '^', '^{-1}': '^(-1)', '\\sqrt{#0}': 'sqrt(', '\\sqrt[#?]{#0}': '^(1/', '\\frac{1}{#0}': '1/', '\\left|#0\\right|': 'abs(',
     '\\ln\\left(#0\\right)': 'ln(', '\\log\\left(#0\\right)': 'log10(', '10^{#?}': '10^', '\\degree ': '°', '\\ ': ' ', '\\_': '_', '\\imaginaryI ': 'i',
     '\\mu ': 'µ', '\\Delta ': 'Δ', '\\lambda ': 'λ', '\\alpha ': 'α', '\\beta ': 'β', '\\omega ': 'ω', '\\phi ': 'φ', '\\sigma ': 'σ', '\\theta ': 'θ',
