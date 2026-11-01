@@ -448,6 +448,8 @@
       }
       core.load(rom, target.id);              // validates size
       await DB.set('rom:' + target.id, rom); await DB.del('state:' + target.id);
+      // CalcShelf keeps a copy of the file you chose, for backups
+      if (window.parent !== window) try { window.parent.postMessage({ type: 'emu-firmware', name: file.name, bytes, model: target.id }, location.origin); } catch (x) { /* standalone */ }
       if (target.id !== model.id) { await switchModel(target.id); return; }
       $('#setup').hidden = true;
       boot(rom, null);

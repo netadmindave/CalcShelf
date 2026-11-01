@@ -14,6 +14,10 @@ CalcShelf is an offline app. It asks Android for **no permissions**, so it can't
 - **Modules** are data only: a JSON file with formulas, calculators, tables, constants and text. CalcShelf draws every screen itself, shows Markdown text without any HTML, and opens only https:// links, in the browser. Before a module's expression goes to the CAS, CalcShelf checks that it only computes: no assignment, strings, loops, programs, settings, files or input and output, and a 10-second limit. A module's inputs get private names, so it can't change your variables. The app never downloads modules; your browser does, and you import the file.
 - **Formulas from backups or files** are rendered by MathLive with its HTML-styling commands removed. HTML in them is shown as text, never run.
 
+## Firmware copies and backups
+
+CalcShelf keeps a copy of each calculator OS, ROM dump and TI-Nspire system file you choose, in the app's private storage, so a backup can include them. They never leave the phone except in a backup file you save yourself. A backup with firmware contains your own ROM dumps: don't share it. **Back up without firmware** makes one that doesn't. CalcShelf itself never includes TI firmware.
+
 ## Restoring a backup someone else made
 
 A backup restores tabs, history, variables and definitions. They are calculator data, and are shown and evaluated as such. Still, only restore backups from people you trust, as with any file.

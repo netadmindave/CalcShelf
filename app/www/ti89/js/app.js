@@ -619,8 +619,11 @@
     const err = $('#setup-err'); err.hidden = true;
     try {
       const bytes = await readFile(file);
-      const imgBytes = core.installOS(bytes, file.name);
+      // a TiEmu image (kept by CalcShelf for older installs) loads as it is; an OS file or ROM dump is converted
+      const imgBytes = /\.img$/i.test(file.name) ? bytes : core.installOS(bytes, file.name);
       await DB.set(SK('img'), imgBytes); await DB.del(SK('state'));
+      // CalcShelf keeps a copy of the file you chose, for backups
+      if (window.parent !== window) try { window.parent.postMessage({ type: 'emu-firmware', name: file.name, bytes, model: SLOT }, location.origin); } catch (x) { /* standalone */ }
       boot(imgBytes, null);
       $('#setup').hidden = true;
       toast('OS installed. Press home to start calculating.');

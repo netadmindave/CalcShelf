@@ -102,6 +102,8 @@
       const u8 = await readFile(f); const kind = classify(u8);
       if (NEED.some((n) => n[0] === kind)) {
         fw[kind] = u8; await DB.set('fw:' + kind, u8);
+        // CalcShelf keeps a copy of each system file and the OS, for backups
+        if (EMBED) try { window.parent.postMessage({ type: 'emu-firmware', name: f.name, bytes: u8, kind, model: 'cx2cas' }, location.origin); } catch (x) { /* ignore */ }
         if (kind === 'os' && installed && core && mode === 'run') { updateOS(u8); }
       }
       else if (kind === 'boot1-nokeys') notes.push({ nokeys: 1, t: f.name + ' is a boot ROM without its keys: use the injected_btrom file from eMMUlate.' });

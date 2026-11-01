@@ -15,6 +15,7 @@
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
     guide: { name: 'Guide & manuals', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a1.6 1.6 0 0 0-1.6-1.6H5z"/><path d="M19 4.5h-5.5a1 1 0 0 0-1 1"/><path d="M19 4.5v13.9h-5.9a1.6 1.6 0 0 0-1.6 1.6"/></svg>', make: (a, s) => new Guide.GuidePage(a, s) },
     module: { name: 'Module', icon: Modules.ICONS.module, make: (a, s) => new Modules.ModulePage(a, s), menu: false },
+    ode: { name: 'Differential Equations', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 19c3-1 4.5-10 8-10s5 6 8 5"/><path d="M4.5 6.5l2.5-1.2M10 5.6h2.8M15.2 5.4l2.6.9"/></svg>', make: (a, s) => new Ode.OdePage(a, s) },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
   };
@@ -101,13 +102,14 @@
   root.addEventListener('message', (e) => {
     const d = e.data, app = root.__app; if (!d || !app || e.origin !== location.origin) return;
     const p = app.pages.find((x) => x.frame && x.frame.contentWindow === e.source); if (!p) return;
-    if (d.type === 'emu-ready') p._ready && p._ready();
+    if (d.type === 'emu-ready') { p._ready && p._ready(); FwStore.installPending(p); }
+    else if (d.type === 'emu-firmware' && d.bytes) FwStore.put(p.fam, typeof d.model === 'string' && emuModel(p.fam, d.model) ? d.model : p.model, { name: d.name, bytes: d.bytes, kind: typeof d.kind === 'string' ? d.kind : '' });
     else if (d.type === 'emu-replace') { app.select(app.pages.indexOf(p)); app.emuChooser(); }
     else if (d.type === 'classic-model' && p.fam === 'z80' && p.model !== d.model && emuModel('z80', d.model)) { p.model = d.model; app.saveSoon(); app.renderTabs(); }
   });
 
   const UNIQUE = new Set(['calc', 'emu']);
-  const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert' };
+  const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert', ode: 'DiffEq' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
   const App = {
@@ -121,6 +123,7 @@
       if (s && !s.fmt) this.settings.fmt = s.sci ? 'sci' : 'norm';
       Units.defineUser(this.settings.userUnits || []);
       Modules.load();
+      FwStore.migrate(EMU_MODELS).catch((e) => console.warn('firmware copy', e));
       this.applyTheme();
       this.cas = new CAS('js/cas-worker.js');
       this.cas.onBusy = (b) => document.body.classList.toggle('cas-busy', b);
@@ -636,8 +639,18 @@
         if (this.settings.multiEmu) item('Add an emulated calculator', 'Opens in a new tab; change a tab’s model from its tab menu', () => this.emuChooser(true, null));
         else item(emu ? 'Replace OS or change calculator' : 'Add an emulated calculator', emu ? 'Now ' + emu.info[2] : 'TI-Nspire CX II CAS, TI-89, TI-92, V200, TI-84 Plus … TI-81, HP 48, HP 49', () => { if (emu) this.select(this.pages.indexOf(emu)); this.emuChooser(true); });
         item('Rename tabs', 'Long-press a tab, or tap the open tab', () => { Sheet.close(); this.renameTab(this.active); });
-        item('Back up', 'Save all tabs, variables and history as a .tns.json file', () => { Sheet.close(); UI.download('CalcShelf-' + new Date().toISOString().slice(0, 10) + '.tns.json', JSON.stringify(this.serializeDoc())); });
-        item('Restore from backup', 'Replaces the current tabs', () => { Sheet.close(); const f = $('#file-open'); f.onchange = async () => { const file = f.files[0]; f.value = ''; if (!file) return; try { const d = JSON.parse(await file.text()); if (!Array.isArray(d.pages)) throw new Error(); if (!confirm('Replace the current tabs with this backup?')) return; d.id = this.doc.id; await this.openDoc(d); await this.saveNow(); toast('Restored'); } catch (e) { toast('That file isn’t a backup from this app.'); } }; f.click(); });
+        item('Back up', 'All tabs, variables and history, and the calculator firmware you loaded, in one .tns.json file', async () => {
+          Sheet.close(); toast('Preparing the backup…', 6000);
+          let firmware = []; try { firmware = await FwStore.exportAll(); } catch (e) { toast('The firmware could not be read: ' + e.message, 5000); }
+          UI.download('CalcShelf-' + new Date().toISOString().slice(0, 10) + '.tns.json', JSON.stringify(Object.assign({}, this.serializeDoc(), { firmware })));
+        });
+        item('Back up without firmware', 'A small file: tabs, variables and history only', () => { Sheet.close(); UI.download('CalcShelf-' + new Date().toISOString().slice(0, 10) + '.tns.json', JSON.stringify(this.serializeDoc())); });
+        item('Restore from backup', 'Replaces the current tabs', () => { Sheet.close(); const f = $('#file-open'); f.onchange = async () => { const file = f.files[0]; f.value = ''; if (!file) return; try { const d = JSON.parse(await file.text()); if (!Array.isArray(d.pages)) throw new Error(); const fw = d.firmware; delete d.firmware;
+            if (!confirm('Replace the current tabs with this backup?' + (Array.isArray(fw) && fw.length ? ' Its calculator firmware (' + fw.length + ' file' + (fw.length > 1 ? 's' : '') + ') replaces the firmware stored for those models.' : ''))) return;
+            d.id = this.doc.id; await this.openDoc(d); await this.saveNow();
+            const n = await FwStore.importAll(fw);
+            for (const p of this.pages) if (p.kind === 'emu' && p.frame) FwStore.installPending(p);
+            toast(n ? 'Restored, with ' + n + ' firmware file' + (n > 1 ? 's' : '') : 'Restored', 4000); } catch (e) { toast('That file isn’t a backup from this app.'); } }; f.click(); });
         b.append(L);
       });
     },

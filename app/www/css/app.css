@@ -380,3 +380,34 @@ body.fieldkeys .sheet { bottom: var(--fkh, 0px); height: min(78dvh, calc(100dvh 
 .fk.fk-unit { font-size: 15px; color: var(--k-tpl-ink, var(--acc)); }
 .fk.fk-os { font-size: 18px; }
 .fk.fk-done { background: var(--acc); color: var(--acc-ink); font-size: 15px; flex-grow: 1.3; }
+
+/* Differential Equations tab */
+.page.ode { display: flex; flex-direction: column; }
+.ode-body { flex: 1; overflow-y: auto; padding: 10px 12px 40px; }
+.ode-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ode-title { flex: 1; font-weight: 700; font-size: 17px; }
+.ode-lab { font-size: 13px; color: var(--ink2); font-weight: 600; margin-bottom: 6px; }
+.ode-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ode-row math-field { flex: 1; min-width: 0; border: 1.5px solid var(--line); border-radius: 10px; padding: 6px 10px; background: var(--bg, var(--card)); font-size: 19px; }
+.ode-x { flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--chip); color: var(--ink2); }
+.ode-add { margin-top: 2px; }
+.ode-quick { display: flex; gap: 6px; flex-wrap: wrap; margin: 2px 0 10px; }
+.ode-quick .chip { min-width: 40px; font-size: 16px; }
+.ode-opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ode-opts .field { margin-bottom: 6px; } .ode-opts .field input, .ode-opts .field select { padding: 8px; }
+.ode-go { width: 100%; margin: 4px 0 10px; }
+.ode-sum { margin: 0 2px 8px; font-size: 13px; }
+.ode-sol { font-size: 19px; overflow-x: auto; padding: 4px 0 6px; }
+.ode-how { margin-top: 8px; font-size: 12px; }
+.ode-err { color: var(--err, #c0392b); font-size: 14px; margin: 4px 0; }
+.ode-ctl { display: flex; flex-direction: column; gap: 6px; margin-bottom: 6px; }
+.ode-ax { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink2); }
+.ode-ax select { flex: 1; padding: 6px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); }
+.ode-atrow { display: flex; align-items: flex-end; gap: 8px; margin-top: 10px; } .ode-atrow .field { flex: 1; margin-bottom: 0; }
+.ode-atrow .chip { margin-bottom: 4px; }
+.ode-det { margin-top: 10px; } .ode-det summary { font-weight: 600; font-size: 14px; padding: 6px 0; }
+.ode-tw { max-height: 320px; overflow: auto; margin-bottom: 6px; }
+.ode-tbl { border-collapse: collapse; font: 13px/1.3 var(--mono, monospace); width: 100%; }
+.ode-tbl th, .ode-tbl td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.ode-tbl th { position: sticky; top: 0; background: var(--card); }
+@media (max-width: 420px) { .ode-opts { grid-template-columns: 1fr 1fr; } }

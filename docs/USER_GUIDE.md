@@ -5,7 +5,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - [The basics: tabs, menus, saving](#the-basics)
 - [The CAS tab](#the-cas-tab)
   - [Keypad](#keypad) · [Entering math](#entering-math) · [Results and history](#results-and-history) · [Uncertainty](#uncertainty-propagation) · [Units](#units) · [Menus and catalog](#menus-and-catalog) · [Settings](#settings)
-- [Other tabs: Graphs, Lists & Spreadsheet, Notes, Program Editor, Unit Converter](#other-tabs)
+- [Other tabs: Graphs, Lists & Spreadsheet, Notes, Program Editor, Differential Equations, Unit Converter](#other-tabs)
 - [Constants, formulas, trig and conversions](#constants-formulas-trig-and-conversions)
 - [Modules: Optics, Machinist and your own](#modules)
 - [TI-36X Pro](#ti-36x-pro)
@@ -24,7 +24,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Tap a tab** to go to it.
 - **Tap the open tab** to get its menu: rename, move, close, export history, and so on.
 - **Long-press a tab** to rename it.
-- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, **Guide & manuals**, or a module such as **Optics** or **Machinist**.
+- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, Differential Equations, **Guide & manuals**, or a module such as **Optics** or **Machinist**.
 - **More tabs than fit?** Swipe the tab bar sideways. Its ends fade when there are more tabs past the edge.
 - **Guide & manuals** (also in the main menu ☰) holds this whole guide, and links to the official manuals of every calculator CalcShelf runs. Those open in your browser.
 - **Screen rotation:** the CAS and the TI-36X Pro stay upright, and the TI-92, TI-92 Plus and Voyage 200 always run in landscape. The other tabs turn with the phone.
@@ -198,6 +198,17 @@ Add these from **+**.
 - **Program Editor.**
   - Write TI-Basic functions and programs (`Func…EndFunc`, `Prgm…EndPrgm`).
   - A program can then be called from the CAS tab like any built-in function. The editor starts with a Fibonacci example.
+- **Differential Equations.** Solves ordinary differential equations of any order, and systems of them.
+  - **Equations:** type derivatives with primes (y′, y″: the **′** key under the equation, or 2nd **=** on the keypad), or as dy/dt, d²y/dt², d/dt(y) or diff(y,t). For a system, tap **+ equation** and give one equation per unknown, like x′ = y and y′ = −x. `xy` means x·y here.
+  - **Conditions** (optional): y(0) = 1, y′(0) = 0. All at one point is an initial value problem. At two points (y(0) = 1, y(π/2) = 2) it is a boundary value problem, solved exactly.
+  - **Variable:** *auto* takes it from dy/dt, else t if the equation has t, else x. **From** and **To** set the range of the numeric solution and its plot (from the initial point to 10 more by default). **Table step** sets the table's spacing.
+  - **Solve** (or enter) gives:
+    - **Exact solution** from Giac, with c₀, c₁ … for the constants when conditions are missing. Linear systems with constant coefficients use the Laplace transform (conditions at 0). Decimals are read as fractions. **Insert** puts it in the CAS tab, **Define y(t)** stores it as a function there, and **Graph** opens it in Graphs.
+    - **Numeric solution** (adaptive Runge–Kutta, Dormand–Prince 5(4)) whenever every initial value is given: works for nonlinear equations too. The plot shows the unknowns (and y′ dashed for one equation) against the variable, or, for two or more components, a **Phase plane** of any two. One first-order equation also gets its slope field; without a condition you see the slope field with several solution curves. Below: **Values at t =** any point, and a **Table** you can copy as CSV.
+  - **Examples** loads 14 worked equations, from exponential decay to the Lorenz system. Angles are radians in this tab.
+
+<p><img src="img/diffeq.png" width="240" alt="Differential Equations tab: logistic growth with its slope field"></p>
+
 - **Unit Converter.** It has four parts:
   - **Units:** choose a quantity, then pick the From and To units from the dropdowns. For a unit that isn't listed, choose *Other unit…* and type it, for example W/(m·K).
   - **Fractions and units in the value:** type `3/8`, `1 3/8`, `1-3/8` or `⅜`, and add a unit if you like: `3/8in`, `1-1/2"`, `12.7 mm`. A unit typed after the value becomes the From unit. `"` means inches and `'` feet.
@@ -489,12 +500,14 @@ These run **HP's own ROMs** on the **Emu48** core. The ROMs are included, so the
 
 ## Backup and restore
 
-- **Back up** (main menu) saves all tabs, CAS variables and history as a `.tns.json` file.
-- **Restore from backup** replaces the current tabs with a backup.
-- **Emulated calculators** keep their memory separately on the phone:
+- **Back up** (main menu) saves all tabs, CAS variables and history as a `.tns.json` file, **with the firmware** of your emulated calculators.
+  - CalcShelf keeps a copy of every OS file, ROM dump and TI-Nspire system file you choose for a calculator. Choosing another for the same calculator replaces its copy. Firmware loaded before 2.7.6 is copied once, the first time the new version starts.
+  - A backup with firmware can be large (about 25 MB with the TI-Nspire OS). It holds your own ROM dumps, so keep it to yourself.
+- **Back up without firmware** saves the small backup: tabs, variables and history only.
+- **Restore from backup** replaces the current tabs with a backup. If it has firmware, the copies are restored and each calculator installs its firmware the first time you open its tab. The TI-Nspire's files are put in its setup screen: tap **Install**.
+- **Emulated calculators** keep their memory (programs, variables) separately on the phone:
   - **TI calculators:** use each one's snapshots, or send their files to the computer through Var-Link and keep those.
   - **HP calculators:** use **Load an object** to bring programs back.
-- **On a new phone:** reload your TI OS files and dumps. They are never included in a backup.
 
 ---
 
