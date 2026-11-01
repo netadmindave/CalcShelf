@@ -13,10 +13,10 @@
   const PAGES = [
     /* TI-89 layout: tap = primary, long-press = choose the 2nd legend s (blue) or ◆ legend d (green) */
     { id: 'num', label: '123', cols: 5, keys: [
-      // a row for √, π, x², x⁻¹ and |x|
+      // a row for √, π, x², eˣ and units (|x| and x⁻¹ are their 2nd functions)
       // EE types a TI-style small capital ᴇ: 6.02ᴇ23 stays on one line and is read as one number
-      K('√', '\\sqrt{#0}', 'fn', S('ⁿ√', '\\sqrt[#?]{#0}')), K('π', '\\pi ', 'fn', S('e', '\\exponentialE ')), K('x²', '^2', 'fn', S('x³', '^3')), K('x⁻¹', '^{-1}', 'fn', S('1/x', '\\frac{1}{#0}')),
-      K('|x|', '\\left|#0\\right|', 'fn', S('n!', '!')),
+      K('√', '\\sqrt{#0}', 'fn', S('ⁿ√', '\\sqrt[#?]{#0}')), K('π', '\\pi ', 'fn', S('e', '\\exponentialE ')), K('x²', '^2', 'fn', S('x³', '^3')), K('eˣ', '\\exponentialE^{#?}', 'fn', S('x⁻¹', '^{-1}'), S('1/x', '\\frac{1}{#0}')),
+      { l: 'units', a: 'units', t: 'fn', title: 'Units', s: S('|x|', '\\left|#0\\right|'), d: S('n!', '!') },
       K('x', 'x', 'var', S('ln', '\\ln\\left(#0\\right)'), S('eˣ', '\\exponentialE^{#?}')), K('y', 'y', 'var', S('sin', '\\sin\\left(#0\\right)'), S('sin⁻¹', '\\sin^{-1}\\left(#0\\right)')),
       K('z', 'z', 'var', S('cos', '\\cos\\left(#0\\right)'), S('cos⁻¹', '\\cos^{-1}\\left(#0\\right)')), K('t', 't', 'var', S('tan', '\\tan\\left(#0\\right)'), S('tan⁻¹', '\\tan^{-1}\\left(#0\\right)')),
       { ...K('^', '^{#?}', 'op', S('π', '\\pi '), S('θ', '\\theta ')), aa: 1 },
@@ -29,7 +29,7 @@
       { ...K('sto▸', '\\to ', 'fn', A('Rcl', 'recallDef')), aa: 1 }, K('1', '1', 'num', S('"', '\\text{"#?"}')), K('2', '2', 'num', { l: 'x²', i: '^2', aa: 1 }), K('3', '3', 'num', A('Units', 'units')),
       { ...K('+', '+', 'op', A('Char', 'abcpage')), aa: 1 },
       { l: 'ans', a: 'ans', t: 'fn', s: S('i', '\\imaginaryI '), d: S('∞', '\\infty ') }, K('0', '0', 'num', S('<', '<'), S('≤', '\\le ')), K('.', '.', 'num', S('>', '>'), S('≥', '\\ge ')),
-      K('(−)', '-', 'num', A('Ans', 'ans'), S('±', '\\pm ')), { l: 'enter', a: 'enter', t: 'enter', s: A('Entry', 'entry'), d: A('≈', 'approx') },
+      K('(−)', '-', 'num', A('Ans', 'ans'), S('±', '\\pm ')), { l: '≈', a: 'approx', t: 'enter', title: 'Decimal answer (≈)', s: A('Entry', 'entry'), d: A('enter', 'enter') },
     ] },
     { id: 'fn', label: 'f(x)', cols: 6, keys: [
       T('sin', '\\sin\\left(#0\\right)', 'fn'), T('cos', '\\cos\\left(#0\\right)', 'fn'), T('tan', '\\tan\\left(#0\\right)', 'fn'), T('ln', '\\ln\\left(#0\\right)', 'fn'), T('log', '\\log\\left(#0\\right)', 'fn'), T('$\\log_{\\square}', '\\log_{#?}\\left(#0\\right)', 'tpl'),

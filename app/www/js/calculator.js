@@ -355,7 +355,13 @@
         const out = String(r.out);
         r.unit = unitOf(out);
         const explicit = /=>\s*_|^\s*convert\(/.test(r.code || '');   // a unit the user asked for stays as it is
-        if (r.unit && !explicit) { const su = Units.simplifyUnit(r.unit.u); if (su !== r.unit.u) { try { r.unit = { v: Units.convert(r.unit.v, r.unit.u, su || '1'), u: su }; } catch (e) { /* keep Giac's */ } } if (!r.unit.u) { r.unit = null; r.tex = GiacFmt.giacToTex(String(Units.convert(+unitOf(out).v, unitOf(out).u, '1')), fmtOpts(this.app.settings)); } }
+        // units Giac leaves uncombined (cm²/s × ns under a root gives √ns·s^-0.5): work in SI base units, then tidy
+        let viaSI = false;
+        if (!r.unit && !explicit && /_[(A-Za-zµμΩÅ]/.test(out) && r.code) {
+          try { const m = String(await this.app.cas.eval('evalf(mksa(' + r.code + '))')); const u2 = unitOf(m); if (u2) { r.unit = u2; r.out = m; viaSI = true; } } catch (e) { /* keep Giac's answer */ }
+        }
+        if (r.unit && !explicit) { const su = Units.simplifyUnit(r.unit.u); if (su !== r.unit.u) { try { r.unit = { v: Units.convert(r.unit.v, r.unit.u, su || '1'), u: su }; viaSI = true; } catch (e) { /* keep Giac's */ } } if (!r.unit.u) { r.unit = null; r.tex = GiacFmt.giacToTex(String(Units.convert(+unitOf(out).v, unitOf(out).u, '1')), fmtOpts(this.app.settings)); } }
+        if (r.unit && viaSI) r.unit = Units.nicePrefix(r.unit.v, Units.simplifyUnit(r.unit.u) || r.unit.u);
         if (r.unit) r.tex = (GiacFmt.giacToTex(String(+r.unit.v.toPrecision(12)), fmtOpts(this.app.settings)) || String(r.unit.v)) + '\\,' + (/[²³⁴⁻¹]/.test(r.unit.u) ? Units.unitTex(r.unit.u.replace(/\*/g, '·')) : unitTexOf(r.unit.u));
         // an exact numeric answer also gets its decimal value
         if (!r.unit && !approx && !/[.\[_]|e-?\d/.test(out) && !/^-?\d+$/.test(out) && out.length < 400) {

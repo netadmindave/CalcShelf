@@ -70,7 +70,7 @@ The toolbar above the keypad has full-size keys (**esc** and **tab** are the wid
 | **‹ ›** | Moves the cursor. |
 | **⌫** | Deletes. Hold it to keep deleting. |
 
-The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²** (long-press for x³), **x⁻¹** (long-press for 1/x) and **|x|** (long-press for n!).
+The top row of the **123** page has **√** (long-press for ⁿ√), **π** (long-press for e), **x²** (long-press for x³), **eˣ** (long-press for x⁻¹ or 1/x) and **units**, which opens the unit list (long-press for |x| or n!).
 
 **Keypad pages.** The strip below the keypad switches between them:
 
@@ -79,7 +79,7 @@ The top row of the **123** page has **√** (long-press for ⁿ√), **π** (lon
 - **∫Σ:** calculus and sums.
 - **abc:** letters.
 
-The **≈** key evaluates to a decimal instead of an exact answer. **enter** evaluates exactly.
+The **≈** keys (bottom right of the 123 page, and beside **enter**) give a decimal instead of an exact answer. **enter** evaluates exactly.
 
 **Second functions.** Keys show a blue **2nd** legend and a green **◆** legend, as on the TI-89. **Long-press a key** to choose one of them.
 
@@ -98,7 +98,7 @@ The **≈** key evaluates to a decimal instead of an exact answer. **enter** eva
   - **Store a value:** `3 sto▸ a`.
   - **Define a function:** use `f(x):=x^2+1`, or **menu → Actions → Define**.
   - **See what's defined:** use **menu → Actions → Variables**.
-- **ans** recalls the last answer. **Long-press enter** to choose **Entry**, which recalls the last entry for editing, or **≈**.
+- **ans** recalls the last answer. **Long-press ≈** (on the 123 page) to choose **Entry**, which recalls the last entry for editing, or **enter**.
 - **In the history, ans shows its value.** `ans×2` after 5 is saved as `5×2`.
 - **EE works as on a TI calculator.** It types a small capital **ᴇ**, and the exponent goes on the same line: `6.02ᴇ23`, `1.5ᴇ−3` (use **(−)** for the minus). The number and its exponent count as one number, so `1/2ᴇ3` is 1/2000. Answers in scientific notation use the same ᴇ (`1.2044ᴇ24`).
 

@@ -577,6 +577,21 @@
     return build(exps);
   }
 
-  const api = { simplifyUnit, unitToGiac, entryTex, unitTo, toGiac, giacUnit, giacNative, fromGiacUnit, siGiac, parse, convert, compatible, dimText, fmt, num, unitTex, alternatives, quantityOf, quantitiesOf, defineUser, checkUser, splitDef, userUnits: () => USER.slice(), QUANTITIES, U, lookup, photonEquivalents, specKind, SPEC, SPEC_INV, SPEC_UNITS, SPEC_LABEL, siText, sameDim };
+  /** a value in a plain SI unit shown with a prefix that puts it between 1 and 1000: 4.36e-5 m → 43.6 µm */
+  function nicePrefix(v, u) {
+    u = String(u).replace(/\^2$/, '²').replace(/\^3$/, '³');
+    if (!/^(m|s|A|K|mol|cd|g|kg|W|J|N|Pa|C|V|Ω|F|H|T|Wb|S|Hz|m²|m³)$/.test(u) || !isFinite(v) || v === 0) return { v, u };
+    const a = Math.abs(v); if (a >= 1 && a < 1000) return { v, u };
+    let base = u, x = v; if (u === 'kg') { base = 'g'; x = v * 1000; }
+    const pw = base === 'm²' ? 2 : base === 'm³' ? 3 : 1, sym = base.replace(/[²³]$/, '');
+    const P = [['T', 12], ['G', 9], ['M', 6], ['k', 3], ['', 0], ['m', -3], ['µ', -6], ['n', -9], ['p', -12], ['f', -15]];
+    for (const [p, e] of P) {
+      const y = x / 10 ** (e * pw); if (Math.abs(y) < 1 || Math.abs(y) >= 1000) continue;
+      const nu = p + sym + (pw === 2 ? '²' : pw === 3 ? '³' : '');
+      try { parse(nu); return { v: y, u: nu }; } catch (er) { /* no such unit */ }
+    }
+    return { v, u };
+  }
+  const api = { nicePrefix, simplifyUnit, unitToGiac, entryTex, unitTo, toGiac, giacUnit, giacNative, fromGiacUnit, siGiac, parse, convert, compatible, dimText, fmt, num, unitTex, alternatives, quantityOf, quantitiesOf, defineUser, checkUser, splitDef, userUnits: () => USER.slice(), QUANTITIES, U, lookup, photonEquivalents, specKind, SPEC, SPEC_INV, SPEC_UNITS, SPEC_LABEL, siText, sameDim };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.Units = api;
 })(typeof self !== 'undefined' ? self : this);
