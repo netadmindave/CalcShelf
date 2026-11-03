@@ -23,6 +23,13 @@
    "description": "All 118 elements: tap one for its mass, configuration, electronegativity, radii, ionization energies, melting and boiling points, density, discovery and isotopes. Colour the table by category, block, state or a property, and work out the molar mass of a formula."
   },
   {
+   "id": "compsci",
+   "name": "Computer Science",
+   "version": "1.0.0",
+   "file": "compsci.json",
+   "description": "IPv4 and IPv6 subnetting (CIDR, VLSM, summaries), bits and bytes, storage sizes in decimal (kB, MB, GB) and binary (KiB, MiB, GiB) units, data rates and transfer times, number bases and bitwise operations, and tables: CIDR masks, special address ranges, ports, ASCII, powers of 2, integer and floating-point formats, algorithm complexity and HTTP status codes."
+  },
+  {
    "id": "example",
    "name": "Example module",
    "version": "1.0.0",

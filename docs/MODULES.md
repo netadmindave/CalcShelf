@@ -63,7 +63,7 @@ Start from [`modules/example.json`](../modules/example.json), which uses every k
 | `tab` | no | A short name for the tab, up to 16 characters. Defaults to `name`. |
 | `version` | no | Your version number, shown when installing. |
 | `author`, `license`, `homepage`, `description` | no | Shown when installing. `homepage` must start with `https://`. |
-| `icon` | no | One of `module`, `optics`, `machinist`, `gear`, `electric`, `flask`, `ruler`, `book`, `wave`, `atom`. |
+| `icon` | no | One of `module`, `optics`, `machinist`, `gear`, `electric`, `flask`, `ruler`, `book`, `wave`, `atom`, `chip`. |
 | `variables` | no | The module's own quantities for the **Variable Solver** (see below). |
 | `main` | no | A built-in view the tab opens with, drawn from the module's data. Only `chem.periodic` exists (the periodic table; it reads the tables titled `Elements` and `Isotopes`). |
 | `sections` | yes | Each section is a chip at the top of the tab and has a `title` and a list of `items`. |
@@ -200,6 +200,9 @@ Opens a tool that is built into CalcShelf:
 | `optics.thinfilm` | Thin-film stack |
 | `trig.triangle` | Triangle solver |
 | `convert.units` | Unit conversion |
+| `convert.base` | Number base converter |
+| `net.ipv4` | IPv4 subnet calculator: network, masks, hosts, bits, split, VLSM, summarize |
+| `net.ipv6` | IPv6 subnet calculator: expand, compress, prefix range, split |
 
 ### link
 

@@ -24,7 +24,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - **Tap a tab** to go to it.
 - **Tap the open tab** to get its menu: rename, move, close, export history, and so on.
 - **Long-press a tab** to rename it.
-- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, Differential Equations, the Variable Solver, **Guide & manuals**, or a module such as **Optics**, **Machinist** or **Periodic Table**.
+- **Tap +** to add a tab: an emulated calculator (this includes the TI-36X Pro), Graphs, Lists & Spreadsheet, Notes, Program Editor, the Unit Converter, Differential Equations, the Variable Solver, **Guide & manuals**, or a module such as **Optics**, **Machinist**, **Periodic Table** or **Computer Science**.
 - **More tabs than fit?** Swipe the tab bar sideways. Its ends fade when there are more tabs past the edge.
 - **Guide & manuals** (also in the main menu ☰) holds this whole guide, and links to the official manuals of every calculator CalcShelf runs. Those open in your browser.
 - **Screen rotation:** the CAS and the TI-36X Pro stay upright, and the TI-92, TI-92 Plus and Voyage 200 always run in landscape. The other tabs turn with the phone.
@@ -277,6 +277,14 @@ A module is a tab for one subject: formulas, calculators, tables, constants and 
   - The **Elements** and **Isotopes** chips are the data as searchable tables, and **Formulas** has moles, concentration, the ideal gas law and dilution for the Variable Solver.
 
 <p><img src="img/periodic.png" width="560" alt="Periodic Table module"></p>
+
+- **Computer Science** (tab **CompSci**):
+  - **Subnetting:** the **IPv4 subnet calculator** takes an address with a prefix (`192.168.10.37/26`), a netmask (`10.20.30.40 255.255.240.0`) or a wildcard, and gives the network, broadcast, netmask, wildcard, host range, host count, class, type (private, CGNAT, loopback…) and the address bits. It splits the network by number of subnets, new prefix or hosts in each, does VLSM for a list of host counts, and summarizes a list of networks into one prefix. The **IPv6 subnet calculator** expands and compresses addresses and gives a prefix's network, first and last address, size, number of /64s, reverse DNS name and smaller prefixes inside it. Tables of every CIDR prefix /0–/32 and the special address ranges.
+  - **Bits & bytes:** storage size in bits, bytes, kB/KiB, MB/MiB, GB/GiB, TB/TiB and PB/PiB; a drive's advertised size as the computer shows it (2 TB = 1.82 TiB); bits and bytes; bits needed for N values; SI and IEC prefixes; powers of 2.
+  - **Data rates:** bit/s ↔ B/s, transfer time from size and line rate (with link efficiency), and the bandwidth–delay product.
+  - **Numbers:** the number base converter, bitwise AND/OR/XOR/NOT and shifts, two's complement, integer types, IEEE 754 formats and an ASCII table.
+  - **Reference:** common ports, algorithm complexity and HTTP status codes.
+  - **Formulas** for the Variable Solver: transfer time, bandwidth–delay product, Amdahl's law, CPU time, Little's law, availability, password entropy, the birthday bound and the Nyquist bit rate.
 
 
 <p><img src="img/optics-module.png" width="240" alt="Optics module"> <img src="img/machinist-module.png" width="240" alt="Machinist module: nearest drills"></p>

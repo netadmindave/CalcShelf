@@ -498,3 +498,14 @@ body.fullpage .app { max-width: none; }
 .pt-tbl th { color: var(--ink2); font-weight: 600; width: 46%; }
 .pt-tbl tr.sub td { color: var(--ink2); }
 .pt-det summary { font-weight: 600; padding: 6px 0; }
+/* the Computer Science module's subnet calculators */
+.nc-in { width: 100%; box-sizing: border-box; font-family: var(--mono); }
+textarea.nc-in { resize: vertical; min-height: 84px; }
+.nc-tbl th { width: auto; }
+.nc-tbl td { font-family: var(--mono); font-size: 13.5px; word-break: break-all; }
+.nc-scroll { max-height: 360px; overflow: auto; }
+.nc-bits { margin: 8px 0 2px; font-size: clamp(10px, 3.1vw, 14px); line-height: 1.6; overflow-x: auto; }
+.nc-bits > div { display: flex; align-items: baseline; white-space: nowrap; }
+.nc-bl { flex: 0 0 6.4em; color: var(--ink2); font-family: inherit; font-size: 12px; }
+.nc-bits .nb { color: var(--acc); font-weight: 700; }
+.nc-bits .hb { color: var(--ink2); }
