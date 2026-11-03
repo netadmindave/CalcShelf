@@ -14,6 +14,7 @@ CalcShelf is a web app (`app/www/`) in a minimal Android WebView shell (`apk/`, 
 | `app/www/nspire/` | The TI-Nspire CX II CAS (Firebird). |
 | `app/www/hp/` | The HP 48 and 49 (Emu48), selected with `?model=48gx\|48sx\|49gp\|49g`. `rom/` has HP's ROMs. |
 | `core-build/` | The scripts, patches and hosts that build each core to WebAssembly. |
+| `core-build/modules/` | The sources of the built-in modules (Optics, Machinist, Periodic Table, Computer Science) and the example module, and `build.js`, which writes them to `app/www/modules/` and `modules/`. |
 | `apk/`, `build_apk.sh` | The Android shell (decoded with apktool) and the build and sign script. |
 | `tests/` | The Playwright UI tests and the Node CAS tests. |
 
@@ -24,6 +25,14 @@ CalcShelf is a web app (`app/www/`) in a minimal Android WebView shell (`apk/`, 
 ```
 
 Open `http://localhost:8091/` in Chrome or Chromium with a phone-sized window. Each emulator page also works on its own, for example `http://localhost:8091/hp/index.html?model=48gx`.
+
+## Building the modules
+
+The module `.json` files are generated. After changing a module source in `core-build/modules/`, rebuild them all:
+
+```sh
+node core-build/modules/build.js    # checks each module as the app would, then writes app/www/modules/ and modules/
+```
 
 ## Building the APK
 

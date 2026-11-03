@@ -260,7 +260,7 @@ Open this from **const** on the toolbar, or from the main menu. It has four tabs
 
 ## Modules
 
-A module is a tab for one subject: formulas, calculators, tables, constants and reference text. Everything works inside the module's tab, using the CAS, so you don't go back to the CAS tab. Every module's formulas also join the Variable Solver. CalcShelf comes with three:
+A module is a tab for one subject: formulas, calculators, tables, constants and reference text. Everything works inside the module's tab, using the CAS, so you don't go back to the CAS tab. Every module's formulas also join the Variable Solver. CalcShelf comes with four:
 
 - **Optics:** light and photons, geometric optics, diffraction, Gaussian beams, cavities and thin films, fibers, frequency combs, detection, materials and data. It holds every optics formula and constant from the library, the optics tools (Δν ↔ Δλ, Gaussian beam, dispersion, etalon, thin film), and calculators such as wavelength ↔ frequency ↔ photon energy, a Gaussian beam with its plot, a cavity, a step-index fiber and a comb beat note. It also has about 225 formulas that follow the topics of Saleh & Teich, *Fundamentals of Photonics*, and Neamen, *Semiconductor Physics and Devices*: rays and Fourier optics, resonators, polarization and thin films, waveguides, photons and atoms, lasers, semiconductor photonics and detectors, acousto-, electro- and nonlinear optics, communications, carrier physics, junctions and transistors. Each one names the chapter it follows. Their variables are in SI units, so pick cm⁻³, eV or µm in the unit menus.
 - **Machinist:**
@@ -296,7 +296,7 @@ A module is a tab for one subject: formulas, calculators, tables, constants and 
 - **Find things:** the chips at the top are its sections. The search box searches the whole module.
 - **All formulas** (the first chip) lists every formula and calculator in the module, grouped by section or sorted A–Z.
 - **Values** can be fractions (`3/8`, `1 3/8`, `1-3/8`, `⅜`) and can carry their own unit, for example `3/8 in` or `9.525 mm` in a field that is in inches. The same works in the formula solver.
-- **Calculators** compute as they open. Change a value or its unit and tap **Calculate**. Each result has a unit menu where it makes sense, and **Copy**.
+- **Calculators** compute as they open. Change a value, menu or unit and the results update by themselves (**Calculate** and **enter** also work). Each result has a unit menu where it makes sense, and **Copy**.
 - **Formulas** solve for any variable, with unit menus as in the library.
 - **Tables:** type to filter. In size tables such as the drill charts, type a number to see the 12 nearest sizes. Chips choose inches or mm.
 - **Constants** can be shown in other units and stored in a CAS variable.
@@ -538,10 +538,11 @@ These run **HP's own ROMs** on the **Emu48** core. The ROMs are included, so the
 ## Backup and restore
 
 - **Back up** (main menu) saves all tabs, CAS variables and history as a `.tns.json` file, **with the firmware** of your emulated calculators.
-  - CalcShelf keeps a copy of every OS file, ROM dump and TI-Nspire system file you choose for a calculator. Choosing another for the same calculator replaces its copy. Firmware loaded before 2.7.6 is copied once, the first time the new version starts.
+  - CalcShelf keeps a copy of every OS file, ROM dump and TI-Nspire system file you choose for a calculator. Choosing another for the same calculator replaces its copy.
   - A backup with firmware can be large (about 25 MB with the TI-Nspire OS). It holds your own ROM dumps, so keep it to yourself.
 - **Back up without firmware** saves the small backup: tabs, variables and history only.
 - **Restore from backup** replaces the current tabs with a backup. If it has firmware, the copies are restored and each calculator installs its firmware the first time you open its tab. The TI-Nspire's files are put in its setup screen: tap **Install**.
+- **Moving from 2.7.5 or older:** 2.7.6 has a new app ID (com.calcshelf) and installs beside the old app. Back up in the old app, restore in 2.7.6, and choose each calculator's OS or ROM again, because backups from 2.7.5 don't hold firmware.
 - **Emulated calculators** keep their memory (programs, variables) separately on the phone:
   - **TI calculators:** use each one's snapshots, or send their files to the computer through Var-Link and keep those.
   - **HP calculators:** use **Load an object** to bring programs back.

@@ -33,7 +33,7 @@ It is free software under the GNU GPL v3. It stands on decades of work by the ca
 | **Variable Solver** | Every formula in the app (library and modules) in one list: enter the values you know and everything that follows is calculated, each with its rearranged and filled-in formula. | — |
 | **Differential equations** | Ordinary differential equations of any order and systems: exact solutions from Giac (general, initial and boundary value problems, Laplace transform for linear systems) and adaptive Runge–Kutta numeric solutions with plots, phase planes, slope fields and tables. | — |
 | **Optics calculators** | Δν ↔ Δλ linewidths, Gaussian beams through ABCD systems with mode matching, material dispersion (n_g, β₂, D, β₃), Fabry–Pérot etalons and thin-film stacks. | — |
-| **Modules** | Tabs for one subject each, made of formulas, calculators, tables, constants and reference text that work inside the tab. Built in: **Computer Science** (IPv4 and IPv6 subnetting with VLSM and summaries, bits and bytes, storage in kB/KiB, MB/MiB, GB/GiB, data rates and transfer times, RAID and ZFS capacity and speed, bitwise operations, ports, ASCII), **Periodic Table** (all 118 elements with their data and isotopes, molar masses), **Optics** (304 formulas, including topics from Saleh & Teich and Neamen, every optics tool, and beam, cavity, fiber and comb calculators) and **Machinist** (speeds and feeds, tap drills, thread data, number, letter, fractional and metric drills, clearance holes, shop math, G and M codes). Add others from the [modules folder](modules) or make your own: see [MODULES.md](docs/MODULES.md). | — |
+| **Modules** | Tabs for one subject each, made of formulas, calculators, tables, constants and reference text that work inside the tab. Built in: **Computer Science** (IPv4 and IPv6 subnetting with VLSM and summaries, bits and bytes, storage in kB/KiB, MB/MiB, GB/GiB, data rates and transfer times, RAID and ZFS capacity and speed, bitwise operations, ports, ASCII), **Periodic Table** (all 118 elements with their data and isotopes, molar masses), **Optics** (331 formulas, including topics from Saleh & Teich and Neamen, every optics tool, and beam, cavity, fiber and comb calculators) and **Machinist** (speeds and feeds, tap drills, thread data, number, letter, fractional and metric drills, clearance holes, shop math, G and M codes). Add others from the [modules folder](modules) or make your own: see [MODULES.md](docs/MODULES.md). | — |
 | **Guide & manuals** | This user guide inside the app, and links to the official TI and HP manuals of every calculator. | — |
 
 There is one document with named tabs. **Settings → Emulated calculators → Several** lets several emulated calculators run at the same time, each in its own tab.
@@ -42,6 +42,8 @@ There is one document with named tabs. **Settings → Emulated calculators → S
 
 1. Download `CalcShelf.apk` from the [latest release](../../releases/latest).
 2. Open it on your Android phone and allow the install.
+
+**Coming from 2.7.5 or older?** 2.7.6 has a new app ID (com.calcshelf), so it installs as a separate app. Use **Back up** in the old app and **Restore from backup** in the new one, choose each calculator's OS or ROM again, then uninstall the old app.
 
 You need Android 7.0 or newer, with a current Android System WebView. The TI-Nspire needs WebAssembly exception handling, which recent WebView versions have.
 
