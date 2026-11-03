@@ -1,0 +1,38 @@
+# Publishes the web version of CalcShelf (app/www) to GitHub Pages on every push to main.
+# It holds only what is in the repository: no TI firmware. Each visitor loads their own, which stays in their browser.
+name: Web version
+on:
+  push:
+    branches: [main]
+    paths: ['app/www/**', 'docs/USER_GUIDE.md', 'core-build/web/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Prepare the site
+        run: |
+          mkdir -p app/www/docs && cp docs/USER_GUIDE.md app/www/docs/guide.md
+          sed -i "s/^const VERSION = 'dev';/const VERSION = '${GITHUB_SHA::12}';/" app/www/sw.js
+          node core-build/web/precache.js app/www
+          touch app/www/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/www
+      - id: pages
+        uses: actions/deploy-pages@v4

@@ -30,3 +30,4 @@ __pycache__/
 node_modules/
 .DS_Store
 app/www/docs/guide.md
+app/www/precache.json

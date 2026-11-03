@@ -34,6 +34,12 @@ The module `.json` files are generated. After changing a module source in `core-
 node core-build/modules/build.js    # checks each module as the app would, then writes app/www/modules/ and modules/
 ```
 
+## The web version
+
+`.github/workflows/pages.yml` publishes `app/www` to GitHub Pages on every push to `main` that changes it. It copies the user guide in, stamps the service worker (`app/www/sw.js`) with the commit so visitors get the new version, and writes `precache.json`, the list of files cached on the first visit (`node core-build/web/precache.js`). Turn it on once in the repository's **Settings → Pages → Source: GitHub Actions**.
+
+The service worker registers only on https, not in the Android app or a local copy. To try it locally, open `http://localhost:8091/index.html?sw=1` after running `node core-build/web/precache.js` (and delete `app/www/precache.json` afterwards; git ignores it). `tests/web276.py` checks that the app starts, computes and opens a module offline.
+
 ## Building the APK
 
 You need Java 11 or newer, [apktool](https://apktool.org) 2.9.3, [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer) 1.3.0, and **your own** signing keystore:

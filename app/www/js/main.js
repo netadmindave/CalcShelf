@@ -248,6 +248,10 @@
       const o = !p ? -1 : p.kind === 'calc' ? 1 : p.kind === 'emu' || p.kind === 'module' ? p.orientation : -1;
       if (o === this._orient) return; this._orient = o;
       try { if (root.TiBridge && root.TiBridge.setOrientation) root.TiBridge.setOrientation(o); } catch (e) { /* older shell */ }
+      if (!root.TiBridge && root.screen && screen.orientation && screen.orientation.lock) {
+        // the web version: browsers that allow it (an installed web app on Android) lock too; others ignore it
+        try { if (o === -1) screen.orientation.unlock(); else screen.orientation.lock(o === 1 ? 'portrait' : 'landscape').catch(() => {}); } catch (e) { /* not allowed here */ }
+      }
     },
     /** the tab's name: what the user typed, else CAS / the calculator's model number / the app's short name */
     tabName(p) {

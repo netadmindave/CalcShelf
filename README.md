@@ -40,6 +40,10 @@ There is one document with named tabs. **Settings → Emulated calculators → S
 
 ## Get it
 
+**Try it in a browser:** [netadmindave.github.io/CalcShelf](https://netadmindave.github.io/CalcShelf/) runs the same app on a computer, an iPhone or an iPad (tested in Chrome; Safari and Firefox less so). Once opened, it works offline, and you can add it to your home screen (Safari: Share → Add to Home Screen) or install it (Chrome, Edge: the install icon in the address bar). Your work and any firmware you load stay in that browser. See [Web version](docs/USER_GUIDE.md#web-version) for what differs from the Android app.
+
+**On Android:**
+
 1. Download `CalcShelf.apk` from the [latest release](../../releases/latest).
 2. Open it on your Android phone and allow the install.
 

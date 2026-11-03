@@ -12,6 +12,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 - [Emulated calculators](#emulated-calculators)
   - [Adding, switching, several at once](#adding-and-switching) · [What every emulator page has](#what-every-emulator-page-has)
   - [TI-Nspire CX II CAS](#ti-nspire-cx-ii-cas) · [TI-89 Titanium](#ti-89-titanium) · [TI-92, TI-92 Plus, Voyage 200](#ti-92-ti-92-plus-voyage-200) · [TI-84 Plus family and other Z80 models](#ti-84-plus-family-and-other-z80-models) · [HP 48 and HP 49](#hp-48gx-hp-48sx-hp-49g-hp-49g)
+- [Web version: computers, iPhone and iPad](#web-version)
 - [Backup, restore and moving to a new phone](#backup-and-restore)
 - [Troubleshooting](#troubleshooting)
 
@@ -535,6 +536,18 @@ These run **HP's own ROMs** on the **Emu48** core. The ROMs are included, so the
 <br clear="right">
 
 ---
+
+## Web version
+
+The same app runs in a browser at **[netadmindave.github.io/CalcShelf](https://netadmindave.github.io/CalcShelf/)**: on a computer, an iPhone or an iPad. It is tested in Chrome; Edge is the same engine, and Firefox and Safari (including on iPhone and iPad) should work, but are less tested.
+
+- **Offline:** after the first visit the app works without a connection. Each emulator is kept for offline use the first time you open it. A new version loads by itself the next time you open the page online.
+- **Install it:** in Safari on an iPhone or iPad, **Share → Add to Home Screen**; in Chrome or Edge, the install icon in the address bar. It then opens in its own window, without the browser's bars.
+- **Your data stays in that browser:** tabs, variables and the firmware you load are kept in the browser's storage for this site, on that device only. Clearing the site's data removes them, so use **Back up**. A backup made in the Android app restores in the web version, and the other way round.
+- **Saved files** (backups, exports, screenshots) go wherever the browser puts downloads; on an iPhone, Safari asks, and they go to the Files app.
+- **Screen orientation:** the TI-92, TI-92 Plus and Voyage 200 ask for landscape, but most browsers (all on an iPhone) can't lock it, so turn the device yourself.
+- **Firmware:** the web version, like the app, contains no TI code. Load your own OS or ROM as on the phone.
+- **iPhone and iPad:** the TI-Nspire is the heaviest emulator; if iOS runs short of memory it may reload the page in the background.
 
 ## Backup and restore
 
