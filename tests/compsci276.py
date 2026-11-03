@@ -51,6 +51,10 @@ async def main():
         for lev, n, g in [('2', '8', '1'), ('5', '12', '2'), ('9', '5', '1')]:
             await sel.select_option(lev); ins = sheet.locator('input.md-in'); await ins.nth(0).fill(n); await ins.nth(1).fill(g); await ins.nth(1).press('Enter'); await pg.wait_for_timeout(1200)
             print('lev', lev, n, g, ':', (await sheet.locator('.md-res').inner_text()).replace('\n', ' | ').replace(' | Copy', ''))
+        # no Enter, no Calculate: the results follow the typed values (the keypad can cover the button)
+        await sel.select_option('7'); ins = sheet.locator('input.md-in'); await ins.nth(0).fill('4'); await ins.nth(1).fill('1'); await ins.nth(2).fill('12'); await pg.wait_for_timeout(1800)
+        t = (await sheet.locator('.md-res').inner_text()).replace('\n', ' | ')
+        print('typed 4 x 12 TB RAIDZ2 → raw 48, usable 24:', 'Raw capacity | 48' in t and 'Usable capacity | 24' in t)
         await pg.screenshot(path=OUT + '/cs_raid.png')
         await E("UI.Sheet.close()"); await pg.wait_for_timeout(300)
         await item('Rebuild time'); await pg.wait_for_timeout(1500)

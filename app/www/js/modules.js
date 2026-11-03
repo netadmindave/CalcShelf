@@ -348,6 +348,8 @@
       if (it.tex) { const t = el('div', { class: 'card', style: { fontSize: '19px', overflowX: 'auto' } }); renderTex(t, it.tex); b.append(t); }
       if (it.note) b.append(el('p', { class: 'desc', text: it.note }));
       const fields = {};
+      let soon = 0, quiet = false;
+      const later = () => { clearTimeout(soon); soon = setTimeout(() => { quiet = true; go(); }, 450); };
       for (const x of it.inputs) {
         let inp;
         if (x.options) inp = el('select', { class: 'search cv-in md-in', 'aria-label': x.label }, x.options.map((o, k) => el('option', { value: String(k), text: o.label, selected: k === x.default })));
@@ -356,13 +358,19 @@
         const sel = us && us.length > 1 ? el('select', { class: 'fs-unit', 'aria-label': 'Unit of ' + x.label }, us.map((u) => el('option', { value: u, text: u, selected: u === x.unit }))) : null;
         fields[x.id] = { inp, sel };
         b.append(el('label', { class: 'cv-lab md-row' }, el('span', { text: x.label + (!sel && x.unit ? ' (' + x.unit + ')' : '') }), el('div', { class: 'md-pair' }, inp, sel)));
-        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+        inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); clearTimeout(soon); go(); } });
+        // results follow the inputs: a changed value, layout or unit recalculates by itself (the on-screen keypad can
+        // cover the Calculate button, and a stale result next to new inputs reads as a wrong answer)
+        inp.addEventListener(x.options ? 'change' : 'input', later);
+        if (sel) sel.addEventListener('change', later);
       }
       const res = el('div', { class: 'card md-res', hidden: true });
       const outSel = {};
       const plotBox = el('div');
       let plot = null;
+      let run = 0;
       const go = async () => {
+        const q = quiet; quiet = false; const me = ++run;
         const vals = {};
         try {
           for (const x of it.inputs) {
@@ -370,15 +378,16 @@
             if (x.options) { vals[x.id] = '(' + x.options[+f.inp.value].value + ')'; continue; }
             // a unit typed after the value ("3/8 in", '1-1/2"') is used instead of the menu's
             const tv = root.splitValueUnit ? root.splitValueUnit(f.inp.value) : { text: f.inp.value, unit: null };
-            const c = userCode(tv.text); if (c == null) { toast('Enter ' + x.label); f.inp.focus(); return; }
+            const c = userCode(tv.text); if (c == null) { if (!q) { toast('Enter ' + x.label); f.inp.focus(); } return; }
             if (tv.unit) { if (!x.unit) throw new Error(x.label + ' has no unit; type just the number'); Units.convert(1, tv.unit, ANGLE.has(x.unit) ? 'rad' : x.unit); }
             vals[x.id] = toUnit(c, x.unit, tv.unit || (f.sel ? f.sel.value : x.unit), it.angles);
           }
-        } catch (e) { toast(e.message); return; }
+        } catch (e) { if (!q) toast(e.message); return; }
         const codes = [];
         for (const o of it.outputs) { const e = sub(o.expr, vals); if (o.id) vals[o.id] = '(' + e + ')'; codes.push(o.format === 'exact' ? 'simplify(' + e + ')' : o.format === 'list' ? 'evalf(' + e + ')' : 'evalf(' + e + ')'); }
-        res.hidden = false; res.textContent = 'Working…';
-        let r; try { r = await casRun(app, codes, it.angles); } catch (e) { res.textContent = e.message; return; }
+        res.hidden = false; if (!q || !res.childElementCount) res.textContent = 'Working…';
+        let r; try { r = await casRun(app, codes, it.angles); } catch (e) { if (me === run) res.textContent = e.message; return; }
+        if (me !== run) return; // a newer calculation started while this one ran
         res.innerHTML = '';
         it.outputs.forEach((o, k) => {
           const raw = r[k];
