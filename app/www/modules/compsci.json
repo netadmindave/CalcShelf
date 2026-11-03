@@ -4,12 +4,12 @@
  "id": "compsci",
  "name": "Computer Science",
  "tab": "CompSci",
- "version": "1.0.0",
+ "version": "1.1.0",
  "icon": "chip",
  "author": "CalcShelf",
  "license": "GPL-3.0-or-later",
  "homepage": "https://github.com/netadmindave/CalcShelf/tree/main/modules",
- "description": "IPv4 and IPv6 subnetting (CIDR, VLSM, summaries), bits and bytes, storage sizes in decimal (kB, MB, GB) and binary (KiB, MiB, GiB) units, data rates and transfer times, number bases and bitwise operations, and tables: CIDR masks, special address ranges, ports, ASCII, powers of 2, integer and floating-point formats, algorithm complexity and HTTP status codes.",
+ "description": "IPv4 and IPv6 subnetting (CIDR, VLSM, summaries), bits and bytes, storage sizes in decimal (kB, MB, GB) and binary (KiB, MiB, GiB) units, data rates and transfer times, RAID and ZFS layouts (capacity, efficiency, fault tolerance and speed), number bases and bitwise operations, and tables: CIDR masks, special address ranges, ports, ASCII, powers of 2, integer and floating-point formats, algorithm complexity and HTTP status codes.",
  "variables": [
   {
    "id": "csS",
@@ -1398,6 +1398,456 @@
        "digits": 12
       }
      ]
+    }
+   ]
+  },
+  {
+   "title": "RAID & ZFS",
+   "items": [
+    {
+     "type": "calc",
+     "title": "RAID and ZFS array",
+     "tags": "raid zfs raidz mirror stripe parity unraid capacity efficiency speed iops",
+     "note": "Speeds are relative to one disk (1× = one disk), for large sequential transfers and for small random I/O. They are ideal values: real arrays lose some to the controller, CPU and file system. Groups are the RAID 50/60 spans or the ZFS RAIDZ vdevs (1 for a single array); for Unraid, the number of parity disks.",
+     "inputs": [
+      {
+       "id": "lev",
+       "label": "Layout",
+       "options": [
+        {
+         "label": "RAID 0 / ZFS stripe",
+         "value": "1"
+        },
+        {
+         "label": "RAID 1 / ZFS n-way mirror",
+         "value": "2"
+        },
+        {
+         "label": "RAID 10 / ZFS 2-way mirror vdevs",
+         "value": "3"
+        },
+        {
+         "label": "ZFS 3-way mirror vdevs",
+         "value": "4"
+        },
+        {
+         "label": "RAID 5 (RAID 50 with groups)",
+         "value": "5"
+        },
+        {
+         "label": "RAID 6 (RAID 60 with groups)",
+         "value": "6"
+        },
+        {
+         "label": "ZFS RAIDZ1",
+         "value": "7"
+        },
+        {
+         "label": "ZFS RAIDZ2",
+         "value": "8"
+        },
+        {
+         "label": "ZFS RAIDZ3",
+         "value": "9"
+        },
+        {
+         "label": "Unraid array (groups = parity disks)",
+         "value": "10"
+        }
+       ],
+       "default": 7
+      },
+      {
+       "id": "n",
+       "label": "Disks",
+       "default": "6"
+      },
+      {
+       "id": "g",
+       "label": "Groups (spans, RAIDZ vdevs)",
+       "default": "1"
+      },
+      {
+       "id": "D",
+       "label": "Size of each disk",
+       "unit": "TB",
+       "default": "8",
+       "units": [
+        "TB",
+        "TiB",
+        "GB",
+        "GiB"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Usable disks",
+       "expr": "[n,1,n/2,n/3,n-g,n-2*g,n-g,n-2*g,n-3*g,n-g][lev]",
+       "unit": "",
+       "digits": 6
+      },
+      {
+       "label": "Raw capacity",
+       "expr": "n*D",
+       "unit": "TB",
+       "digits": 6,
+       "units": [
+        "TiB",
+        "GB",
+        "PB"
+       ]
+      },
+      {
+       "label": "Usable capacity",
+       "expr": "[n,1,n/2,n/3,n-g,n-2*g,n-g,n-2*g,n-3*g,n-g][lev]*D",
+       "unit": "TB",
+       "digits": 6,
+       "units": [
+        "TiB",
+        "GB",
+        "PB"
+       ]
+      },
+      {
+       "label": "ZFS usable after slop space (1/32)",
+       "expr": "[n,1,n/2,n/3,n-g,n-2*g,n-g,n-2*g,n-3*g,n-g][lev]*D*31/32",
+       "unit": "TB",
+       "digits": 6,
+       "units": [
+        "TiB",
+        "GB",
+        "PB"
+       ]
+      },
+      {
+       "label": "Space efficiency",
+       "expr": "100*[n,1,n/2,n/3,n-g,n-2*g,n-g,n-2*g,n-3*g,n-g][lev]/n",
+       "unit": "%",
+       "digits": 4
+      },
+      {
+       "label": "Disk failures survived, any disks",
+       "expr": "[0,n-1,1,2,1,2,1,2,3,g][lev]",
+       "unit": "",
+       "digits": 6
+      },
+      {
+       "label": "Disk failures survived, best case",
+       "expr": "[0,n-1,n/2,2*n/3,g,2*g,g,2*g,3*g,g][lev]",
+       "unit": "",
+       "digits": 6
+      },
+      {
+       "label": "Sequential read (× one disk)",
+       "expr": "[n,n,n,n,n-g,n-2*g,n-g,n-2*g,n-3*g,1][lev]",
+       "unit": "",
+       "digits": 4
+      },
+      {
+       "label": "Sequential write (× one disk)",
+       "expr": "[n,1,n/2,n/3,n-g,n-2*g,n-g,n-2*g,n-3*g,1/2][lev]",
+       "unit": "",
+       "digits": 4
+      },
+      {
+       "label": "Random read IOPS (× one disk)",
+       "expr": "[n,n,n,n,n,n,g,g,g,1][lev]",
+       "unit": "",
+       "digits": 4
+      },
+      {
+       "label": "Random write IOPS (× one disk)",
+       "expr": "[n,1,n/2,n/3,n/4,n/6,g,g,g,1/2][lev]",
+       "unit": "",
+       "digits": 4
+      }
+     ]
+    },
+    {
+     "type": "table",
+     "title": "RAID and ZFS layouts",
+     "note": "n disks, g groups (RAID 50/60 spans or RAIDZ vdevs). Speeds are relative to one disk. Random write IOPS for RAID 5/6 divide by the write penalty (each small write reads and writes the data and parity).",
+     "columns": [
+      "Layout",
+      "Min disks",
+      "Usable",
+      "Efficiency (6 disks)",
+      "Survives",
+      "Seq read",
+      "Seq write",
+      "Random read",
+      "Random write",
+      "Notes"
+     ],
+     "rows": [
+      [
+       "JBOD / span",
+       "1",
+       "n",
+       "100 %",
+       "0",
+       "1×",
+       "1×",
+       "1×",
+       "1×",
+       "No striping; a failed disk takes its data (a span may lose everything)."
+      ],
+      [
+       "RAID 0",
+       "2",
+       "n",
+       "100 %",
+       "0",
+       "n×",
+       "n×",
+       "n×",
+       "n×",
+       "Any failure loses the whole array. Scratch space only."
+      ],
+      [
+       "RAID 1",
+       "2",
+       "1",
+       "17 % (50 % for 2)",
+       "n − 1",
+       "n×",
+       "1×",
+       "n×",
+       "1×",
+       "Every disk is a full copy. Simple and fast to rebuild."
+      ],
+      [
+       "RAID 5",
+       "3",
+       "n − 1",
+       "83 %",
+       "1",
+       "(n − 1)×",
+       "(n − 1)×",
+       "n×",
+       "n/4× (penalty 4)",
+       "Long rebuilds, and a second failure or unreadable sector during one loses data. Avoid with large disks."
+      ],
+      [
+       "RAID 6",
+       "4",
+       "n − 2",
+       "67 %",
+       "2",
+       "(n − 2)×",
+       "(n − 2)×",
+       "n×",
+       "n/6× (penalty 6)",
+       "The usual choice for large parity arrays."
+      ],
+      [
+       "RAID 10",
+       "4",
+       "n/2",
+       "50 %",
+       "1 (up to n/2, one per mirror)",
+       "n×",
+       "n/2×",
+       "n×",
+       "n/2× (penalty 2)",
+       "Fast and quick to rebuild; good for databases and VMs."
+      ],
+      [
+       "RAID 50",
+       "6",
+       "n − g",
+       "67 % (g = 2)",
+       "1 (up to one per span)",
+       "(n − g)×",
+       "(n − g)×",
+       "n×",
+       "n/4×",
+       "RAID 5 spans striped together."
+      ],
+      [
+       "RAID 60",
+       "8",
+       "n − 2g",
+       "33 % (g = 2)",
+       "2 (up to two per span)",
+       "(n − 2g)×",
+       "(n − 2g)×",
+       "n×",
+       "n/6×",
+       "RAID 6 spans striped together."
+      ],
+      [
+       "ZFS stripe",
+       "1",
+       "n",
+       "100 %",
+       "0",
+       "n×",
+       "n×",
+       "n×",
+       "n×",
+       "Losing any vdev loses the pool."
+      ],
+      [
+       "ZFS mirror vdev",
+       "2",
+       "1 per vdev",
+       "50 % (2-way)",
+       "width − 1 per vdev",
+       "n×",
+       "g×",
+       "n×",
+       "g×",
+       "Reads come from every side. Striped 2-way mirrors are the fastest pool and resilver quickly; grow two disks at a time."
+      ],
+      [
+       "ZFS RAIDZ1",
+       "3",
+       "n − g",
+       "83 %",
+       "1 per vdev",
+       "(n − g)×",
+       "(n − g)×",
+       "g×",
+       "g×",
+       "Like RAID 5 with no write hole. Random IOPS are about one disk per vdev."
+      ],
+      [
+       "ZFS RAIDZ2",
+       "4",
+       "n − 2g",
+       "67 %",
+       "2 per vdev",
+       "(n − 2g)×",
+       "(n − 2g)×",
+       "g×",
+       "g×",
+       "The common choice for bulk storage, 6–10 disks per vdev."
+      ],
+      [
+       "ZFS RAIDZ3",
+       "5",
+       "n − 3g",
+       "50 %",
+       "3 per vdev",
+       "(n − 3g)×",
+       "(n − 3g)×",
+       "g×",
+       "g×",
+       "For wide vdevs of very large disks."
+      ],
+      [
+       "ZFS dRAID",
+       "about 5",
+       "n − parity − spares",
+       "like RAIDZ, less",
+       "1–3 per group",
+       "like RAIDZ",
+       "like RAIDZ",
+       "g×",
+       "g×",
+       "Distributed spares give fast rebuilds. Fixed stripe width wastes space on small blocks. For large pools (20+ disks)."
+      ],
+      [
+       "Unraid array",
+       "2",
+       "n − parity",
+       "67–83 %",
+       "parity disks (1 or 2)",
+       "1×",
+       "≈ ½× (turbo write ≈ 1×)",
+       "1×",
+       "≈ ½×",
+       "No striping: each disk has its own file system, so a failure beyond parity loses only that disk’s files. Disks can differ in size; parity must be the largest."
+      ]
+     ]
+    },
+    {
+     "type": "calc",
+     "title": "Rebuild time and unreadable-sector risk",
+     "tex": "P=1-e^{-8(n-1)D/\\mathrm{URE}}",
+     "note": "A RAID 5 or RAIDZ1 rebuild reads every surviving disk. The chance of meeting an unreadable sector uses the drive’s rated unrecoverable read error rate; real drives usually do better than their rating.",
+     "inputs": [
+      {
+       "id": "n",
+       "label": "Disks in the array (or vdev)",
+       "default": "6"
+      },
+      {
+       "id": "D",
+       "label": "Size of each disk",
+       "unit": "TB",
+       "default": "8",
+       "units": [
+        "TiB",
+        "GB"
+       ]
+      },
+      {
+       "id": "ure",
+       "label": "Rated URE rate",
+       "options": [
+        {
+         "label": "1 in 10¹⁴ bits (desktop)",
+         "value": "10^14"
+        },
+        {
+         "label": "1 in 10¹⁵ bits (NAS, enterprise)",
+         "value": "10^15"
+        },
+        {
+         "label": "1 in 10¹⁶ bits",
+         "value": "10^16"
+        }
+       ],
+       "default": 1
+      },
+      {
+       "id": "r",
+       "label": "Rebuild speed",
+       "unit": "MB/s",
+       "default": "150",
+       "units": [
+        "MiB/s",
+        "GB/s"
+       ]
+      }
+     ],
+     "outputs": [
+      {
+       "label": "Data read in the rebuild",
+       "expr": "(n-1)*D",
+       "unit": "TB",
+       "digits": 6,
+       "units": [
+        "TiB",
+        "GB"
+       ]
+      },
+      {
+       "label": "Chance of an unreadable sector",
+       "expr": "100*(1-exp(-8*(n-1)*D*10^12/ure))",
+       "unit": "%",
+       "digits": 4
+      },
+      {
+       "label": "Rebuild time (at least)",
+       "expr": "D*10^6/r/3600",
+       "unit": "h",
+       "digits": 4,
+       "units": [
+        "min",
+        "d",
+        "s"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "text",
+     "title": "ZFS notes",
+     "md": "- **Capacity:** ZFS keeps 1/32 of the pool (slop space) in reserve, and RAIDZ loses more to padding with small blocks or a small recordsize. Keep pools under about 80 % full for good speed.\n- **Speed:** a pool is as fast as its vdevs added together. Each RAIDZ vdev gives about one disk’s random IOPS, so more, narrower vdevs (or mirrors) are faster for VMs and databases.\n- **Growing:** add a whole vdev, replace every disk in a vdev with larger ones, or (OpenZFS 2.3 and later) widen a RAIDZ vdev one disk at a time.\n- **Other vdevs:** a SLOG speeds up only synchronous writes; L2ARC is a read cache (more RAM usually helps more); a special vdev holds metadata and small blocks and must be redundant, because losing it loses the pool.\n- **Disks:** use ashift=12 for 4K-sector disks. Avoid SMR disks in ZFS and RAID arrays: resilvers can take days.\n- **RAID is not a backup:** keep copies elsewhere (3-2-1: three copies, two media, one off site)."
     }
    ]
   },
@@ -3284,6 +3734,57 @@
       [
        "m",
        "possible hash values (2^bits)",
+       ""
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Parity array usable capacity",
+     "tex": "C=(n-p)D",
+     "eq": "C=(n-p)*D",
+     "vars": [
+      [
+       "C",
+       "usable capacity",
+       "B"
+      ],
+      [
+       "n",
+       "disks",
+       ""
+      ],
+      [
+       "p",
+       "parity disks (RAID 5/RAIDZ1: 1, RAID 6/RAIDZ2: 2)",
+       ""
+      ],
+      [
+       "D",
+       "size of each disk",
+       "B"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Parity array efficiency",
+     "tex": "E=\\frac{n-p}{n}",
+     "eq": "E=(n-p)/n",
+     "vars": [
+      [
+       "E",
+       "space efficiency",
+       ""
+      ],
+      [
+       "n",
+       "disks",
+       ""
+      ],
+      [
+       "p",
+       "parity disks",
        ""
       ]
      ]

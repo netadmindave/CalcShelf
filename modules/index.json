@@ -25,9 +25,9 @@
   {
    "id": "compsci",
    "name": "Computer Science",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "file": "compsci.json",
-   "description": "IPv4 and IPv6 subnetting (CIDR, VLSM, summaries), bits and bytes, storage sizes in decimal (kB, MB, GB) and binary (KiB, MiB, GiB) units, data rates and transfer times, number bases and bitwise operations, and tables: CIDR masks, special address ranges, ports, ASCII, powers of 2, integer and floating-point formats, algorithm complexity and HTTP status codes."
+   "description": "IPv4 and IPv6 subnetting (CIDR, VLSM, summaries), bits and bytes, storage sizes in decimal (kB, MB, GB) and binary (KiB, MiB, GiB) units, data rates and transfer times, RAID and ZFS layouts (capacity, efficiency, fault tolerance and speed), number bases and bitwise operations, and tables: CIDR masks, special address ranges, ports, ASCII, powers of 2, integer and floating-point formats, algorithm complexity and HTTP status codes."
   },
   {
    "id": "example",
