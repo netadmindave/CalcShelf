@@ -509,3 +509,13 @@ textarea.nc-in { resize: vertical; min-height: 84px; }
 .nc-bl { flex: 0 0 6.4em; color: var(--ink2); font-family: inherit; font-size: 12px; }
 .nc-bits .nb { color: var(--acc); font-weight: 700; }
 .nc-bits .hb { color: var(--ink2); }
+/* installed firmware in the calculator chooser */
+.fw-ok, .fw-no { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: 11.5px; font-weight: 700; vertical-align: 2px; letter-spacing: .2px; }
+.fw-ok { background: color-mix(in srgb, #2e9d4f 18%, transparent); color: #1f7a3b; }
+.fw-no { background: color-mix(in srgb, var(--ink2) 14%, transparent); color: var(--ink2); }
+:root[data-theme="dark"] .fw-ok, body.dark .fw-ok { color: #6fd18c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fw-ok { color: #6fd18c; } }
+.fw-state { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; font-size: 14px; margin: 6px 0; }
+.fw-state .fw-ok, .fw-state .fw-no { margin-left: 0; }
+.mi.emu-pick { flex-direction: column; align-items: flex-start; gap: 3px; }
+.mi.emu-pick .sub { text-align: left; margin-left: 0; }

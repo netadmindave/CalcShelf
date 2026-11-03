@@ -10,7 +10,7 @@ async def main():
         await pg.goto(BASE + '/index.html'); await pg.wait_for_timeout(2500)
         # TI-36X Pro night display
         await pg.evaluate("__app.emuApply('ti36','36xpro',null)"); await pg.wait_for_timeout(800)
-        await pg.evaluate("(() => { const p = __app.page.t36; p.setNight(true); })()"); await pg.wait_for_timeout(500)
+        await pg.evaluate("(() => { const p = __app.page.t36; p.setDisplay('night'); })()"); await pg.wait_for_timeout(500)
         await pg.screenshot(path='out/v27_t36night.png')
         # several emulator tabs
         await pg.evaluate("__app.settings.multiEmu = true; __app.saveSettings && __app.saveSettings()")

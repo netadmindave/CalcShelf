@@ -34,6 +34,12 @@
   /** HP models removed in 2.6 (HP-42S, 12C, 15C, 16C) open as the HP 48GX */
   const OLD_HP = new Set(['42s', '12c', '15c', '16c']);
   const EMU_FAMILY = { ti36: 'TI scientific (built in)', nspire: 'TI-Nspire (Firebird)', ti68k: 'TI 68k (TiEmu)', z80: 'TI Z80 (TilEm)', hp: 'HP' };
+  /** what is installed for a model: file names, size and date */
+  const fwDesc = (e) => {
+    const f = e.files, size = f.reduce((t, x) => t + x.size, 0), d = Math.max(...f.map((x) => x.date || 0));
+    const mb = size >= 1048576 ? (size / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(size / 1024)) + ' KB';
+    return (f.length === 1 ? f[0].name : f.length + ' files') + ' · ' + mb + (d ? ' · ' + new Date(d).toLocaleDateString() : '');
+  };
   const emuModel = (fam, id) => EMU_MODELS.find((m) => m[0] === fam && m[1] === id);
   /** OS file extension → the calculator it belongs to (null model: keep the chosen one if it accepts the file) */
   const OS_EXT = { '89u': ['ti68k', '89'], '9xu': ['ti68k', '92p'], 'v2u': ['ti68k', 'v200'], '8xu': ['z80', null], '73u': ['z80', '7'], tcc2: ['nspire', 'cx2cas'], tco2: ['nspire', 'cx2cas'], tct2: ['nspire', 'cx2cas'] };
@@ -318,6 +324,7 @@
       const act = this.pages[this.active];
       const cur = target !== undefined ? target : act && act.kind === 'emu' ? act : this.settings.multiEmu ? null : this.pages.find((x) => x.kind === 'emu');
       this._emuTarget = cur;
+      const fwIdx = FwStore.index().catch(() => ({}));
       const build = (b) => {
         b.append(el('p', { class: 'desc', text: cur ? 'Pick a model to switch the ' + this.tabName(cur) + ' tab to it, or load a new OS for the current one. Each model keeps its own OS and memory, so you can switch back at any time.' : 'Pick the calculator for the emulator tab. TI models need their OS file or a ROM once; HP models are ready to use.' }));
         for (const fam of Object.keys(EMU_FAMILY)) {
@@ -325,7 +332,10 @@
           const L = el('ul', { class: 'mlist' }); b.append(L);
           for (const m of EMU_MODELS.filter((x) => x[0] === fam)) {
             const isCur = cur && cur.fam === m[0] && cur.model === m[1];
-            const x = el('button', { class: 'mi' + (isCur ? ' on' : ''), 'data-emu': m[0] + ':' + m[1] }, el('span', { class: 'lbl', text: m[2] + (isCur ? '  ✓' : '') }), el('span', { class: 'sub', text: (isCur ? 'Current · ' : '') + m[4] }));
+            const sub = el('span', { class: 'sub', text: (isCur ? 'Current · ' : '') + m[4] });
+            const x = el('button', { class: 'mi emu-pick' + (isCur ? ' on' : ''), 'data-emu': m[0] + ':' + m[1] }, el('span', { class: 'lbl', text: m[2] + (isCur ? '  ✓' : '') }), sub);
+            // a model whose OS or ROM is installed says so, with a badge and the file's name
+            if (!(m[0] === 'hp' || m[0] === 'ti36')) fwIdx.then((idx) => { const e = idx[FwStore.key(m[0], m[1])]; if (!e || !e.files.length) return; x.classList.add('fw-has'); x.querySelector('.lbl').append(el('span', { class: 'fw-ok', text: 'Installed' })); sub.textContent = (isCur ? 'Current · ' : '') + fwDesc(e); });
             x.onclick = () => Sheet.push(m[2], (bb) => this.emuModelActions(bb, m));
             L.append(el('li', {}, x));
           }
@@ -338,8 +348,15 @@
       const isCur = cur && cur.fam === m[0] && cur.model === m[1];
       const builtIn = m[0] === 'hp' || m[0] === 'ti36';
       b.append(el('p', { class: 'desc', text: m[4] + '.' + (builtIn ? '' : ' Firmware stays on this phone; the app contains no TI code.') }));
+      const st = builtIn ? null : el('div', { class: 'card fw-state' }); if (st) { st.textContent = 'Checking for installed firmware…'; b.append(st); }
       const L = el('ul', { class: 'mlist' }); b.append(L);
-      const item = (label, sub, fn) => L.append(el('li', {}, el('button', { class: 'mi', 'data-act': label, onclick: fn }, el('span', { class: 'lbl', text: label }), sub ? el('span', { class: 'sub', text: sub }) : null)));
+      if (st) FwStore.index().then((idx) => {
+        const e = idx[FwStore.key(m[0], m[1])]; st.innerHTML = '';
+        if (e && e.files.length) { st.classList.add('ok'); st.append(el('span', { class: 'fw-ok', text: 'Installed' }), el('span', { text: ' ' + fwDesc(e) })); const o = L.querySelector('[data-act^="Switch"], [data-act^="Open"]'); if (o) o.querySelector('.sub').textContent = 'Ready: uses the firmware installed for it';
+          const c = L.querySelector('[data-act^="Choose"]'); if (c && m[0] !== 'nspire') { c.querySelector('.lbl').textContent = 'Replace OS or ROM…'; c.querySelector('.sub').textContent = 'Replaces the installed one and erases this calculator’s memory'; } }
+        else st.append(el('span', { class: 'fw-no', text: 'Not installed' }), el('span', { text: ' Choose its ' + (m[0] === 'nspire' ? 'system files and OS' : 'OS file or a ROM dump') + ' to use it.' }));
+      }).catch(() => { st.remove(); });
+      const item = (label, sub, fn) => L.append(el('li', {}, el('button', { class: 'mi emu-pick', 'data-act': label, onclick: fn }, el('span', { class: 'lbl', text: label }), sub ? el('span', { class: 'sub', text: sub }) : null)));
       const ns = m[0] === 'nspire';
       if (!builtIn) item(ns ? (isCur ? 'Load system files or a new OS…' : 'Choose system files and OS…') : isCur ? 'Replace OS or ROM…' : 'Choose OS file or ROM…',
         ns ? 'boot ROM with keys, manuf, btldr, instl, diags and the .tcc2 OS — select them all at once' : isCur ? 'Erases this calculator’s memory' : 'Switches to the ' + m[3] + ' and installs it', () => {

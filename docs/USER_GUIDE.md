@@ -363,6 +363,7 @@ These run the calculators' own operating systems on emulator cores. The calculat
 - **Change model or OS:** tap the open emulator tab and choose **Replace OS or change calculator**.
   - **Each model keeps its own OS and memory**, so you can switch back and forth.
   - Choosing an OS file that belongs to another model switches to that model automatically.
+  - **Installed** marks each model whose OS, ROM or system files are on the phone, with the file's name, size and date. Models without it show what to load. A model's own page says **Installed** or **Not installed**.
 - **Several at once:** turn on **Settings → Emulated calculators → Several, running at once**.
   - Each emulator tab is then a different model. Picking a model that is already open takes you to its tab.
   - Background tabs keep running at their own speed, so a long program keeps going while you use another tab.

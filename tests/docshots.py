@@ -61,8 +61,8 @@ async def main():
         for t in ['\\frac{1}{2}+\\frac{1}{3}', '\\sin\\left(30\\right)', '\\sqrt{8}']:
             await pg.evaluate("async (t)=>{ const p=__app.page.t36; p.mf.value=t; await p.enter(); }", t); await pg.wait_for_timeout(900)
         await shot(pg, 'ti36.png')
-        await pg.evaluate("__app.page.t36.setNight(true)"); await pg.wait_for_timeout(500); await shot(pg, 'ti36-night.png')
-        await pg.evaluate("__app.page.t36.setNight(false)")
+        await pg.evaluate("__app.page.t36.setDisplay('night')"); await pg.wait_for_timeout(500); await shot(pg, 'ti36-night.png')
+        await pg.evaluate("__app.page.t36.setDisplay('standard')")
         await ctx.close()
         # HP 48GX and 49g+, then several calculators open in tabs
         for model, name in [('48gx', 'hp48gx.png'), ('49gp', 'hp49gplus.png')]:
