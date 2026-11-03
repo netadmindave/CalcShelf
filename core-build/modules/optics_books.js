@@ -8,7 +8,7 @@ module.exports = function opticsBooks() {
   const c = ['c', 'speed of light c', 'm/s', C.c], h = ['h', 'Planck constant h', 'J·s', C.h], hb = ['hb', 'reduced Planck constant ħ', 'J·s', C.hbar];
   const kB = ['kB', 'Boltzmann constant k', 'J/K', C.kB], q = ['q', 'elementary charge e', 'C', C.q], e0 = ['eps0', 'vacuum permittivity ε₀', 'F/m', C.e0];
   const mu0 = ['mu0', 'vacuum permeability μ₀', 'H/m', C.mu0], m0 = ['m0', 'electron rest mass m₀', 'kg', C.m0], T300 = ['T', 'temperature', 'K', '300'];
-  const F = (n, tex, eq, v, note) => ({ type: 'formula', title: n, tex, eq, vars: v, note: note || '' });
+  const F = (n, tex, eq, v, note, solveFor) => Object.assign({ type: 'formula', title: n, tex, eq, vars: v, note: note || '' }, solveFor ? { solveFor } : {});
   const ST = (ch) => 'Saleh & Teich, Fundamentals of Photonics, ch. ' + ch + '.';
   const NM = (ch) => 'Neamen, Semiconductor Physics and Devices, ch. ' + ch + '.';
 
@@ -219,6 +219,8 @@ module.exports = function opticsBooks() {
     F('Mass-action law', 'n_0p_0=n_i^2', 'n0*p0=ni^2', [['p0', 'hole density', '1/m³'], ['n0', 'electron density', '1/m³'], ni], NM(4)),
     F('Intrinsic Fermi level offset', 'E_{Fi}-E_{mid}=\\tfrac34kT\\ln\\frac{m_p^*}{m_n^*}', 'dE=3/4*kB*T*ln(mp/mn)', [['dE', 'E_Fi − E_midgap', 'J'], ['mp', 'hole DOS mass', 'kg', '7.47e-31'], ['mn', 'electron DOS mass', 'kg', '9.83e-31'], T300, kB], NM(4)),
     F('Hydrogenic donor ionization energy', 'E=13.6\\,\\mathrm{eV}\\,\\frac{m^*/m_0}{\\epsilon_r^2}', 'E=13.6*mr/er^2', [['E', 'ionization energy', 'eV'], ['mr', 'm*/m₀ (conductivity mass)', '', '0.26'], ['er', 'relative permittivity', '', '11.7']], NM(4)),
+    F('Majority electrons, n-type (approximation)', 'n_0\\approx N_d', 'n0=Nd', [['n0', 'electron density', '1/m³'], ['Nd', 'donor density', '1/m³']], NM(4) + ' Full ionization and N_d ≫ n_i, with no acceptors. Ignore it for p-type or compensated material.', ['n0']),
+    F('Majority holes, p-type (approximation)', 'p_0\\approx N_a', 'p0=Na', [['p0', 'hole density', '1/m³'], ['Na', 'acceptor density', '1/m³']], NM(4) + ' Full ionization and N_a ≫ n_i, with no donors. Ignore it for n-type or compensated material.', ['p0']),
     F('Electron density with compensation', 'n_0=\\frac{N_d-N_a}{2}+\\sqrt{\\left(\\frac{N_d-N_a}{2}\\right)^2+n_i^2}', 'n0=(Nd-Na)/2+sqrt(((Nd-Na)/2)^2+ni^2)', [['n0', 'electron density', '1/m³'], ['Nd', 'donor density', '1/m³'], ['Na', 'acceptor density', '1/m³', '0'], ni], NM(4) + ' Complete ionization.'),
     F('Fermi level from doping', 'E_F-E_{Fi}=kT\\ln\\frac{n_0}{n_i}', 'dE=kB*T*ln(n0/ni)', [['dE', 'E_F − E_Fi', 'J'], ['n0', 'electron density', '1/m³'], ni, T300, kB], NM(4)),
     F('Fermi level below the conduction band', 'E_c-E_F=kT\\ln\\frac{N_c}{N_d}', 'dE=kB*T*ln(Nc/Nd)', [['dE', 'E_c − E_F', 'J'], ['Nc', 'N_c', '1/m³', '2.8e25'], ['Nd', 'donor density', '1/m³'], T300, kB], NM(4)),

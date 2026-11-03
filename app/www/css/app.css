@@ -431,3 +431,70 @@ body.fieldkeys .sheet { bottom: var(--fkh, 0px); height: min(78dvh, calc(100dvh 
 
 /* calculator tabs use the whole window, however wide (tablets, desktop windows) */
 body.fullpage .app { max-width: none; }
+
+/* Variable Solver */
+.page.vs { display: flex; flex-direction: column; }
+.vs-head { flex: none; padding: 8px 12px 4px; display: flex; flex-direction: column; gap: 6px; }
+.vs-search { margin: 0; }
+.vs-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.vs-body { flex: 1; overflow-y: auto; padding: 0 12px 40px; }
+.vs-sec { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 14px 2px 4px; font-weight: 700; font-size: 14px; color: var(--ink2); text-transform: uppercase; letter-spacing: .03em; }
+.vs-sec .sub { text-transform: none; font-weight: 500; letter-spacing: 0; }
+.vs-row { background: var(--card); border-radius: 12px; padding: 8px 10px; margin-bottom: 6px; border-left: 4px solid transparent; }
+.vs-row.user { border-left-color: var(--acc); }
+.vs-row.calc { border-left-color: var(--g3, #2a9d8f); }
+.vs-row.const { border-left-color: var(--line); }
+.vs-row.conflict { border-left-color: #d9822b; }
+.vs-top { display: flex; align-items: flex-start; gap: 10px; }
+.vs-sym { flex: none; min-width: 44px; font-size: 19px; padding-top: 2px; }
+.vs-info { flex: 1; min-width: 0; }
+.vs-n { font-weight: 600; font-size: 15px; display: flex; gap: 6px; align-items: center; }
+.vs-d { font-size: 12.5px; color: var(--ink2); line-height: 1.35; margin-top: 2px; }
+.vs-badge { font-size: 11px; font-weight: 700; background: var(--acc); color: #fff; border-radius: 99px; padding: 1px 7px; }
+.vs-line { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.vs-line input { flex: 1; min-width: 0; font: 16px var(--font); padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg, var(--card)); color: var(--ink); }
+.vs-unit { flex: none; max-width: 40%; padding: 8px 6px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); font-size: 14px; }
+.vs-val { flex: 1; min-width: 0; font-size: 19px; overflow-x: auto; }
+.vs-x { flex: none; width: 32px; height: 32px; border-radius: 9px; background: var(--chip); color: var(--ink2); font-size: 16px; }
+.vs-how { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.vs-from { font-size: 13px; font-weight: 600; color: var(--ink2); }
+.vs-step { font-size: 12px; color: var(--ink2); margin-top: 4px; }
+.vs-tex { font-size: 18px; overflow-x: auto; padding: 2px 0; }
+.vs-alts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+.vs-warn { font-size: 12.5px; color: #b5651d; margin-top: 4px; }
+.vs-more { width: 100%; margin: 6px 0; }
+.vs-det { margin: 10px 0; } .vs-det summary { font-weight: 600; font-size: 14px; padding: 6px 2px; color: var(--ink2); }
+.vs-chk { display: flex; align-items: center; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.vs-chk input { width: 20px; height: 20px; accent-color: var(--acc); } .vs-chk span:nth-child(2) { flex: 1; }
+.vs-fc { padding: 10px; }
+.vs-d { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.vs-row.user .vs-d, .vs-row.calc .vs-d, .vs-row.const .vs-d { -webkit-line-clamp: 1; }
+.vs-how .vs-d { display: block; }
+.vs-chips .chip { padding: 6px 10px; }
+
+/* Periodic Table module */
+.modpage.md-main .gd-body { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.modpage.md-main .md-search { display: none; }
+.pt-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 4px 8px 6px; gap: 4px; }
+.pt-bar { display: flex; gap: 6px; align-items: center; flex: none; }
+.pt-sel { padding: 6px 8px; border-radius: 9px; border: 1.5px solid var(--line); background: var(--card); color: var(--ink); font-size: 14px; }
+.pt-q { flex: 1; min-width: 0; margin: 0; padding: 6px 10px; font-size: 14px; }
+.pt-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); grid-template-rows: repeat(7, minmax(0, 1fr)) 0.35fr repeat(2, minmax(0, 1fr)); gap: 2px; }
+.pt-el { position: relative; border-radius: 4px; color: #15181c; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1px; min-width: 0; min-height: 0; overflow: hidden; line-height: 1; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.pt-el.dim { opacity: .2; }
+.pt-el .pt-z { position: absolute; top: 2px; left: 3px; font-size: clamp(6px, 1.4vmin, 10px); opacity: .75; }
+.pt-el .pt-s { font-weight: 700; font-size: clamp(9px, 3.2vmin, 22px); }
+.pt-el .pt-n { font-size: clamp(5px, 1.25vmin, 9px); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; opacity: .85; }
+.pt-mark { font-size: clamp(6px, 1.3vmin, 10px); color: var(--ink2); display: grid; place-items: center; border: 1px dashed var(--line); border-radius: 4px; }
+.pt-legend { flex: none; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 11px; color: var(--ink2); }
+.pt-key { display: inline-flex; align-items: center; gap: 4px; } .pt-key i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.pt-ramp { display: inline-block; width: 80px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgb(198,222,245), rgb(246,226,140), rgb(232,120,96)); }
+.pt-head { display: flex; gap: 14px; align-items: center; margin-bottom: 8px; }
+.pt-big { width: 76px; height: 76px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; color: #15181c; flex: none; }
+.pt-big .pt-z { position: absolute; top: 5px; left: 7px; font-size: 12px; } .pt-big .pt-s { font-size: 30px; font-weight: 700; } .pt-big .pt-n { font-size: 11px; }
+.pt-title { font-size: 22px; font-weight: 700; }
+.pt-tbl { width: 100%; border-collapse: collapse; font-size: 14px; margin: 6px 0; }
+.pt-tbl th, .pt-tbl td { text-align: left; padding: 5px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.pt-tbl th { color: var(--ink2); font-weight: 600; width: 46%; }
+.pt-tbl tr.sub td { color: var(--ink2); }
+.pt-det summary { font-weight: 600; padding: 6px 0; }

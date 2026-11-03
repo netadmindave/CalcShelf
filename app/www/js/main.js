@@ -15,6 +15,7 @@
     prog: { name: 'Program Editor', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/></svg>', make: (a, s) => new Programs.ProgramPage(a, s) },
     guide: { name: 'Guide & manuals', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a1.6 1.6 0 0 0-1.6-1.6H5z"/><path d="M19 4.5h-5.5a1 1 0 0 0-1 1"/><path d="M19 4.5v13.9h-5.9a1.6 1.6 0 0 0-1.6 1.6"/></svg>', make: (a, s) => new Guide.GuidePage(a, s) },
     module: { name: 'Module', icon: Modules.ICONS.module, make: (a, s) => new Modules.ModulePage(a, s), menu: false },
+    vsolve: { name: 'Variable Solver', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 6h7M4 12h5M4 18h7"/><path d="M14 9l3 3-3 3M17 12h3"/><circle cx="12.5" cy="6" r="1"/></svg>', make: (a, s) => new VarSolver.VarSolverPage(a, s) },
     ode: { name: 'Differential Equations', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 19c3-1 4.5-10 8-10s5 6 8 5"/><path d="M4.5 6.5l2.5-1.2M10 5.6h2.8M15.2 5.4l2.6.9"/></svg>', make: (a, s) => new Ode.OdePage(a, s) },
     convert: { name: 'Unit Converter', icon: '<svg class="ic" viewBox="0 0 24 24"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>', make: (a, s) => new ConverterPage(a, s) },
     emu: { name: 'Emulated calculator', icon: '<svg class="ic" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2"/><rect x="8.5" y="5" width="7" height="4.5" rx=".8"/><path d="M9 13h.01M12 13h.01M15 13h.01M9 16h.01M12 16h.01M15 16h.01"/></svg>', make: (a, s) => new EmuPage(a, s), menu: false },
@@ -116,7 +117,7 @@
 
   const UNIQUE = new Set(['calc', 'emu']);
   const LCD_NAMES = { stn: 'Standard', paper: 'Paper', night: 'Night' };
-  const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert', ode: 'DiffEq' };
+  const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert', ode: 'DiffEq', vsolve: 'Solver' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
   const App = {
@@ -238,7 +239,7 @@
     },
     /** the CAS and the TI-36X Pro stay upright; the TI-92, TI-92 Plus and Voyage 200 are landscape only */
     applyOrientation(p) {
-      const o = !p ? -1 : p.kind === 'calc' ? 1 : p.kind === 'emu' ? p.orientation : -1;
+      const o = !p ? -1 : p.kind === 'calc' ? 1 : p.kind === 'emu' || p.kind === 'module' ? p.orientation : -1;
       if (o === this._orient) return; this._orient = o;
       try { if (root.TiBridge && root.TiBridge.setOrientation) root.TiBridge.setOrientation(o); } catch (e) { /* older shell */ }
     },
@@ -629,7 +630,7 @@
     applyTheme() { const t = this.settings.theme; if (t === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t); },
     saveSettings() { DB.set('settings', this.settings); },
     /** after a module is installed or removed, its open tabs draw it again */
-    refreshModulePages(id) { this.pages.forEach((p) => { if (p.kind === 'module' && p.id === id) p.render(); }); this.renderTabs(); },
+    refreshModulePages(id) { this.pages.forEach((p) => { if (p.kind === 'module' && p.id === id) p.render(); if (p.kind === 'vsolve') p.start(); }); this.renderTabs(); },
     rerender() { this.pages.forEach((p) => p.renderAll && p.kind === 'calc' && p.renderAll()); },
     docMenu() {
       Sheet.open('CalcShelf', (b) => {

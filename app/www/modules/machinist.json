@@ -4,12 +4,149 @@
  "id": "machinist",
  "name": "Machinist",
  "tab": "Machinist",
- "version": "1.0.0",
+ "version": "1.1.0",
  "icon": "machinist",
  "author": "CalcShelf",
  "license": "GPL-3.0-or-later",
  "homepage": "https://github.com/netadmindave/CalcShelf/tree/main/modules",
  "description": "Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, and a G-code and M-code reference.",
+ "variables": [
+  {
+   "id": "mN",
+   "symbol": "N",
+   "name": "Spindle speed",
+   "description": "Revolutions per minute of the spindle.",
+   "unit": "rpm",
+   "also": "RPM"
+  },
+  {
+   "id": "mVc",
+   "symbol": "V_c",
+   "name": "Surface speed",
+   "description": "Cutting speed at the tool or work surface (SFM).",
+   "unit": "ft/min",
+   "also": "SFM, cutting speed"
+  },
+  {
+   "id": "mD",
+   "symbol": "D",
+   "name": "Tool or work diameter",
+   "description": "Diameter of the cutter, drill, or the work in turning.",
+   "unit": "in"
+  },
+  {
+   "id": "mfz",
+   "symbol": "f_z",
+   "name": "Chip load",
+   "description": "Feed per tooth.",
+   "unit": "in",
+   "also": "IPT, feed per tooth"
+  },
+  {
+   "id": "mz",
+   "symbol": "z",
+   "name": "Number of flutes",
+   "description": "Cutting edges on the tool.",
+   "unit": "",
+   "also": "teeth"
+  },
+  {
+   "id": "mF",
+   "symbol": "F",
+   "name": "Feed rate",
+   "description": "Table or tool feed per minute.",
+   "unit": "in/min",
+   "also": "IPM"
+  },
+  {
+   "id": "mfr",
+   "symbol": "f_r",
+   "name": "Feed per revolution",
+   "description": "Feed per spindle revolution (turning, drilling).",
+   "unit": "in",
+   "also": "IPR"
+  },
+  {
+   "id": "mae",
+   "symbol": "a_e",
+   "name": "Width of cut",
+   "description": "Radial engagement (stepover).",
+   "unit": "in",
+   "also": "WOC"
+  },
+  {
+   "id": "map",
+   "symbol": "a_p",
+   "name": "Depth of cut",
+   "description": "Axial depth of cut.",
+   "unit": "in",
+   "also": "DOC"
+  },
+  {
+   "id": "mQ",
+   "symbol": "Q",
+   "name": "Material removal rate",
+   "description": "Volume of metal removed per minute.",
+   "unit": "in^3/min",
+   "also": "MRR"
+  },
+  {
+   "id": "mL",
+   "symbol": "L",
+   "name": "Length of cut",
+   "description": "Length the tool travels while cutting.",
+   "unit": "in"
+  },
+  {
+   "id": "mt",
+   "symbol": "t",
+   "name": "Cutting time",
+   "description": "Time for one pass.",
+   "unit": "min"
+  },
+  {
+   "id": "mKp",
+   "symbol": "K_p",
+   "name": "Unit power",
+   "description": "Power per removal rate for the material (about 1 hp·min/in³ for steel, 0.3 for aluminium).",
+   "unit": "hp*min/in^3"
+  },
+  {
+   "id": "mP",
+   "symbol": "P",
+   "name": "Spindle power",
+   "description": "Power at the spindle.",
+   "unit": "hp"
+  },
+  {
+   "id": "mTPI",
+   "symbol": "\\mathrm{TPI}",
+   "name": "Threads per inch",
+   "description": "Threads per inch.",
+   "unit": ""
+  },
+  {
+   "id": "mpitch",
+   "symbol": "p",
+   "name": "Thread pitch",
+   "description": "Distance between threads.",
+   "unit": "mm"
+  },
+  {
+   "id": "mRa",
+   "symbol": "R_a",
+   "name": "Surface roughness",
+   "description": "Arithmetic-mean roughness (theoretical, turning).",
+   "unit": "µin"
+  },
+  {
+   "id": "mre",
+   "symbol": "r_\\varepsilon",
+   "name": "Nose radius",
+   "description": "Tool nose radius.",
+   "unit": "in"
+  }
+ ],
  "sections": [
   {
    "title": "Speeds & feeds",
@@ -7172,6 +7309,252 @@
      "type": "text",
      "title": "A typical program start",
      "md": "```\n%\nO1001 (PART NAME)\nG20 G17 G40 G49 G80 G90   (safe start: inch, XY, cancel comp and cycles, absolute)\nT1 M06                    (tool 1)\nG54 G00 X0 Y0             (work offset, rapid to start)\nS2000 M03                 (spindle on)\nG43 H01 Z1.0 M08          (length offset, coolant)\n...\nM09\nG91 G28 Z0                (home Z)\nM30\n%\n```\nAn example only: check the safe-start line and the homing moves for your control."
+    }
+   ]
+  },
+  {
+   "title": "Formulas",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Spindle speed (inch)",
+     "tex": "N=\\frac{12\\,V_c}{\\pi D}",
+     "eq": "N=12*Vc/(pi*D)",
+     "vars": [
+      [
+       "N",
+       "spindle speed",
+       "rpm",
+       "",
+       "mN"
+      ],
+      [
+       "Vc",
+       "surface speed",
+       "ft/min",
+       "",
+       "mVc"
+      ],
+      [
+       "D",
+       "diameter",
+       "in",
+       "",
+       "mD"
+      ]
+     ],
+     "note": "Machinery’s Handbook. The same speed in metric is N = 1000V_c/(πD) with V_c in m/min and D in mm."
+    },
+    {
+     "type": "formula",
+     "title": "Milling feed rate",
+     "tex": "F=N\\,f_z\\,z",
+     "eq": "F=N*fz*z",
+     "vars": [
+      [
+       "F",
+       "feed rate",
+       "in/min",
+       "",
+       "mF"
+      ],
+      [
+       "N",
+       "spindle speed",
+       "rpm",
+       "",
+       "mN"
+      ],
+      [
+       "fz",
+       "chip load",
+       "in",
+       "",
+       "mfz"
+      ],
+      [
+       "z",
+       "flutes",
+       "",
+       "",
+       "mz"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Feed rate from feed per revolution",
+     "tex": "F=N\\,f_r",
+     "eq": "F=N*fr",
+     "vars": [
+      [
+       "F",
+       "feed rate",
+       "in/min",
+       "",
+       "mF"
+      ],
+      [
+       "N",
+       "spindle speed",
+       "rpm",
+       "",
+       "mN"
+      ],
+      [
+       "fr",
+       "feed per revolution",
+       "in",
+       "",
+       "mfr"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Material removal rate (milling)",
+     "tex": "Q=a_e\\,a_p\\,F",
+     "eq": "Q=ae*ap*F",
+     "vars": [
+      [
+       "Q",
+       "removal rate",
+       "in^3/min",
+       "",
+       "mQ"
+      ],
+      [
+       "ae",
+       "width of cut",
+       "in",
+       "",
+       "mae"
+      ],
+      [
+       "ap",
+       "depth of cut",
+       "in",
+       "",
+       "map"
+      ],
+      [
+       "F",
+       "feed rate",
+       "in/min",
+       "",
+       "mF"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Spindle power",
+     "tex": "P=K_p\\,Q",
+     "eq": "P=Kp*Q",
+     "vars": [
+      [
+       "P",
+       "power",
+       "hp",
+       "",
+       "mP"
+      ],
+      [
+       "Kp",
+       "unit power",
+       "hp*min/in^3",
+       "1",
+       "mKp"
+      ],
+      [
+       "Q",
+       "removal rate",
+       "in^3/min",
+       "",
+       "mQ"
+      ]
+     ],
+     "note": "Divide by the machine efficiency (about 0.8) for the motor power."
+    },
+    {
+     "type": "formula",
+     "title": "Cutting time",
+     "tex": "t=\\frac{L}{F}",
+     "eq": "t=L/F",
+     "vars": [
+      [
+       "t",
+       "time",
+       "min",
+       "",
+       "mt"
+      ],
+      [
+       "L",
+       "length of cut",
+       "in",
+       "",
+       "mL"
+      ],
+      [
+       "F",
+       "feed rate",
+       "in/min",
+       "",
+       "mF"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Pitch and TPI",
+     "tex": "p=\\frac{25.4}{\\mathrm{TPI}}",
+     "eq": "p=25.4/TPI",
+     "vars": [
+      [
+       "p",
+       "pitch",
+       "mm",
+       "",
+       "mpitch"
+      ],
+      [
+       "TPI",
+       "threads per inch",
+       "",
+       "",
+       "mTPI"
+      ]
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Theoretical surface finish (turning)",
+     "tex": "R_a\\approx\\frac{f_r^2}{32\\,r_\\varepsilon}",
+     "eq": "Ra=1000000*fr^2/(32*re)",
+     "vars": [
+      [
+       "Ra",
+       "roughness",
+       "µin",
+       "",
+       "mRa"
+      ],
+      [
+       "fr",
+       "feed per revolution",
+       "in",
+       "",
+       "mfr"
+      ],
+      [
+       "re",
+       "nose radius",
+       "in",
+       "",
+       "mre"
+      ]
+     ]
     }
    ]
   }

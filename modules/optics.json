@@ -4,7 +4,7 @@
  "id": "optics",
  "name": "Optics",
  "tab": "Optics",
- "version": "1.1.0",
+ "version": "1.2.0",
  "icon": "optics",
  "author": "CalcShelf",
  "license": "GPL-3.0-or-later",
@@ -8208,6 +8208,50 @@
       ]
      ],
      "note": "Neamen, Semiconductor Physics and Devices, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Majority electrons, n-type (approximation)",
+     "tex": "n_0\\approx N_d",
+     "eq": "n0=Nd",
+     "vars": [
+      [
+       "n0",
+       "electron density",
+       "1/m³"
+      ],
+      [
+       "Nd",
+       "donor density",
+       "1/m³"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_d ≫ n_i, with no acceptors. Ignore it for p-type or compensated material.",
+     "solveFor": [
+      "n0"
+     ]
+    },
+    {
+     "type": "formula",
+     "title": "Majority holes, p-type (approximation)",
+     "tex": "p_0\\approx N_a",
+     "eq": "p0=Na",
+     "vars": [
+      [
+       "p0",
+       "hole density",
+       "1/m³"
+      ],
+      [
+       "Na",
+       "acceptor density",
+       "1/m³"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_a ≫ n_i, with no donors. Ignore it for n-type or compensated material.",
+     "solveFor": [
+      "p0"
+     ]
     },
     {
      "type": "formula",

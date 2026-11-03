@@ -4,6 +4,14 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 
 ## 2.7.6
 
+- **Variable Solver tab** (+ → Variable Solver): every formula in CalcShelf (the library and every module, about 490) in one master list, solved from the values you know.
+  - Each formula variable is matched to a named quantity with a short description and its other names (N_a, also p₀ in p-type material), so a value entered once feeds every formula that uses it: λ₀, n and L give ν, k, the wavelength in the medium, the photon energy and more; N_d and n_i give n₀, p₀ and E_F − E_Fi.
+  - Values you enter move to the top, calculated values follow. **How** shows the formula a value came from, rearranged for it and filled in with your numbers; **In terms of your values** gives one formula in what you entered.
+  - **Reset values**, **Ignore** a variable or a formula, choose **Which formulas** to use, and see which single value would calculate the most. Values two formulas disagree on are flagged.
+  - Modules can name the quantity each variable is, define their own quantities, and limit approximations to one direction (docs/MODULES.md).
+- **Periodic Table module** (built in): a landscape periodic table coloured by category, block, state or a property; every element's data and isotopes; molar masses of formulas; and chemistry formulas for the Variable Solver.
+- **Machinist module 1.1:** a Formulas section (spindle speed, feed rate, removal rate, power, cutting time, pitch, surface finish) that the Variable Solver uses.
+- **Optics module:** the majority-carrier approximations n₀ ≈ N_d and p₀ ≈ N_a, for the Variable Solver.
 - **Emulators fill any window shape.** The calculator's screen is as wide as the window, and drawn to fill its frame (it was limited to whole-pixel sizes and could stay much smaller). In a window wider than tall (landscape, split screen, a tablet), the screen is on the left and the keys on the right, for every calculator. The TI-36X Pro no longer squashes its keys and labels together in a short window.
 - **One screen style for every calculator:** Standard, Paper or Night in **Settings → Calculator screens** (also in each emulator tab's menu and in each calculator's own menu) applies to all emulated calculators and the TI-36X Pro. The TI-Nspire's colour screen gets a Night style too.
 - **Calculator clocks follow the phone:**

@@ -52,6 +52,7 @@ CalcShelf 2.2 to 2.5 also ran these, and they're thanked for that time:
 
 - **Physical constants:** CODATA 2018 recommended values, published by NIST. SI 2019 exact values.
 - **Optical constants:** published dispersion data and Sellmeier fits (Malitson, Schott, Corning and others), as cited in `app/www/data/constants.js`.
+- **Element data (Periodic Table module):** PubChem's periodic table (NCBI, U.S. National Library of Medicine; public domain) through the `periodic-table-data` package (MIT); group, period, block, category, shells, ionization energies, heat capacity and discovery from the data of `@pie-players/pie-tool-periodic-table` (MIT); van der Waals radii and bonding type from the `periodic-table` package (ISC); isotope masses and abundances from cheminfo's `chemical-elements` (MIT). The merged data is `core-build/modules/data/elements.json`.
 - **The TI-89 command reference** in the command finder lists TI's command names and syntax. The descriptions are written for CalcShelf.
 
 ## Fonts and tools

@@ -11,7 +11,7 @@ module.exports = function optics({ FORMULAS, CONSTANTS }) {
 
   return {
     format: 'calcshelf-module', formatVersion: 1,
-    id: 'optics', name: 'Optics', tab: 'Optics', version: '1.1.0', icon: 'optics',
+    id: 'optics', name: 'Optics', tab: 'Optics', version: '1.2.0', icon: 'optics',
     author: 'CalcShelf', license: 'GPL-3.0-or-later', homepage: 'https://github.com/netadmindave/CalcShelf/tree/main/modules',
     description: 'Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Every formula solves for any of its variables.',
     sections: [

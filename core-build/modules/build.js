@@ -8,11 +8,11 @@ const ROOT = path.join(__dirname, '..', '..'), WWW = path.join(ROOT, 'app', 'www
 const ctx = { self: {}, console, Math, JSON };
 ctx.self = ctx; ctx.UI = { el: () => ({}), toast() {}, renderTex() {}, Sheet: {}, DB: {} };
 vm.createContext(ctx);
-for (const f of ['data/formulas.js', 'data/constants.js', 'js/modules.js']) vm.runInContext(fs.readFileSync(path.join(WWW, f), 'utf8'), ctx, { filename: f });
+for (const f of ['data/formulas.js', 'data/constants.js', 'js/modules.js', 'js/periodic.js']) vm.runInContext(fs.readFileSync(path.join(WWW, f), 'utf8'), ctx, { filename: f });
 const { FORMULAS, CONSTANTS, Modules } = ctx;
 
-const mods = { optics: require('./optics')({ FORMULAS, CONSTANTS }), machinist: require('./machinist')(), template: require('./template')() };
-const builtIn = ['optics', 'machinist'];
+const mods = { optics: require('./optics')({ FORMULAS, CONSTANTS }), machinist: require('./machinist')(), periodic: require('./periodic')(), template: require('./template')() };
+const builtIn = ['optics', 'machinist', 'periodic'];
 fs.mkdirSync(path.join(WWW, 'modules'), { recursive: true });
 fs.mkdirSync(path.join(ROOT, 'modules'), { recursive: true });
 let bad = 0;

@@ -63,7 +63,9 @@ Start from [`modules/example.json`](../modules/example.json), which uses every k
 | `tab` | no | A short name for the tab, up to 16 characters. Defaults to `name`. |
 | `version` | no | Your version number, shown when installing. |
 | `author`, `license`, `homepage`, `description` | no | Shown when installing. `homepage` must start with `https://`. |
-| `icon` | no | One of `module`, `optics`, `machinist`, `gear`, `electric`, `flask`, `ruler`, `book`, `wave`. |
+| `icon` | no | One of `module`, `optics`, `machinist`, `gear`, `electric`, `flask`, `ruler`, `book`, `wave`, `atom`. |
+| `variables` | no | The module's own quantities for the **Variable Solver** (see below). |
+| `main` | no | A built-in view the tab opens with, drawn from the module's data. Only `chem.periodic` exists (the periodic table; it reads the tables titled `Elements` and `Isotopes`). |
 | `sections` | yes | Each section is a chip at the top of the tab and has a `title` and a list of `items`. |
 
 Every item has a `type` and a `title`. It can also have a `note` (shown under the title), `tags` (extra words for the search box) and `tex` (a LaTeX formula shown in the list).
@@ -127,6 +129,28 @@ An equation the user can solve for any one of its variables, with a menu of unit
 ```
 
 `eq` has exactly one `=`. Write each variable's `unit` in SI, or in the unit the equation expects. The solver starts every unit menu on **units**, which uses the numbers as typed, and offers the units of the same kind. Angles (unit `rad`) follow the calculator's angle mode unless the user picks a unit. A variable can also be written as an array, `["f", "focal length", "m", ""]`.
+
+**The Variable Solver.** Every formula of every installed module joins the Variable Solver's master list. Each variable is matched to a named quantity, so that a value entered once feeds every formula that uses that quantity:
+
+- Give a variable a `"quantity"` (or a fifth array element) to say which quantity it is: one of CalcShelf's (`app/www/data/quantities.js`: `lam0` vacuum wavelength, `n` refractive index, `T` temperature, `Nd` donor density, `c`, `h`, `kB` …) or one of the module's own `variables`. The units may differ, for example `eV` for a quantity kept in joules; the solver converts.
+- Without one, CalcShelf matches the variable by its name, unit and description. A variable it can't match is linked only to variables with the same name, unit and description.
+- `"solveFor": ["n0"]` limits which variables a formula is solved for. Use it for an approximation that only works one way, such as n₀ ≈ N_d, which gives n₀ from N_d but should never give N_d.
+
+```json
+"variables": [
+  { "id": "mN", "symbol": "N", "name": "Spindle speed", "description": "Revolutions per minute of the spindle.", "unit": "rpm", "also": "RPM" },
+  { "id": "NAv", "symbol": "N_A", "name": "Avogadro constant", "unit": "1/mol", "value": 6.02214076e23 }
+]
+```
+
+| Field | Meaning |
+|---|---|
+| `id` | Letters, digits and `_`. The same id in two modules is the same quantity. |
+| `symbol` | LaTeX for the symbol. |
+| `name`, `description`, `also` | Shown in the solver's variable list; `also` lists other names (N_a also p₀ in p-type material). |
+| `unit` | The unit values are shown in. |
+| `value` | A constant: known unless the user enters another value. |
+| `names` | Variable names in this module's formulas that are this quantity, when they don't say `quantity` themselves. |
 
 ### table
 

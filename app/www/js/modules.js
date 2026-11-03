@@ -11,7 +11,7 @@
 
   const FORMAT = 'calcshelf-module', FORMAT_VERSION = 1;
   const REPO = 'https://github.com/netadmindave/CalcShelf/tree/main/modules';
-  const LIMIT = { bytes: 4 * 1024 * 1024, sections: 60, items: 2000, rows: 10000, cols: 16, str: 40000, vars: 24, outputs: 24 };
+  const LIMIT = { bytes: 4 * 1024 * 1024, sections: 60, items: 2000, rows: 10000, cols: 40, str: 40000, vars: 24, outputs: 24 };
   const TYPES = ['text', 'formula', 'calc', 'table', 'constants', 'tool', 'link'];
 
   /* ---------------------------------------------------------------- icons: modules pick one by name */
@@ -26,6 +26,7 @@
     ruler: svg('<path d="M3 17 17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/>'),
     book: svg('<path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a1.6 1.6 0 0 0-1.6-1.6H5zM19 4.5h-5.5a2 2 0 0 0-1 .3"/><path d="M19 4.5v13.9h-5.9a1.6 1.6 0 0 0-1.6 1.6"/>'),
     wave: svg('<path d="M2 12c2.5-6 4.5-6 7 0s4.5 6 7 0 4.5-6 6 0"/>'),
+    atom: svg('<circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(-60 12 12)"/>'),
   };
 
   /* ---------------------------------------------------------------- checking a module file */
@@ -68,6 +69,19 @@
       version: str(m.version, 20) || '1', author: str(m.author, 100), description: str(m.description, 600), license: str(m.license, 60),
       homepage: https(m.homepage), icon: ICONS[m.icon] ? m.icon : 'module', sections: [],
     };
+    // a built-in view the module opens with (the periodic table), drawn from the module's own data
+    if (m.main != null) { const t = str(m.main, 40); if (!TOOLS[t] || !TOOLS[t].main) throw new Error('there is no built-in view “' + t + '”'); out.main = t; }
+    // its own quantities for the Variable Solver: [{ id, symbol, name, description, unit, also, names: [variable names in its formulas] }]
+    if (m.variables != null) {
+      if (!Array.isArray(m.variables) || m.variables.length > 500) throw new Error('"variables" must be a list of up to 500 quantities');
+      out.variables = m.variables.map((v, k) => {
+        if (!v || typeof v !== 'object') throw new Error('variable ' + (k + 1) + ' isn’t an object');
+        const id = str(v.id, 40); if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(id)) throw new Error('variable id “' + id + '” must be letters, digits and _');
+        const o = { id, symbol: str(v.symbol, 80) || id, name: str(v.name, 80) || id, description: str(v.description, 600), unit: unitStr(v.unit), also: str(v.also, 200), names: Array.isArray(v.names) ? v.names.slice(0, 20).map((n) => ident(n, 'A variable name')) : [] };
+        if (v.value != null && v.value !== '') { const x = Number(v.value); if (!isFinite(x)) throw new Error('variable ' + id + ': value must be a number'); o.value = x; }
+        return o;
+      });
+    }
     if (!Array.isArray(m.sections) || !m.sections.length) throw new Error('A module needs at least one section');
     if (m.sections.length > LIMIT.sections) throw new Error('Too many sections (' + m.sections.length + ')');
     let nItems = 0;
@@ -98,10 +112,18 @@
         if ((o.eq.match(/(^|[^<>!])=($|[^=])/g) || []).length !== 1) throw new Error('the equation needs exactly one =');
         const vars = Array.isArray(it.vars) ? it.vars : [];
         if (!vars.length || vars.length > LIMIT.vars) throw new Error('a formula needs 1 to ' + LIMIT.vars + ' variables');
-        o.vars = vars.map((v) => { const a = Array.isArray(v) ? { name: v[0], desc: v[1], unit: v[2], default: v[3] } : v || {}; return [ident(a.name, 'Variable'), str(a.desc, 120) || a.name, unitStr(a.unit), a.default == null || a.default === '' ? '' : checkExpr(String(a.default), 'A default value')]; });
+        o.vars = vars.map((v) => {
+          const a = Array.isArray(v) ? { name: v[0], desc: v[1], unit: v[2], default: v[3], quantity: v[4] } : v || {};
+          const r = [ident(a.name, 'Variable'), str(a.desc, 120) || a.name, unitStr(a.unit), a.default == null || a.default === '' ? '' : checkExpr(String(a.default), 'A default value')];
+          // the Variable Solver quantity this variable is (data/quantities.js, or one of the module's own variables)
+          if (a.quantity) { const q = str(a.quantity, 40); if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(q)) throw new Error('quantity “' + q + '” must be letters, digits and _'); r.push(q); }
+          return r;
+        });
         const names = new Set(o.vars.map((v) => v[0]));
         for (const w of o.eq.match(/[A-Za-z_]\w*/g) || []) if (/^[a-z]$/i.test(w) && !names.has(w) && !['e', 'i'].includes(w)) throw new Error('the equation uses ' + w + ', which isn’t one of its variables');
         if (!o.tex) o.tex = o.eq;
+        // an approximation that is only used one way (n₀ ≈ N_d gives n₀, never N_d): the variables it may be solved for
+        if (Array.isArray(it.solveFor)) { o.solveFor = it.solveFor.slice(0, LIMIT.vars).map((n) => ident(n, 'solveFor')); if (o.solveFor.some((n) => !names.has(n))) throw new Error('solveFor names a variable the formula doesn’t have'); }
         break;
       }
       case 'calc': {
@@ -448,7 +470,7 @@
   class ModulePage {
     constructor(app, state = {}) {
       this.app = app; this.kind = 'module'; this.noKeypad = true;
-      this.id = String(state.id || ''); this.sec = state.sec === 'all' ? 'all' : state.sec | 0; this.allSort = state.sort === 'az' ? 'az' : 'sec'; this.q = '';
+      this.id = String(state.id || ''); this.sec = state.sec === 'all' || state.sec === 'main' ? state.sec : state.sec == null ? null : state.sec | 0; this.allSort = state.sort === 'az' ? 'az' : 'sec'; this.q = '';
       this.root = el('div', { class: 'page guide modpage' });
       this.secs = el('div', { class: 'chips md-secs', role: 'tablist' });
       this.search = el('input', { class: 'search md-search', type: 'search', placeholder: 'Search this module', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
@@ -460,6 +482,8 @@
       Modules.load().then(() => this.render());
     }
     get target() { return null; }
+    /** a module's main view can ask for landscape (the periodic table) */
+    get orientation() { const m = this.m; return m && m.main && this.sec === 'main' && TOOLS[m.main].landscape ? 6 : -1; }
     get defaultName() { const m = this.m || Modules.get(this.id); return m ? m.tab : 'Module'; }
     get icon() { const m = this.m || Modules.get(this.id); return ICONS[m ? m.icon : 'module']; }
     serialize() { return { id: this.id, sec: this.sec, sort: this.allSort }; }
@@ -472,14 +496,19 @@
         return;
       }
       this.search.hidden = false;
-      if (this.sec !== 'all' && !(this.sec < this.m.sections.length)) this.sec = 0;
+      if (this.sec === null) this.sec = this.m.main ? 'main' : 0;
+      if (this.sec === 'main' && !this.m.main) this.sec = 0;
+      if (this.sec !== 'all' && this.sec !== 'main' && !(this.sec < this.m.sections.length)) this.sec = 0;
+      const pick = (c, v) => { this.sec = v; this.search.value = this.q = ''; this.secs.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === c)); this.drawList(); this.app.saveSoon(); if (this.app.page === this) this.app.applyOrientation(this); };
+      if (this.m.main) { const c = el('button', { class: 'chip md-all' + (this.sec === 'main' ? ' on' : ''), text: TOOLS[this.m.main].chip || 'View', role: 'tab' }); c.onclick = () => pick(c, 'main'); this.secs.append(c); }
       // "All formulas": every formula and calculator of the module in one list
       const nForm = this.m.sections.reduce((t, x) => t + x.items.filter((i) => i.type === 'formula' || i.type === 'calc').length, 0);
-      if (nForm > 1) { const c = el('button', { class: 'chip md-all' + (this.sec === 'all' ? ' on' : ''), text: 'All formulas', role: 'tab' }); c.onclick = () => { this.sec = 'all'; this.search.value = this.q = ''; this.secs.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === c)); this.drawList(); this.app.saveSoon(); }; this.secs.append(c); }
+      if (nForm > 1) { const c = el('button', { class: 'chip md-all' + (this.sec === 'all' ? ' on' : ''), text: 'All formulas', role: 'tab' }); c.onclick = () => pick(c, 'all'); this.secs.append(c); }
       else if (this.sec === 'all') this.sec = 0;
-      this.m.sections.forEach((s, k) => { const c = el('button', { class: 'chip' + (k === this.sec ? ' on' : ''), text: s.title, role: 'tab' }); c.onclick = () => { this.sec = k; this.search.value = this.q = ''; this.secs.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === c)); this.drawList(); this.app.saveSoon(); }; this.secs.append(c); });
+      this.m.sections.forEach((s, k) => { const c = el('button', { class: 'chip' + (k === this.sec ? ' on' : ''), text: s.title, role: 'tab' }); c.onclick = () => pick(c, k); this.secs.append(c); });
       this.drawList();
       this.app.renderTabs();
+      if (this.app.page === this) this.app.applyOrientation(this);
     }
     /** every formula and calculator of the module, by section or A–Z */
     drawAll() {
@@ -504,6 +533,8 @@
     drawList() {
       const m = this.m, b = this.body; b.innerHTML = ''; b.scrollTop = 0;
       const s = this.q.trim().toLowerCase();
+      this.root.classList.toggle('md-main', !s && this.sec === 'main');
+      if (!s && this.sec === 'main') { TOOLS[m.main].run(b, this.app, m, this); return; }
       if (!s && this.sec === 'all') { this.drawAll(); return; }
       const pick = s ? m.sections.flatMap((sec) => sec.items.map((it) => [it, sec])) : m.sections[this.sec].items.map((it) => [it, m.sections[this.sec]]);
       if (!s && this.sec === 0 && m.description) b.append(el('p', { class: 'desc gd-pad', text: m.description }));
