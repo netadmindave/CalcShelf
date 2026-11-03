@@ -8,7 +8,7 @@ async def main():
         b = await p.chromium.launch()
         for slot in ['92p', 'v200']:
             for vw, vh, tag in [(852, 393, 'land'), (393, 808, 'port')]:
-                sel = '#skin .key' if tag == 'land' else '#pad .key'
+                sel = '#skin .key'   # landscape only: a tall window turns the page
                 ctx = await b.new_context(viewport={'width': vw, 'height': vh}, device_scale_factor=2.5, has_touch=True, is_mobile=True)
                 pg = await ctx.new_page(); errs = []
                 pg.on('pageerror', lambda e: errs.append(str(e))); pg.on('console', lambda m: errs.append(m.text) if m.type == 'error' else None)
@@ -18,7 +18,7 @@ async def main():
                     await pg.locator(f'{sel}[data-k="{k}"]').first.tap(); await pg.wait_for_timeout(350)
                 await pg.wait_for_timeout(1200)
                 await pg.screenshot(path=f'out/skin_{slot}_{tag}.png')
-                # 2nd mode relabels (a tall window gets the key pad instead of the sideways skin)
+                # 2nd mode relabels
                 await pg.locator(f'{sel}[data-k="2ND"]').first.tap(); await pg.wait_for_timeout(500)
                 await pg.screenshot(path=f'out/skin_{slot}_{tag}_2nd.png')
                 await pg.locator(f'{sel}[data-k="2ND"]').first.tap(); await pg.wait_for_timeout(300)

@@ -281,3 +281,5 @@ body:not(.skin) .lcd, body:not(.skin) .lcd.hp48 { width: min(calc(100% - 12px), 
   body:not(.skin) .pad { grid-column: 2; grid-row: 1 / 3; padding-top: 6px; }
   body:not(.skin) .lcd, body:not(.skin) .lcd.hp48 { width: min(calc(100% - 12px), calc((100dvh - 76px) * var(--ar, 1.5))); }
 }
+/* short landscape windows: the enter key's alpha legend (Solve) moves to the top so it doesn't cover "enter" */
+@media (orientation: landscape) and (max-height: 560px) { .key.enter .a { top: 2px; bottom: auto; } }

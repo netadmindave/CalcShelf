@@ -5,7 +5,6 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 ## 2.7.6
 
 - **Emulators fill any window shape.** The calculator's screen is as wide as the window, and drawn to fill its frame (it was limited to whole-pixel sizes and could stay much smaller). In a window wider than tall (landscape, split screen, a tablet), the screen is on the left and the keys on the right, for every calculator. The TI-36X Pro no longer squashes its keys and labels together in a short window.
-- **TI-92, TI-92 Plus, Voyage 200 in a tall window** use a key pad with the screen across the full width, instead of the sideways Graph89 layout.
 - **One screen style for every calculator:** Standard, Paper or Night in **Settings → Calculator screens** (also in each emulator tab's menu and in each calculator's own menu) applies to all emulated calculators and the TI-36X Pro. The TI-Nspire's colour screen gets a Night style too.
 - **Calculator clocks follow the phone:**
   - **TI-89 Titanium, TI-92 Plus, Voyage 200:** set automatically at start, on returning to the app and every 10 minutes (**Clock follows the phone** in the menu). The manual **Set clock to phone time** used UTC instead of local time and reported failure when it worked; both are fixed.

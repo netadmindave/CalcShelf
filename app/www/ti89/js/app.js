@@ -200,9 +200,7 @@
   /* ---- TI-92 Plus / TI-92 / Voyage 200 in Graph89's landscape layout ---- */
   const SKIN = SKIN92[SLOT === 'v200' ? 'v200' : '92p'];
   let skinOn = false;
-  // the TI-92 models use Graph89's landscape layout when the window is wider than tall, and the key pad otherwise
-  // (a tall window: split screen, a tablet held upright, a phone with rotation locked)
-  const skinWanted = () => is92() && window.innerWidth >= window.innerHeight;
+  const skinWanted = () => is92();   // the TI-92 models are landscape only (the app turns the phone's screen)
   function buildSkin() {
     const LEG = SKINLEG92[SLOT === 'v200' ? 'v200' : SLOT === '92' ? '92' : '92p'];
     keyEls.length = 0; PAD = { fkeys: [], cluster: [[]] };

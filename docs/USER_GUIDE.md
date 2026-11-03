@@ -437,7 +437,7 @@ These use the same TiEmu core, with Graph89's landscape layout: every key is whe
 - **TI-92 and TI-92 Plus:** F1–F8 sit in two columns to the left of the screen.
 - **All three:** the cursor pad and number block are on the right, and the QWERTY keyboard is below. Each key shows its 2nd and ◆ legends.
 
-**Landscape, or a key pad in tall windows.** On the phone, CalcShelf turns the screen to landscape while one of these is open, and you get the Graph89 layout. In a window taller than wide (split screen, a tablet held upright, or rotation locked), you get a key pad instead, with the screen across the full width: F1–F8, the cursor pad, and a number page and an **abc** page for letters.
+**Landscape only.** On the phone, CalcShelf turns the screen to landscape while one of these is open. In a window taller than wide (split screen, a tablet held upright, or rotation locked), the page turns itself so that you can just rotate the device.
 
 **What you need:**
 
