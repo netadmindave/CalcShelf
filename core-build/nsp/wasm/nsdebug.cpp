@@ -1,4 +1,4 @@
-/* CAS Touch: the debugger and GDB stub are not available on the phone; faults just continue (like typing "c"). */
+/* CalcShelf: the debugger and GDB stub are not available on the phone; faults just continue (like typing "c"). */
 #include <cstdint>
 #include "core/emu.h"
 #include "core/debug.h"

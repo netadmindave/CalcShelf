@@ -7,7 +7,7 @@
  * timeSetEvent() callbacks are kept in a small queue and fired from the run loop,
  * and SetEvent(hEventShutdn) just raises a flag that the loop checks.
  *
- * Part of CAS Touch. GPL-2.0-or-later, like Emu48.
+ * Part of CalcShelf. GPL-2.0-or-later, like Emu48.
  */
 #include "pch.h"
 #include "Emu48.h"

@@ -2,7 +2,7 @@
 .super Landroid/app/Activity;
 .source "MainActivity.java"
 
-# TI-89 Touch Android shell (GPL-3.0-or-later): hosts the web app in a WebView.
+# CalcShelf Android shell (GPL-3.0-or-later): hosts the web app in a WebView.
 
 .field public web:Landroid/webkit/WebView;
 .field public fileCb:Landroid/webkit/ValueCallback;

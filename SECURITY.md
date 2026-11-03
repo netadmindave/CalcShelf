@@ -7,7 +7,7 @@ CalcShelf is an offline app. It asks Android for **no permissions**, so it can't
 - **Everything stays on the phone.** Your documents, settings, and the calculator OS files or ROMs you load are kept in the app's private storage.
 - **No network.** A content security policy on every page allows only the app's own files to load. Nothing can be fetched from another site or sent to one, and scripts can't be injected.
 - **Links** in the Guide & manuals tab open in your phone's browser. Only web links (http and https) are opened; any other kind of link is blocked.
-- **Files you save** (backups, CSV exports, screenshots) go to Downloads/TI-89. A file name is always reduced to a plain name, so a file can't be written anywhere else.
+- **Files you save** (backups, CSV exports, screenshots) go to Downloads/CalcShelf (on Android 7–9, the app's own folder, Android/data/com.calcshelf/files/Download). A file name is always reduced to a plain name, so a file can't be written anywhere else.
 - **Files you open** (backups, OS files, ROMs, calculator programs) are read by the app's own code or by the emulator cores, which run as WebAssembly inside the app's web view.
 - **The CAS** (Giac) runs in secure mode, in a separate worker, with no access to files.
 - **The emulator pages** exchange messages with the app only, and check where every message comes from.

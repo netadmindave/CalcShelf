@@ -1,5 +1,5 @@
 /* Minimal GLib compatibility shim for building TiEmu/libti* to WebAssembly.
- * Part of TI-89 Touch (GPL-3.0). Implements only what the emulator core uses. */
+ * Part of CalcShelf (GPL-3.0). Implements only what the emulator core uses. */
 #ifndef SHIM_GLIB_H
 #define SHIM_GLIB_H
 #include <stdio.h>

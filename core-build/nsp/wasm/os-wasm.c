@@ -1,4 +1,4 @@
-/* CAS Touch: Firebird OS layer for wasm32-wasi (no JIT, no mmap). GPL-3.0-or-later. */
+/* CalcShelf: Firebird OS layer for wasm32-wasi (no JIT, no mmap). GPL-3.0-or-later. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

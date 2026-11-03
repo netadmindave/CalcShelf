@@ -1,4 +1,4 @@
-/* Minimal GLib compatibility shim implementation (GPL-3.0, part of TI-89 Touch). */
+/* Minimal GLib compatibility shim implementation (GPL-3.0, part of CalcShelf). */
 #include <glib.h>
 #include <ctype.h>
 #include <dirent.h>

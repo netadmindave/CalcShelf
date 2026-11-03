@@ -1,5 +1,5 @@
 /*
- * CAS Touch — WebAssembly glue for the Firebird TI-Nspire emulator core (GPL-3.0).
+ * CalcShelf — WebAssembly glue for the Firebird TI-Nspire emulator core (GPL-3.0).
  * Files live in the in-memory WASI file system provided by JavaScript:
  *   boot1.img (boot ROM with keys), manuf.img, btldr.img, diags.img, instl.img, os.tcc2, snap.bin
  * The 132 MiB NAND flash stays in linear memory (ns_flash_*); JavaScript persists changed blocks.

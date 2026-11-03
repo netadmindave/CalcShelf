@@ -1,4 +1,4 @@
-/* TI-89 Touch: TiGroup (.tig, zip-based) archives are not supported in the wasm build (no zlib). */
+/* CalcShelf: TiGroup (.tig, zip-based) archives are not supported in the wasm build (no zlib). */
 #include <stdlib.h>
 #include "tifiles.h"
 #include "error.h"

@@ -43,7 +43,7 @@ There is one document with named tabs. **Settings → Emulated calculators → S
 1. Download `CalcShelf.apk` from the [latest release](../../releases/latest).
 2. Open it on your Android phone and allow the install.
 
-**Coming from 2.7.5 or older?** 2.7.6 has a new app ID (com.calcshelf), so it installs as a separate app. Use **Back up** in the old app and **Restore from backup** in the new one, choose each calculator's OS or ROM again, then uninstall the old app.
+**Coming from 2.7.5 or older?** 2.7.6 has a new app ID (com.calcshelf), so it installs as a separate app. Use **Back up** in the old app (it saves to Downloads/TI-89) and **Restore from backup** in the new one, choose each calculator's OS or ROM again, then uninstall the old app.
 
 You need Android 7.0 or newer, with a current Android System WebView. The TI-Nspire needs WebAssembly exception handling, which recent WebView versions have.
 

@@ -1,5 +1,5 @@
 /*
- * CAS Touch — WebAssembly entry points for the TilEm 2 core (Z80 TI calculators:
+ * CalcShelf — WebAssembly entry points for the TilEm 2 core (Z80 TI calculators:
  * TI-81, 82, 83, 83 Plus (SE), 84 Plus (SE), 85, 86).
  * Derived from Graph89's tilemwrapper.c (C) 2012-2013 Dritan Hashorva,
  * TilEm (C) 2001-2012 Benjamin Moody et al., Wabbitemu boot images. GPL-3.0-or-later.

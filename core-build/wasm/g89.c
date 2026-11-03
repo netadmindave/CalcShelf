@@ -1,5 +1,5 @@
 /*
- * TI-89 Touch — WebAssembly entry points for the TiEmu core.
+ * CalcShelf — WebAssembly entry points for the TiEmu core.
  * Derived from Graph89's tiemuwrapper.c (C) 2012-2013 Dritan Hashorva and
  * TiEmu (C) 2000-2006 Corvazier, Liévin, Blache, Kofler. GPL-3.0-or-later.
  */

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy Firebird's core and apply the CAS Touch WebAssembly patches (idempotent)."""
+"""Copy Firebird's core and apply the CalcShelf WebAssembly patches (idempotent)."""
 import os, re, shutil, sys
 SRC = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('FB', '../firebird/core')
 DST = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'core')
@@ -101,7 +101,7 @@ void throttle_interval_event(int index)
     if (emu_slice_ticks > 0 && --emu_slice_ticks == 0)
         exiting = true;''', 1)
 s += '''
-/* CAS Touch: run the emulation for `ticks` x 10 ms of emulated time, then return. */
+/* CalcShelf: run the emulation for `ticks` x 10 ms of emulated time, then return. */
 extern "C" void emu_run_slice(int ticks)
 {
     emu_slice_ticks = ticks;

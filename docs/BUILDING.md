@@ -44,7 +44,7 @@ TOOLS=/path/to/tools KEYSTORE=my.keystore KS_ALIAS=calcshelf KS_PASS=… ./build
 ```
 
 - **The output** is `CalcShelf.apk`.
-- **About the app ID:** it is `com.ti89touch`, kept from the first version so that updates install over older builds.
+- **About the app ID:** it is `com.calcshelf` from 2.7.6 on (`com.ti89touch` before), so 2.7.6 installs beside older builds instead of over them. The Java classes keep their `com.ti89touch` package (`apk/smali/com/ti89touch/`); only the app ID changed.
 - **About signing:** Android only updates an app with an APK signed by the same key. If you sign with your own key, your build installs as a separate app.
 
 ## Building the emulator cores

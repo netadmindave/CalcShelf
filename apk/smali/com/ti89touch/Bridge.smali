@@ -86,7 +86,7 @@
     const-string v2, "mime_type"
     invoke-virtual {v1, v2, p3}, Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V
     const-string v2, "relative_path"
-    const-string v3, "Download/TI-89"
+    const-string v3, "Download/CalcShelf"
     invoke-virtual {v1, v2, v3}, Landroid/content/ContentValues;->put(Ljava/lang/String;Ljava/lang/String;)V
 
     iget-object v2, p0, Lcom/ti89touch/Bridge;->act:Lcom/ti89touch/MainActivity;
@@ -105,7 +105,7 @@
     const-string v2, "Saved "
     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
     invoke-virtual {v1, p1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    const-string v2, " to Downloads/TI-89"
+    const-string v2, " to Downloads/CalcShelf"
     invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
     invoke-virtual {v1}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
     move-result-object v1
