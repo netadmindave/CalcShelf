@@ -49,7 +49,9 @@
     },
     async clear() { if (!this.db) return; const keys = (await this.prefix('')).map(([k]) => [k, null]); await this.setMany(keys); },
   };
-  const DEFAULTS = { speed: 1 };
+  const DEFAULTS = { speed: 1, lcd: 'stn' };
+  /** the screen style CalcShelf sets for every calculator: the Nspire's colour screen is darkened for Night */
+  function applyLcd() { const l = $('#lcd'); if (!l) return; l.classList.remove('paper', 'night'); if (S.lcd !== 'stn') l.classList.add(S.lcd); }
   let S = { ...DEFAULTS };
   const saveSettings = () => DB.set('settings', S);
 
@@ -438,6 +440,7 @@
     window.addEventListener('message', async (e) => {
       const d = e.data; if (!d || e.source !== window.parent) return;
       if (d.type === 'emu-save') { try { await saveState(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
+      else if (d.type === 'emu-lcd' && ['stn', 'paper', 'night'].includes(d.lcd)) { if (S.lcd !== d.lcd) { S.lcd = d.lcd; applyLcd(); saveSettings(); } }
       else if (d.type === 'emu-install') { await addFiles([new File([d.bytes], d.name)]); if (!installed && NEED.every(([k]) => k === 'diags' || fw[k])) toast('All files loaded. Press Install the OS.'); }
     });
   }
@@ -446,10 +449,10 @@
     buildPad(); bindTouchpad(); bindMenu(); bindHardwareKeys();
     await DB.open();
     const st = await DB.get('settings'); if (st) S = { ...DEFAULTS, ...st };
-    syncMenu();
+    syncMenu(); applyLcd();
     for (const [k] of NEED) { const v = await DB.get('fw:' + k); if (v) fw[k] = v; }
     renderFiles();
-    if (EMBED) window.parent.postMessage({ type: 'emu-ready' }, location.origin);
+    if (EMBED) window.parent.postMessage({ type: 'emu-ready', lcd: S.lcd }, location.origin);
     if (fw.boot1 && await DB.get('fl:ok')) await resume();
     else $('#setup').hidden = false;
     window.__ns = { core: () => core, mode: () => mode, tick: () => tick, typeText, press, release, arrow, saveState, classify };

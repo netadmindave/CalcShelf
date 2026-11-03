@@ -102,13 +102,20 @@
   root.addEventListener('message', (e) => {
     const d = e.data, app = root.__app; if (!d || !app || e.origin !== location.origin) return;
     const p = app.pages.find((x) => x.frame && x.frame.contentWindow === e.source); if (!p) return;
-    if (d.type === 'emu-ready') { p._ready && p._ready(); FwStore.installPending(p); }
+    if (d.type === 'emu-ready') {
+      p._ready && p._ready(); FwStore.installPending(p);
+      // one screen style for every calculator; before 2.7.6 each had its own, so the first one seen becomes the setting
+      if (!app.settings.lcd && LCD_NAMES[d.lcd]) { app.settings.lcd = d.lcd; app.saveSettings(); }
+      app.setLcd(app.settings.lcd || 'stn', true);
+    }
+    else if (d.type === 'emu-lcd-set' && LCD_NAMES[d.lcd]) app.setLcd(d.lcd);
     else if (d.type === 'emu-firmware' && d.bytes) FwStore.put(p.fam, typeof d.model === 'string' && emuModel(p.fam, d.model) ? d.model : p.model, { name: d.name, bytes: d.bytes, kind: typeof d.kind === 'string' ? d.kind : '' });
     else if (d.type === 'emu-replace') { app.select(app.pages.indexOf(p)); app.emuChooser(); }
     else if (d.type === 'classic-model' && p.fam === 'z80' && p.model !== d.model && emuModel('z80', d.model)) { p.model = d.model; app.saveSoon(); app.renderTabs(); }
   });
 
   const UNIQUE = new Set(['calc', 'emu']);
+  const LCD_NAMES = { stn: 'Standard', paper: 'Paper', night: 'Night' };
   const DEFAULT_NAMES = { calc: 'CAS', guide: 'Guide', graph: 'Graphs', lists: 'Lists', notes: 'Notes', prog: 'Program', convert: 'Convert', ode: 'DiffEq' };
   const DEFAULT_SETTINGS = { angle: 'rad', digits: 6, fmt: 'norm', showDec: true, group: true, autoAns: true, calc: 'auto', complex: 'rect', theme: 'system', haptic: true, keypage: 'num', multiEmu: false };
 
@@ -268,8 +275,7 @@
         if (p.kind === 'emu') item('Replace OS or change calculator', 'Now ' + p.info[2] + ' · each model keeps its own OS and memory', () => this.emuChooser());
         if (i > 1) item('Move left', '', () => { this.pages.splice(i - 1, 0, this.pages.splice(i, 1)[0]); this.select(i - 1); this.saveSoon(); });
         if (i > 0 && i < this.pages.length - 1) item('Move right', '', () => { this.pages.splice(i + 1, 0, this.pages.splice(i, 1)[0]); this.select(i + 1); this.saveSoon(); });
-        const t36 = p.t36;
-        if (t36) item(t36.S.night ? 'Day display' : 'Night display', t36.S.night ? 'Back to the grey-green screen' : 'Dark screen with light text', () => { Sheet.close(); t36.setNight(!t36.S.night); });
+        if (p.kind === 'emu') item('Screen style: ' + LCD_NAMES[this.settings.lcd || 'stn'], 'Standard, Paper or Night, for every calculator', () => Sheet.push('Calculator screens', (bb) => this.lcdUI(bb)));
         const pp = p.t36 || p;
         if (pp.exportCSV) item('Export history (CSV)', 'Inputs, results, decimals, uncertainties and units', () => pp.exportCSV());
         if (pp.clear) item('Clear page', p.kind === 'calc' ? 'Pinned results stay' : '', () => pp.clear());
@@ -654,6 +660,26 @@
         b.append(L);
       });
     },
+    /** the screen style of every calculator: stn (the calculator's own colours), paper or night */
+    setLcd(v, quiet) {
+      if (!LCD_NAMES[v]) return;
+      if (!quiet && this.settings.lcd !== v) { this.settings.lcd = v; this.saveSettings(); }
+      for (const p of this.pages) {
+        if (p.kind !== 'emu') continue;
+        if (p.t36) p.t36.setDisplay(v);
+        else if (p.frame) try { p.frame.contentWindow.postMessage({ type: 'emu-lcd', lcd: v }, location.origin); } catch (e) { /* not loaded yet */ }
+      }
+    },
+    lcdUI(b) {
+      const g = el('div', { class: 'seg' }), cur = this.settings.lcd || 'stn';
+      for (const [v, l] of Object.entries(LCD_NAMES)) {
+        const btn = el('button', { text: l, class: v === cur ? 'on' : '' });
+        btn.onclick = () => { this.setLcd(v); g.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === btn)); };
+        g.append(btn);
+      }
+      b.append(el('div', { class: 'setrow' }, el('span', { text: 'Calculator screens' }), g),
+        el('p', { class: 'desc', style: { margin: '-2px 2px 10px' }, text: 'Applies to every emulated calculator and the TI-36X Pro. Standard is each calculator’s own screen colour; Paper is light grey on white; Night is a dark screen with light text (the TI-Nspire’s colour screen is darkened).' }));
+    },
     settingsUI(b) {
       const S = this.settings;
       const seg = (label, key, opts, after) => {
@@ -677,6 +703,7 @@
       seg('Emulated calculators', 'multiEmu', [['false', 'One tab'], ['true', 'Several, running at once']], () => this.select(this.active));
       b.append(el('p', { class: 'desc', style: { margin: '-2px 2px 10px' }, text: 'With several, each tab is a different model and they all keep running in the background. That uses more battery and memory (the TI-Nspire uses about 330 MB).' }));
       seg('Theme', 'theme', [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']], () => this.applyTheme());
+      this.lcdUI(b);
       b.append(el('p', { class: 'desc', style: { marginTop: '18px' }, html: 'CAS engine: Giac/Xcas by Bernard Parisse (GPL). 2D math editor: MathLive (MIT). TI-89 Titanium emulation: TiEmu/Graph89 (GPL). This app is free software under the GNU GPL v3. TI-Nspire and TI-89 are trademarks of Texas Instruments; this app contains no TI code.' }));
     },
   };

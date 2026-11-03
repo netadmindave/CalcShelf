@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <stdio.h>
 #include <glib.h>
 #include <ticalcs.h>
@@ -127,6 +128,25 @@ EXPORT("tz_load") int tz_load(const char *path, int model)
 	if (emu_new((char)model)) return -1;
 	strncpy(rom_path, path, sizeof rom_path - 1);
 	return tilem_calc_load_ROM(emu->calc, path);
+}
+
+/* Set the clock of a TI-84 Plus family calculator: seconds since 1 January 1997 00:00, local time.
+   TilEm's clock is the host clock plus an offset, so it then keeps time with the phone.
+   Returns 0, or -1 for a calculator without a clock. */
+EXPORT("tz_set_clock") int tz_set_clock(int v)
+{
+	int i, mode = -1, diff = -1;
+	time_t now;
+	if (!emu) return -1;
+	for (i = 0; i < emu->calc->hw.nhwregs; i++) {
+		if (!strcmp(emu->calc->hw.hwregnames[i], "clock_mode")) mode = i;
+		else if (!strcmp(emu->calc->hw.hwregnames[i], "clock_diff")) diff = i;
+	}
+	if (mode < 0 || diff < 0) return -1;
+	time(&now);
+	emu->calc->hwregs[mode] |= 1;
+	emu->calc->hwregs[diff] = (dword) (v - (long long) now);
+	return 0;
 }
 
 EXPORT("tz_model") int tz_model(void) { return emu ? emu->calc->hw.model_id : 0; }

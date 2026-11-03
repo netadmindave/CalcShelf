@@ -41,7 +41,7 @@
     del(k) { return new Promise((res) => { if (!this.db) return res(); const t = this.db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(); }); },
   };
 
-  const DEFAULTS = { lcd: 'stn', gray: true, grid: true, speed: 1, turbo: true, hist: [], lay92: 'skin' };
+  const DEFAULTS = { lcd: 'stn', gray: true, grid: true, speed: 1, turbo: true, hist: [], lay92: 'skin', clock: true };
   let S = { ...DEFAULTS };
   const saveSettings = () => DB.set('settings', S);
 
@@ -110,16 +110,13 @@
   function hexToRgb(h) { h = h.trim().replace('#', ''); return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]; }
   function layoutScreen() {
     const lcd = $('#lcd'); const r = { width: lcd.clientWidth, height: lcd.clientHeight }; if (!r.width) return;
+    // fill the screen area: draw at the next whole number of device pixels per calculator pixel, and show it scaled
+    // down to fit (smoothly, so every pixel looks the same size)
     const dpr = window.devicePixelRatio || 1;
-    const pad = 0.985;
-    scale = Math.max(1, Math.floor(Math.min(r.width * pad * dpr / W, r.height * pad * dpr / H)));
-    canvas.width = W * scale; canvas.height = H * scale;
-    canvas.style.width = (canvas.width / dpr) + 'px'; canvas.style.height = (canvas.height / dpr) + 'px';
-    if (skinOn) {   // Graph89 layout: fill the screen area (the canvas is drawn at the next integer scale and shown pixelated)
-      const f = Math.min(r.width * 0.97 / W, r.height * 0.95 / H);
-      scale = Math.max(1, Math.ceil(f * dpr)); canvas.width = W * scale; canvas.height = H * scale;
-      canvas.style.width = W * f + 'px'; canvas.style.height = H * f + 'px';
-    }
+    const f = skinOn ? Math.min(r.width * 0.97 / W, r.height * 0.95 / H) : Math.min(r.width * 0.985 / W, r.height * 0.985 / H);
+    scale = Math.max(1, Math.ceil(f * dpr - 0.02)); canvas.width = W * scale; canvas.height = H * scale;
+    canvas.style.width = W * f + 'px'; canvas.style.height = H * f + 'px';
+    canvas.style.imageRendering = Math.abs(f * dpr - scale) < 0.03 ? '' : 'auto';
     img = ctx.createImageData(canvas.width, canvas.height);
     const cs = getComputedStyle(lcd);
     const bg = hexToRgb(cs.getPropertyValue('--lcd-bg')), ink = hexToRgb(cs.getPropertyValue('--lcd-ink'));
@@ -203,7 +200,9 @@
   /* ---- TI-92 Plus / TI-92 / Voyage 200 in Graph89's landscape layout ---- */
   const SKIN = SKIN92[SLOT === 'v200' ? 'v200' : '92p'];
   let skinOn = false;
-  const skinWanted = () => is92();   // the TI-92 models are landscape only (the app turns the phone's screen)
+  // the TI-92 models use Graph89's landscape layout when the window is wider than tall, and the key pad otherwise
+  // (a tall window: split screen, a tablet held upright, a phone with rotation locked)
+  const skinWanted = () => is92() && window.innerWidth >= window.innerHeight;
   function buildSkin() {
     const LEG = SKINLEG92[SLOT === 'v200' ? 'v200' : SLOT === '92' ? '92' : '92p'];
     keyEls.length = 0; PAD = { fkeys: [], cluster: [[]] };
@@ -553,6 +552,7 @@
     const sm = document.createElement('small'); sm.textContent = snap ? 'Saved ' + new Date(snap).toLocaleString() : 'No snapshot yet'; $('#m-restore').appendChild(sm);
     document.querySelectorAll('#s-lcd button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.lcd));
     document.querySelectorAll('#s-speed button').forEach((b) => b.classList.toggle('on', +b.dataset.v === S.speed));
+    $('#s-clock').checked = S.clock; $('#s-clock').closest('label').hidden = SLOT === '92';
     $('#s-gray').checked = S.gray; $('#s-grid').checked = S.grid; $('#s-turbo').checked = S.turbo;
     $('#about').textContent = `Running TI AMS ${core ? core.romVersion() : ''} on the TiEmu emulator core, built on Graph89 by Dritan Hashorva. Free software under the GNU GPL v3. The TI-89, TI-92 Plus and Voyage 200 and the AMS operating system are © Texas Instruments; this app contains no TI code.`;
   }
@@ -569,11 +569,12 @@
     $('#m-shot').onclick = () => { closeSheets(); screenshotPNG(); };
     $('#m-save').onclick = async () => { const st = core.saveState(); await DB.set(SK('snapshot'), st); await DB.set(SK('snapshot-date'), Date.now()); closeSheets(); toast('Snapshot saved'); };
     $('#m-restore').onclick = async () => { const st = await DB.get(SK('snapshot')); if (!st) return; try { core.loadState(st); toast('Snapshot restored'); } catch (e) { toast(e.message); } closeSheets(); forceDraw = true; };
-    $('#m-clock').onclick = () => { closeSheets(); const r = core.syncClock(); toast(r ? 'The calculator was busy. Go to the Home screen and try again.' : 'Clock set to ' + new Date().toLocaleTimeString()); };
+    $('#m-clock').onclick = () => { closeSheets(); const r = core.syncClock(); if (!r) clock.last = Date.now(); toast(r ? (SLOT === '92' ? 'The TI-92 has no clock.' : 'The calculator didn’t answer. Go to the Home screen and try again (the clock needs AMS 2.07 or later).') : 'Clock set to ' + new Date().toLocaleTimeString()); };
+    $('#s-clock').onchange = (e) => { S.clock = e.target.checked; saveSettings(); if (S.clock) clockDue(); };
     $('#m-reset').onclick = () => { closeSheets(); core.reset(); toast('Calculator restarted'); };
     $('#m-os').onclick = () => { closeSheets(); if (EMBED) askReplace(); else $('#file-os').click(); };
     if (EMBED) { $('#m-os').firstElementChild.textContent = 'Replace OS or change calculator'; const o = $('#btn-other'); if (o) { o.hidden = false; o.onclick = askReplace; } }
-    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); });
+    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); if (EMBED) window.parent.postMessage({ type: 'emu-lcd-set', lcd: S.lcd }, location.origin); });
     document.querySelectorAll('#s-speed button').forEach((b) => b.onclick = () => { S.speed = +b.dataset.v; saveSettings(); renderMenu(); });
     $('#s-gray').onchange = (e) => { S.gray = e.target.checked; saveSettings(); toast('Takes effect next time the app starts'); };
     $('#s-grid').onchange = (e) => { S.grid = e.target.checked; saveSettings(); forceDraw = true; };
@@ -606,8 +607,9 @@
       const d = e.data; if (!d || e.source !== window.parent) return;
       if (d.type === 'emu-save') { try { await saveFn(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install' && installFn) installFn(new File([d.bytes], d.name));
+      else if (d.type === 'emu-lcd' && ['stn', 'paper', 'night'].includes(d.lcd)) { if (S.lcd !== d.lcd) { S.lcd = d.lcd; applyLcd(); saveSettings(); renderMenu(); } }
     });
-    window.parent.postMessage({ type: 'emu-ready' }, location.origin);
+    window.parent.postMessage({ type: 'emu-ready', lcd: S.lcd }, location.origin);
   }
 
   /* ------------------------------------------------------------------ lifecycle */
@@ -645,6 +647,7 @@
     if (state) { try { core.loadState(state); } catch (e) { console.warn('state', e); } }
     core.turnOn();
     running = true; lastT = 0; forceDraw = true; requestAnimationFrame(frame);
+    clock.last = 0; clock.due = false; setTimeout(clockDue, state ? 1500 : 8000);
   }
   window.onAndroidBack = () => {
     if (!$('#pop').hidden) { closePop(); return true; }
@@ -654,7 +657,22 @@
   };
   window.__closeOverlay = () => { if (!$('#pop').hidden) { closePop(); return true; } if (openSheet) { closeSheets(); return true; } return false; };
   window.onAndroidPause = () => { saveState(true); };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(true); else { lastT = 0; } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(true); else { lastT = 0; clockDue(); } });
+
+  /* ---- the calculator's clock follows the phone: set at start, on returning to the app and every 10 minutes
+     (the TI-89 HW2 / TI-92 Plus clock only runs while the emulator runs). Needs AMS 2.07 or later; the TI-92 has none. ---- */
+  const clock = { last: 0, due: false, fails: 0 };
+  function clockDue() { clock.due = true; clock.fails = 0; }
+  function clockTick() {
+    if (!S.clock || SLOT === '92' || !core || !core.loaded || !running || document.hidden) return;
+    if (!clock.due && Date.now() - clock.last < 600000) return;
+    if (queue.length || typeQueue.length || openSheet) return;
+    let busy = true; try { busy = core.screen().busy; } catch (e) { /* not ready */ }
+    if (busy) return;
+    if (core.setClock(new Date()) === 0) { clock.last = Date.now(); clock.due = false; clock.fails = 0; }
+    else if (++clock.fails >= 12) { clock.last = Date.now(); clock.due = false; clock.fails = 0; }   // no clock, or not answering: wait 10 minutes
+  }
+  setInterval(clockTick, 5000);
   window.addEventListener('pagehide', () => saveState(true));
 
   function setupTexts() {
@@ -684,6 +702,7 @@
     $('#btn-load-os').onclick = () => $('#file-os').click();
     $('#file-os').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) installOS(f); };
     window.addEventListener('resize', () => { choosePad(); layoutScreen(); });
+    try { new ResizeObserver(() => layoutScreen()).observe($('#lcd')); } catch (e) { /* older WebView */ }
 
     await DB.open();
     const st = await DB.get('settings'); if (st) S = { ...DEFAULTS, ...st };

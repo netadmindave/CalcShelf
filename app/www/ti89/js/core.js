@@ -120,7 +120,9 @@
       this.fs.remove(path);
       if (err) throw new Error('Send failed: ' + this.errorText(err));
     }
-    syncClock() { return this.x.g89_sync_clock(); }
+    /** set the calculator's clock (AMS 2.07+) to a local date and time; 0 when it worked */
+    setClock(d = new Date()) { return this.x.g89_set_clock ? this.x.g89_set_clock(d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()) : -1; }
+    syncClock() { return this.setClock(new Date()); }
     romVersion() { return this.cstr(this.x.g89_rom_version()); }
     _fileReceived(src, dst) {
       const data = this.fs.read(src);

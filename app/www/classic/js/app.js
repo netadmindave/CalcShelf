@@ -25,7 +25,7 @@
     set(k, v) { return new Promise((res) => { if (!this.db) return res(false); try { const t = this.db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(true); t.onerror = () => res(false); } catch (e) { res(false); } }); },
     del(k) { return new Promise((res) => { if (!this.db) return res(); try { const t = this.db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(); } catch (e) { res(); } }); },
   };
-  const DEFAULTS = { lcd: 'stn', grid: true, speed: 1, hist: [], autoContrast: true };
+  const DEFAULTS = { lcd: 'stn', grid: true, speed: 1, hist: [], autoContrast: true, clock: true };
   let S = { ...DEFAULTS };
   const saveSettings = () => DB.set('settings', S);
 
@@ -83,9 +83,11 @@
     const lcd = $('#lcd'); lcd.style.setProperty('--ar', W / H);
     const r = lcd.getBoundingClientRect(); if (!r.width) return;
     const dpr = window.devicePixelRatio || 1;
-    scale = Math.max(1, Math.floor(Math.min(r.width * 0.985 * dpr / W, r.height * 0.985 * dpr / H)));
-    canvas.width = W * scale; canvas.height = H * scale;
-    canvas.style.width = (canvas.width / dpr) + 'px'; canvas.style.height = (canvas.height / dpr) + 'px';
+    // fill the screen area (drawn at whole device pixels per calculator pixel, shown scaled to fit)
+    const f = Math.min(r.width * 0.985 / W, r.height * 0.985 / H);
+    scale = Math.max(1, Math.ceil(f * dpr - 0.02)); canvas.width = W * scale; canvas.height = H * scale;
+    canvas.style.width = W * f + 'px'; canvas.style.height = H * f + 'px';
+    canvas.style.imageRendering = Math.abs(f * dpr - scale) < 0.03 ? '' : 'auto';
     img = ctx.createImageData(canvas.width, canvas.height);
     const cs = getComputedStyle(lcd);
     const bg = hexToRgb(cs.getPropertyValue('--lcd-bg')), ink = hexToRgb(cs.getPropertyValue('--lcd-ink'));
@@ -337,6 +339,7 @@
     const sm = document.createElement('small'); sm.textContent = snap ? 'Saved ' + new Date(snap).toLocaleString() : 'No snapshot yet'; $('#m-restore').appendChild(sm);
     document.querySelectorAll('#s-lcd button').forEach((b) => b.classList.toggle('on', b.dataset.v === S.lcd));
     document.querySelectorAll('#s-speed button').forEach((b) => b.classList.toggle('on', +b.dataset.v === S.speed));
+    $('#s-clock').checked = S.clock; $('#s-clock').closest('label').hidden = !hasClock();
     $('#s-grid').checked = S.grid; $('#s-auto').checked = S.autoContrast;
     $('#about').textContent = `${model.name} on the TilEm 2 emulator core (Benjamin Moody et al.), with the free BootFree boot code from Wabbitemu for OS installs, as packaged by Graph89. Free software under the GNU GPL v3. ${model.short} and its operating system are © Texas Instruments; this app contains no TI code.`;
   }
@@ -356,8 +359,9 @@
     $('#m-reset').onclick = () => { closeSheets(); core.reset(); core.turnOn(); toast('Calculator restarted'); };
     $('#m-os').onclick = () => { closeSheets(); if (EMBED) askReplace(); else $('#file-os').click(); };
     if (EMBED) { $('#m-os').firstElementChild.textContent = 'Replace OS or change calculator'; const o = $('#btn-other'); if (o) { o.hidden = false; o.onclick = askReplace; } }
-    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); });
+    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); if (EMBED) window.parent.postMessage({ type: 'emu-lcd-set', lcd: S.lcd }, location.origin); });
     document.querySelectorAll('#s-speed button').forEach((b) => b.onclick = () => { S.speed = +b.dataset.v; saveSettings(); renderMenu(); });
+    $('#s-clock').onchange = (e) => { S.clock = e.target.checked; saveSettings(); syncClock(); };
     $('#s-grid').onchange = (e) => { S.grid = e.target.checked; saveSettings(); forceDraw = true; };
     $('#s-auto').onchange = (e) => { S.autoContrast = e.target.checked; saveSettings(); forceDraw = true; };
   }
@@ -387,8 +391,9 @@
       const d = e.data; if (!d || e.source !== window.parent) return;
       if (d.type === 'emu-save') { try { await saveFn(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install' && installFn) installFn(new File([d.bytes], d.name));
+      else if (d.type === 'emu-lcd' && ['stn', 'paper', 'night'].includes(d.lcd)) { if (S.lcd !== d.lcd) { S.lcd = d.lcd; applyLcd(); saveSettings(); renderMenu(); } }
     });
-    window.parent.postMessage({ type: 'emu-ready' }, location.origin);
+    window.parent.postMessage({ type: 'emu-ready', lcd: S.lcd }, location.origin);
   }
 
   /* ------------------------------------------------------------------ firmware & lifecycle */
@@ -466,10 +471,14 @@
     if (state && state.sav) { try { core.load(state.rom, model.id); core.loadState(state.sav); resumed = true; } catch (e) { console.warn('state', e); core.load(rom, model.id); } }
     if (!resumed) core.turnOn();
     running = true; lastT = 0; forceDraw = true; requestAnimationFrame(frame);
+    syncClock();
   }
   window.__closeOverlay = () => { if (!$('#pop').hidden) { closePop(); return true; } if (openSheet) { closeSheets(); return true; } return false; };
   window.onAndroidPause = () => { saveState(true); };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(true); else lastT = 0; });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(true); else { lastT = 0; syncClock(); } });
+  /* the TI-84 Plus clock follows the phone: TilEm keeps it as the phone's clock plus an offset, set here */
+  const hasClock = () => model && (model.id === '4' || model.id === 'z');
+  function syncClock() { if (core && running && hasClock() && S.clock !== false) core.setClock(new Date()); }
   window.addEventListener('pagehide', () => saveState(true));
 
   async function main() {
@@ -483,6 +492,7 @@
     $('#btn-load-os').onclick = () => $('#file-os').click();
     $('#file-os').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) installFirmware(f); };
     window.addEventListener('resize', layoutScreen);
+    try { new ResizeObserver(() => layoutScreen()).observe($('#lcd')); } catch (e) { /* older WebView */ }
     await DB.open();
     const st = await DB.get('settings'); if (st) S = { ...DEFAULTS, ...st };
     applyLcd();

@@ -92,6 +92,12 @@
       if (err) throw new Error('Load state failed (' + err + ')');
     }
     /** Send a variable/program/app file (.8xp .8xk .85p .86p …) through the virtual link cable. */
+    /** set the clock (TI-84 Plus family) to the phone's local time; false for a calculator without one */
+    setClock(d = new Date()) {
+      if (!this.x.tz_set_clock) return false;
+      const local = Math.floor(d.getTime() / 1000) - d.getTimezoneOffset() * 60;   // local time as seconds since 1970
+      return this.x.tz_set_clock(local - 852076800) === 0;                         // the TI clock counts from 1 Jan 1997
+    }
     sendFile(name, bytes) {
       const safe = name.replace(/[^A-Za-z0-9._-]/g, '_');
       const path = '/tmp/' + safe;

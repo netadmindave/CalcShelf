@@ -411,3 +411,23 @@ body.fieldkeys .sheet { bottom: var(--fkh, 0px); height: min(78dvh, calc(100dvh 
 .ode-tbl th, .ode-tbl td { padding: 3px 8px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
 .ode-tbl th { position: sticky; top: 0; background: var(--card); }
 @media (max-width: 420px) { .ode-opts { grid-template-columns: 1fr 1fr; } }
+
+/* TI-36X Pro in a window wider than tall: screen on the left, keys on the right */
+@media (min-aspect-ratio: 1/1) {
+  .page.t36 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-rows: auto minmax(0, 1fr); column-gap: 14px; row-gap: 4px; }
+  .page.t36 .t36-brand { grid-column: 1; grid-row: 1; }
+  .page.t36 .t36-lcd { grid-column: 1; grid-row: 2; max-height: none; min-height: 0; }
+  .page.t36 .t36-pad { grid-column: 2; grid-row: 1 / 3; }
+  .key36 .s { height: clamp(10px, 2.5dvh, 15px); line-height: clamp(10px, 2.5dvh, 15px); font-size: clamp(7.5px, 1.9dvh, 11.5px); }
+  .key36 .f { font-size: clamp(11px, 2.9dvh, 17px); }
+  .key36.num .f { font-size: clamp(13px, 3.6dvh, 23px); }
+  .key36.ent .f { font-size: clamp(11px, 2.8dvh, 16px); }
+}
+
+/* TI-36X Pro, Paper screen style */
+.page.t36.paper .t36-lcd, .page.t36.paper .t36-menu { background: #EDEFE9; color: #20242A; }
+.page.t36.paper .t36-row { border-bottom-color: rgba(32,36,42,.18); }
+.page.t36.paper .t36-entry math-field { background: rgba(32,36,42,.05); color: #20242A; --caret-color: #20242A; }
+
+/* calculator tabs use the whole window, however wide (tablets, desktop windows) */
+body.fullpage .app { max-width: none; }

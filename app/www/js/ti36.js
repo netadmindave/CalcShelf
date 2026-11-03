@@ -159,7 +159,7 @@
       top.append(cg, dp);
       const grid = el('div', { class: 't36-grid' }); rows.flat().forEach((d) => grid.append(mk(d)));
       P.append(top, grid);
-      this.applyContrast(); this.root.classList.toggle('night', !!this.S.night);
+      this.applyContrast(); this.setDisplay(this.app.settings.lcd || (this.S.night ? 'night' : 'stn'));
     }
     /* multi-tap keys: tapping the same key again within 1.6 s replaces what it inserted with the next legend */
     tap(key, list) {
@@ -174,8 +174,8 @@
         put(list[0]); this.lastTap = { key, i: 0, t: now, before, pos };
       }
     }
-    /** night display: dark screen, light text (kept with the TI-36X Pro's settings) */
-    setNight(on) { this.S.night = !!on; this.root.classList.toggle('night', this.S.night); this.app.saveSoon(); }
+    /** the screen style CalcShelf sets for every calculator (Settings → Calculator screens): stn, paper or night */
+    setDisplay(v) { this.root.classList.toggle('night', v === 'night'); this.root.classList.toggle('paper', v === 'paper'); }
     applyContrast() { const c = this.S.contrast || 0; this.lcd.style.filter = c ? 'contrast(' + (1 + c * 0.12).toFixed(2) + ') brightness(' + (1 - c * 0.035).toFixed(3) + ')' : ''; }
     onKey() { if (this.off) { this.off = false; this.root.classList.remove('off'); return; } this.clear(); }
     offKey() { this.closeMenu(); this.off = true; this.root.classList.add('off'); }

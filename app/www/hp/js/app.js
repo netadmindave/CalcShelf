@@ -93,10 +93,12 @@
     const rows = core ? core.rows : L.lcd, wrap = $('#lcd'), dpr = window.devicePixelRatio || 1;
     wrap.style.setProperty('--ar', (131 / (rows + 9)).toFixed(4));
     const r = wrap.getBoundingClientRect();
-    const avail = Math.max(131, Math.min((r.width - 14) * dpr, (r.height - 20) * dpr * 131 / rows));
-    sc = Math.max(1, Math.floor(avail / 131));
+    // fill the screen area (drawn at whole device pixels per calculator pixel, shown scaled to fit)
+    const f = Math.max(1 / dpr, Math.min((r.width - 14) / 131, (r.height - 28) / rows));
+    sc = Math.max(1, Math.ceil(f * dpr - 0.02));
     canvas.width = 131 * sc; canvas.height = rows * sc;
-    canvas.style.width = canvas.width / dpr + 'px'; canvas.style.height = canvas.height / dpr + 'px';
+    canvas.style.width = 131 * f + 'px'; canvas.style.height = rows * f + 'px';
+    canvas.style.imageRendering = Math.abs(f * dpr - sc) < 0.03 ? '' : 'auto';
     img = ctx.createImageData(canvas.width, canvas.height); COL = lcdColors(); lastSerial = -1;
   }
   function draw() {
@@ -345,9 +347,10 @@
     $('#m-save').onclick = async () => { closeSheets(); await save(); toast('Saved'); };
     $('#m-reset').onclick = () => { closeSheets(); core.reset(); changed = true; toast('Restarted — memory is kept'); };
     $('#m-clear').onclick = async () => { if (!confirm('Erase everything on this ' + L.name + '? This is a Memory Clear.')) return; cleared = true; await DB.setMany([['state:' + MODEL, null], ['flash:' + MODEL, null]]); location.reload(); };
-    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); });
+    document.querySelectorAll('#s-lcd button').forEach((b) => b.onclick = () => { S.lcd = b.dataset.v; applyLcd(); saveSettings(); renderMenu(); if (EMBED) window.parent.postMessage({ type: 'emu-lcd-set', lcd: S.lcd }, location.origin); });
     document.querySelectorAll('#s-speed button').forEach((b) => b.onclick = () => { S.speed = Number(b.dataset.v); saveSettings(); renderMenu(); });
     window.addEventListener('resize', layout);
+    try { new ResizeObserver(() => { if (core) layout(); }).observe($('#lcd')); } catch (e) { /* older WebView */ }
     const HW = { Enter: 'ENTER', Backspace: '⌫', ArrowUp: '▲', ArrowDown: '▼', ArrowLeft: '◀', ArrowRight: '▶', Escape: 'ON' };
     window.addEventListener('keydown', (e) => {
       if (openSheet || !core || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -386,7 +389,9 @@
   }
   window.__closeOverlay = () => { if (!$('#pop').hidden) { closePop(); return true; } if (openSheet) { closeSheets(); return true; } return false; };
   window.onAndroidPause = () => { save(); };
-  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); else lastT = 0; });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) save(); else { lastT = 0; if (core) core.resyncClock(); } });
+  // the clock follows the phone: its time comes from the emulation, which stops in the background or runs at another speed
+  setInterval(() => { if (core && !document.hidden) core.resyncClock(); }, 600000);
   window.addEventListener('pagehide', () => save());
 
   /* ---- embedded in CalcShelf: the main app chooses the model ---- */
@@ -397,8 +402,9 @@
       const d = e.data; if (!d || e.source !== window.parent) return;
       if (d.type === 'emu-save') { try { await save(); } catch (x) { /* ignore */ } window.parent.postMessage({ type: 'emu-saved', id: d.id }, location.origin); }
       else if (d.type === 'emu-install') loadObjects([new File([d.bytes], d.name)]);
+      else if (d.type === 'emu-lcd' && ['stn', 'paper', 'night'].includes(d.lcd)) { if (S.lcd !== d.lcd) { S.lcd = d.lcd; applyLcd(); saveSettings(); renderMenu(); } }
     });
-    window.parent.postMessage({ type: 'emu-ready' }, location.origin);
+    window.parent.postMessage({ type: 'emu-ready', lcd: S.lcd }, location.origin);
   }
 
   async function main() {

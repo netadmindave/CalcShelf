@@ -316,7 +316,7 @@ Open it from **+ → Emulated calculator → TI-36X Pro** (under *TI scientific*
   - Also: data and statistics with regressions and distributions; table of f(x); num-solv, poly-solv and sys-solv; matrix and vector editors; constants; convert; expr-eval; op and set op.
 - **Answers:** exact or decimal, fractions and mixed numbers, DEG/RAD/GRAD with DMS, and complex numbers in a+bi or r∠θ form.
 - **Contrast** is 2nd − and 2nd +, as on the real calculator.
-- **Night display:** tap the open TI-36X Pro tab and choose **Night display**. It gives a dark screen with light text, and is saved with the TI-36's settings.
+- **Night or Paper display:** tap the open TI-36X Pro tab and choose **Screen style**, or use **Settings → Calculator screens**. The style is shared with the emulated calculators.
 - **Export history (CSV)** and **Reset** are in the same tab menu.
 
 <br clear="right">
@@ -343,6 +343,13 @@ These run the calculators' own operating systems on emulator cores. The calculat
 ### What every emulator page has
 
 - **☰ menu:** files (send programs or documents, screenshots), snapshots or save, restart, replace OS, screen style, and speed.
+- **Screen style is one setting for every calculator:** **Standard** (each calculator's own colour), **Paper** or **Night**. Change it in **Settings → Calculator screens**, from an emulator tab's menu (tap the open tab, **Screen style**), or in any calculator's own ☰ menu; every calculator and the TI-36X Pro follow. On the TI-Nspire's colour screen, Night darkens the screen.
+- **Any window shape:** the screen is as wide as the window. When the window is wider than tall (landscape, split screen, a tablet), the screen is on the left and the keys on the right.
+- **The clock follows the phone** on every calculator that has one:
+  - **TI-89 Titanium, TI-92 Plus, Voyage 200** (AMS 2.07 or later): set when the calculator starts, when you come back to the app, and every 10 minutes. **Clock follows the phone** in the ☰ menu turns this off. The original TI-92 has no clock.
+  - **TI-84 Plus and TI-84 Plus Silver Edition:** set when the calculator starts and when you come back to it; it then runs on the phone's clock.
+  - **HP 48 and 49:** set from the phone when the calculator starts, when you come back to the app, and every 10 minutes.
+  - **TI-Nspire CX II:** its clock runs on the phone's clock (the OS doesn't show it; it dates your files).
 - **⌨ type:** type text with the phone keyboard. CalcShelf presses the right keys for you.
 - **Long-press a key** to choose its 2nd, ◆, shift or alpha function. Arrows and ⌫ repeat while held.
 - **Hardware keyboards:** letters, digits, arrows, Enter, Backspace and Escape all work.
@@ -415,8 +422,8 @@ This runs **TI AMS** on the **TiEmu** core (from Graph89).
   - **Send programs or variables:** `.89p`, `.89e`, `.89f`, `.89g`, `.89k` and more.
   - **Received files:** what you send from Var-Link appears here to save.
   - **Save screenshot**, **Save snapshot** and **Restore snapshot**.
-  - **Set clock to phone time**, **Restart**, **Replace OS**.
-- **Settings:** screen style (Classic, Paper, Night), grayscale for games and pictures, pixel grid, and speed (Real, 2×, 4×, or full speed while busy).
+  - **Clock follows the phone** (on by default), **Set clock to phone time now**, **Restart**, **Replace OS**.
+- **Settings:** screen style (Standard, Paper, Night, shared by every calculator), grayscale for games and pictures, pixel grid, and speed (Real, 2×, 4×, or full speed while busy).
 
 <br clear="right">
 
@@ -430,7 +437,7 @@ These use the same TiEmu core, with Graph89's landscape layout: every key is whe
 - **TI-92 and TI-92 Plus:** F1–F8 sit in two columns to the left of the screen.
 - **All three:** the cursor pad and number block are on the right, and the QWERTY keyboard is below. Each key shows its 2nd and ◆ legends.
 
-**Landscape only.** On the phone, CalcShelf turns the screen to landscape while one of these is open. In a browser held in portrait, the page turns itself so that you can just rotate the device.
+**Landscape, or a key pad in tall windows.** On the phone, CalcShelf turns the screen to landscape while one of these is open, and you get the Graph89 layout. In a window taller than wide (split screen, a tablet held upright, or rotation locked), you get a key pad instead, with the screen across the full width: F1–F8, the cursor pad, and a number page and an **abc** page for letters.
 
 **What you need:**
 
@@ -490,7 +497,7 @@ These run **HP's own ROMs** on the **Emu48** core. The ROMs are included, so the
 - **Restart:** like ON+C; memory is kept.
 - **Memory clear.**
 - **Speed:** Real, 2×, 4× or Max (about 30× a real 48GX).
-- **Screen style:** Classic, Paper or Night.
+- **Screen style:** Standard, Paper or Night (the same for every calculator).
 
 **Memory** is saved every 20 seconds and when you leave the app. On the 49 models this includes the flash memory (port 2).
 

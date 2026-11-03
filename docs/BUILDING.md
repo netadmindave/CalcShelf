@@ -47,7 +47,9 @@ Every core is built with **zig 0.17** (`pip install ziglang`) for `wasm32-wasi`,
 You need the Graph89 sources (`app/src/main/jni` from https://github.com/eanema/graph89):
 
 ```sh
-J=/path/to/graph89/app/src/main/jni ./core-build/build.sh         # TiEmu + libti* → g89.wasm
+J=/path/to/graph89/app/src/main/jni ./core-build/build.sh         # TiEmu + libti* objects
+python3 -m ziglang cc -target wasm32-wasi -mexec-model=reactor -O2 -s -o g89.wasm $(cat core-build/objs.txt) \
+  -lwasi-emulated-signal -lwasi-emulated-process-clocks -lwasi-emulated-mman
 J=/path/to/graph89/app/src/main/jni ./core-build/build_tilem.sh   # TilEm + wabbit helpers + tz80.c
 python3 -m ziglang cc -target wasm32-wasi -mexec-model=reactor -O2 -s -o tz80.wasm $(cat core-build/objs_tilem.txt) \
   -lwasi-emulated-signal -lwasi-emulated-process-clocks -lwasi-emulated-mman

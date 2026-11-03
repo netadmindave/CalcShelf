@@ -19,6 +19,8 @@
       c.x.hp_set_clock(Date.now(), -new Date().getTimezoneOffset());
       return c;
     }
+    /** set the calculator's clock to the phone's time again */
+    resyncClock() { const d = new Date(); if (this.x.hp_resync_clock) this.x.hp_resync_clock(d.getTime(), -d.getTimezoneOffset()); }
     u8(p, n) { return new Uint8Array(this.mem.buffer, p, n); }
     /** ROM file bytes (packed or nibble-per-byte); type 'S' 'G' 'X' 'Q' */
     loadRom(bytes, type, cls) {

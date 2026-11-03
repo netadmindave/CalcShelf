@@ -434,33 +434,34 @@ static int do_cpu(int duration)	// thenth of seconds
 	return 0;
 }
 
-int sync_clock() {
-	time_t tt;
-	struct tm *lt;
+/* Set the calculator's clock (AMS 2.07 and later) through the link port, as TI Connect does.
+   CalcShelf passes the phone's local date and time: the WebAssembly C library has no time zone.
+   Returns 0, or the libticalcs error (the calculator isn't ready, or this calculator has no clock). */
+int set_clock_to(int year, int month, int day, int hours, int minutes, int seconds) {
 	CalcClock tc;
 	int err;
 
 	sip = 1;
-
 	err = ticalcs_calc_isready(calc_handle);
-	if (err) {
-		goto end;
+	if (!err) {
+		/* keep the calculator's own 12/24-hour and date formats */
+		memset(&tc, 0, sizeof tc);
+		if (ticalcs_calc_get_clock(calc_handle, &tc) || (tc.time_format != 12 && tc.time_format != 24)) { tc.time_format = 12; tc.date_format = 1; }
+		tc.day = day; tc.month = month; tc.year = year;
+		tc.hours = hours; tc.minutes = minutes; tc.seconds = seconds;
+		err = ticalcs_calc_set_clock(calc_handle, &tc);
 	}
+	sip = 0;
+	return err;
+}
+
+int sync_clock() {
+	time_t tt;
+	struct tm *lt;
 
 	time(&tt);
 	lt = localtime(&tt);
-	tc.day = lt->tm_mday;
-	tc.month = lt->tm_mon + 1;
-	tc.year = lt->tm_year + 1900;
-	tc.hours = lt->tm_hour;
-	tc.minutes = lt->tm_min;
-	tc.seconds = lt->tm_sec;
-
-	err = ticalcs_calc_set_clock(calc_handle, &tc);
-	if (err) {
-		goto end;
-	}
-	end: sip = 0;
+	return set_clock_to(lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min, lt->tm_sec);
 }
 
 int send_ti_file(const char *filename) {

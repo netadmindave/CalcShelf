@@ -4,6 +4,13 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 
 ## 2.7.6
 
+- **Emulators fill any window shape.** The calculator's screen is as wide as the window, and drawn to fill its frame (it was limited to whole-pixel sizes and could stay much smaller). In a window wider than tall (landscape, split screen, a tablet), the screen is on the left and the keys on the right, for every calculator. The TI-36X Pro no longer squashes its keys and labels together in a short window.
+- **TI-92, TI-92 Plus, Voyage 200 in a tall window** use a key pad with the screen across the full width, instead of the sideways Graph89 layout.
+- **One screen style for every calculator:** Standard, Paper or Night in **Settings → Calculator screens** (also in each emulator tab's menu and in each calculator's own menu) applies to all emulated calculators and the TI-36X Pro. The TI-Nspire's colour screen gets a Night style too.
+- **Calculator clocks follow the phone:**
+  - **TI-89 Titanium, TI-92 Plus, Voyage 200:** set automatically at start, on returning to the app and every 10 minutes (**Clock follows the phone** in the menu). The manual **Set clock to phone time** used UTC instead of local time and reported failure when it worked; both are fixed.
+  - **TI-84 Plus / Silver Edition:** set at start and on returning to the app, then kept by the phone's clock.
+  - **HP 48 / 49:** set again on returning to the app and every 10 minutes, so time spent in the background no longer makes it run slow.
 - **Differential Equations tab** (+ → Differential Equations): ordinary differential equations of any order, one equation or a system.
   - **Exact solutions** from Giac: the general solution with constants c₀, c₁ …, or the particular solution for initial or boundary conditions (y(0) = 1, y′(0) = 0, or y(0) = 1, y(π/2) = 2). Linear systems with constant coefficients are solved by the Laplace transform. Decimals are read as fractions, so answers stay exact. Insert the solution, copy it, define y(t) in the Calculator, or graph it.
   - **Numeric solutions** for any equation or system with initial values, linear or not: adaptive Runge–Kutta (Dormand–Prince 5(4)). A plot against the variable or a phase plane (any two of x, y, y′ …), a slope field for one first-order equation, values at any point, and a table you can copy as CSV. Solutions that blow up stop with a note.

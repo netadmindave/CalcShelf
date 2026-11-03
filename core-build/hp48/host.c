@@ -247,6 +247,13 @@ static void leave_run(void) {
     StopDisplay(); StopTimers();
     nState = nNextState = SM_INVALID;
 }
+/* the calculator's clock follows the phone: take the phone's time again, then pause and resume, as Emu48 writes
+   the time into the calculator when it starts running (the HP keeps time from the emulation's timers, which stop
+   while the app is in the background) */
+EXPORT(hp_resync_clock) void hp_resync_clock(double ms, int tzmin) {
+    hp_set_clock(ms, tzmin);
+    if (nState == SM_RUN) { leave_run(); enter_run(); }
+}
 
 static void free_ports(void) {
     if (Port0) { free(Port0); Port0 = NULL; } if (Port1) { free(Port1); Port1 = NULL; } if (Port2) { free(Port2); Port2 = NULL; }

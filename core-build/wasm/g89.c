@@ -31,6 +31,7 @@ extern int ngc;
 extern volatile int lcd_flag;
 extern int g89_log_level;
 int sync_clock(void);
+int set_clock_to(int year, int month, int day, int hours, int minutes, int seconds);
 int engine_num_cycles_per_loop(void);
 
 /* Graph89 wrappercommon globals still referenced by the core */
@@ -108,6 +109,7 @@ EXPORT("g89_save_state") int g89_save_state(const char *f) { return tihw.ram ? t
 EXPORT("g89_load_state") int g89_load_state(const char *f) { return ti68k_state_load(f); }
 EXPORT("g89_send_file") int g89_send_file(const char *f) { return ti68k_linkport_send_file(f); }
 EXPORT("g89_sync_clock") int g89_sync_clock(void) { return sync_clock(); }
+EXPORT("g89_set_clock") int g89_set_clock(int y, int mo, int d, int h, int mi, int s) { return set_clock_to(y, mo, d, h, mi, s); }
 
 EXPORT("g89_error_text") const char *g89_error_text(int code)
 {
