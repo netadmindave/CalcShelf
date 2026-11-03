@@ -135,6 +135,8 @@ An equation the user can solve for any one of its variables, with a menu of unit
 - Give a variable a `"quantity"` (or a fifth array element) to say which quantity it is: one of CalcShelf's (`app/www/data/quantities.js`: `lam0` vacuum wavelength, `n` refractive index, `T` temperature, `Nd` donor density, `c`, `h`, `kB` …) or one of the module's own `variables`. The units may differ, for example `eV` for a quantity kept in joules; the solver converts.
 - Without one, CalcShelf matches the variable by its name, unit and description. A variable it can't match is linked only to variables with the same name, unit and description.
 - `"solveFor": ["n0"]` limits which variables a formula is solved for. Use it for an approximation that only works one way, such as n₀ ≈ N_d, which gives n₀ from N_d but should never give N_d.
+- `"unlessKnown": ["Na"]` (quantity ids) leaves the formula out once any of those quantities is known. n₀ ≈ N_d doesn't hold once N_a is given (compensated material, or the p side of a junction).
+- `"when": "Nd>Na"` uses the formula only when the comparison of its own variables holds, for a formula that applies in one range (and loses precision outside it).
 
 ```json
 "variables": [

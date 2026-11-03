@@ -84,7 +84,7 @@
         if (seen.has(key)) return; seen.add(key);
         const map = {}; vars.forEach((v) => { map[v.name] = v.ph; });
         const eqp = it.eq.replace(/\b[A-Za-z_]\w*\b/g, (w) => map[w] || w);
-        const f = { i: F.length, src, srcName, cat, group: src + '|' + cat, title: it.title, tex: it.tex || it.eq, eq: it.eq, eqp, note: it.note || '', vars, solveFor: it.solveFor ? new Set(it.solveFor) : null };
+        const f = { i: F.length, src, srcName, cat, group: src + '|' + cat, title: it.title, tex: it.tex || it.eq, eq: it.eq, eqp, note: it.note || '', vars, solveFor: it.solveFor ? new Set(it.solveFor) : null, unlessKnown: it.unlessKnown || null, when: it.when ? it.when.replace(/\b[A-Za-z_]\w*\b/g, (w) => map[w] || w) : null };
         F.push(f);
         for (const v of vars) Q[v.id].fs.push(f.i);
       };
@@ -122,6 +122,24 @@
       };
       walk(ast);
       return out.filter((a) => !JSON.stringify(a).includes('"' + ph + '"'));
+    },
+    /** the other side of the equation when the formula is written for x (x = … or … = x), else null */
+    explicit(f, x) {
+      let ast; try { ast = GiacFmt.parse(f.eqp); } catch (e) { return null; }
+      if (!ast || ast.t !== 'bin' || ast.op !== '=') return null;
+      const has = (n) => JSON.stringify(n).includes('"' + x.ph + '"');
+      if (ast.a.t === 'id' && ast.a.v === x.ph && !has(ast.b)) return ast.b;
+      if (ast.b.t === 'id' && ast.b.v === x.ph && !has(ast.a)) return ast.a;
+      return null;
+    },
+    /** a formula's condition ("Nd>Na"): true only when every value in it is known and it holds */
+    holds(f, known) {
+      const vs = f.vars.filter((v) => f.when.includes(v.ph));
+      if (vs.some((v) => !known.has(v.id))) return false;
+      let fn = this.fnCache.get('when:' + f.i);
+      if (fn === undefined) { try { fn = GiacFmt.compile(f.when, vs.map((v) => v.ph)); } catch (e) { fn = null; } this.fnCache.set('when:' + f.i, fn); }
+      if (!fn) return false;
+      try { return fn(...vs.map((v) => known.get(v.id).v / v.f)) === 1; } catch (e) { return false; }
     },
     /** evaluate the rearranged formulas for x; returns { v (SI), alts, ast, k } or null */
     async evalFor(app, f, x, known) {
@@ -253,10 +271,14 @@
             if (!k) { n++; unk = v; if (n > 1) break; } else if (k.src !== 'const' && !(Q[v.id] && Q[v.id].context)) real = true;
           }
           // one unknown, which may be calculated, and at least one value that isn't a constant or a condition (T)
+          if (n === 1 && f.unlessKnown && f.unlessKnown.some((id) => known.has(id))) continue;
+          if (n === 1 && f.when && !VS.holds(f, known)) continue;
           if (n === 1 && real && !Q[unk.id].input && !failed.has(f.i + ':' + unk.name) && (!f.solveFor || f.solveFor.has(unk.name))) ready.push([f, unk]);
         }
         if (!ready.length) break;
         ready.sort((a, b) => !!a[0].solveFor - !!b[0].solveFor);   // approximations last: an exact formula wins
+        // a formula already written for its unknown (x = …) is used as it is: it reads better than Giac's rearrangement
+        for (const [f, x] of ready) { const key = f.i + ':' + x.name; if (!VS.symCache.has(key)) { const a = VS.explicit(f, x); if (a) VS.symCache.set(key, [a]); } }
         const need = ready.filter(([f, x]) => !VS.symCache.has(f.i + ':' + x.name));
         if (need.length) {
           const res = await app.cas.batch(need.map(([f, x]) => 'solve(' + f.eqp + ',' + x.ph + ')'));
@@ -277,7 +299,7 @@
       // formulas with every value known: do they agree?
       const conflicts = new Map();
       for (const f of active) {
-        if (f.solveFor || f.vars.some((v) => !known.has(v.id))) continue;
+        if (f.solveFor || f.vars.some((v) => !known.has(v.id)) || (f.when && !VS.holds(f, known))) continue;
         if (!f.vars.some((v) => known.get(v.id).src !== 'const')) continue;
         const via = f.vars.some((v) => { const k = known.get(v.id); return k.src === 'calc' && k.f === f; });
         if (via) continue;
@@ -442,6 +464,7 @@
       const acts = el('div', { class: 'vs-alts' },
         el('button', { class: 'chip', text: 'In terms of your values', onclick: () => this.derive(q, box, acts) }),
         el('button', { class: 'chip', text: 'Copy', onclick: () => { const s = this.shown(q, k.v); const t = Units.num(s.x, 10) + (s.u ? ' ' + s.u : ''); try { navigator.clipboard.writeText(t); toast('Copied ' + t); } catch (e) { toast(t); } } }),
+        el('button', { class: 'chip', text: 'Enter my own value', onclick: () => { const sh = this.shown(q, k.v); this.S.user[q.id] = { v: k.v, raw: Units.num(sh.x, 10) }; if (sh.u) this.S.units[q.id] = sh.u; this.open.delete(q.id); this.app.saveSoon(); this.solve(); } }),
         el('button', { class: 'chip', text: 'Ignore this formula', onclick: () => this.ignoreFormula(f) }));
       box.append(acts);
       return box;

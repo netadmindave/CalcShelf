@@ -123,6 +123,10 @@
         for (const w of o.eq.match(/[A-Za-z_]\w*/g) || []) if (/^[a-z]$/i.test(w) && !names.has(w) && !['e', 'i'].includes(w)) throw new Error('the equation uses ' + w + ', which isn’t one of its variables');
         if (!o.tex) o.tex = o.eq;
         // an approximation that is only used one way (n₀ ≈ N_d gives n₀, never N_d): the variables it may be solved for
+        // an approximation that doesn't hold once another quantity is known (n₀ ≈ N_d once N_a is given): those quantity ids
+        if (Array.isArray(it.unlessKnown)) o.unlessKnown = it.unlessKnown.slice(0, LIMIT.vars).map((n) => { const q = str(n, 40); if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(q)) throw new Error('unlessKnown “' + q + '” must be a quantity id'); return q; });
+        // when the formula applies, as a comparison of its variables ("Nd>Na"); it's used only once that is true
+        if (it.when != null) { o.when = checkExpr(String(it.when), 'The condition'); if (!/[<>]/.test(o.when)) throw new Error('the condition must compare, like Nd>Na'); for (const w of o.when.match(/[A-Za-z_]\w*/g) || []) if (!names.has(w)) throw new Error('the condition uses ' + w + ', which isn’t one of its variables'); }
         if (Array.isArray(it.solveFor)) { o.solveFor = it.solveFor.slice(0, LIMIT.vars).map((n) => ident(n, 'solveFor')); if (o.solveFor.some((n) => !names.has(n))) throw new Error('solveFor names a variable the formula doesn’t have'); }
         break;
       }

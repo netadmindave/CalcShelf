@@ -8226,9 +8226,12 @@
        "1/m³"
       ]
      ],
-     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_d ≫ n_i, with no acceptors. Ignore it for p-type or compensated material.",
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_d ≫ n_i, with no acceptors. Not used when N_a is known (p-type, compensated, or a p–n junction).",
      "solveFor": [
       "n0"
+     ],
+     "unlessKnown": [
+      "Na"
      ]
     },
     {
@@ -8248,9 +8251,12 @@
        "1/m³"
       ]
      ],
-     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_a ≫ n_i, with no donors. Ignore it for n-type or compensated material.",
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Full ionization and N_a ≫ n_i, with no donors. Not used when N_d is known (n-type, compensated, or a p–n junction).",
      "solveFor": [
       "p0"
+     ],
+     "unlessKnown": [
+      "Nd"
      ]
     },
     {
@@ -8282,7 +8288,8 @@
        "1.5e16"
       ]
      ],
-     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. Complete ionization."
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. One region with both dopants, complete ionization, N_d > N_a (use the hole form when N_a > N_d). In a p–n junction N_a and N_d are on different sides: ignore this formula.",
+     "when": "Nd>Na"
     },
     {
      "type": "formula",
@@ -8824,6 +8831,517 @@
       ]
      ],
      "note": "Neamen, Semiconductor Physics and Devices, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Hole density from the Fermi level",
+     "tex": "p_0=n_ie^{(E_{Fi}-E_F)/kT}",
+     "eq": "p0=ni*exp(-dE/(kB*T))",
+     "vars": [
+      [
+       "p0",
+       "hole density",
+       "1/m³",
+       "",
+       "p0"
+      ],
+      [
+       "ni",
+       "intrinsic carrier density",
+       "1/m³",
+       "",
+       "ni"
+      ],
+      [
+       "dE",
+       "E_F − E_Fi",
+       "J",
+       "",
+       "EFEFi"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Hole density with compensation",
+     "tex": "p_0=\\frac{N_a-N_d}{2}+\\sqrt{\\left(\\frac{N_a-N_d}{2}\\right)^2+n_i^2}",
+     "eq": "p0=(Na-Nd)/2+sqrt(((Na-Nd)/2)^2+ni^2)",
+     "vars": [
+      [
+       "p0",
+       "hole density",
+       "1/m³",
+       "",
+       "p0"
+      ],
+      [
+       "Na",
+       "acceptor density",
+       "1/m³",
+       "",
+       "Na"
+      ],
+      [
+       "Nd",
+       "donor density",
+       "1/m³",
+       "0",
+       "Nd"
+      ],
+      [
+       "ni",
+       "intrinsic carrier density",
+       "1/m³",
+       "",
+       "ni"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 4. One region with both dopants, complete ionization, N_a > N_d. In a p–n junction N_a and N_d are on different sides: ignore this formula.",
+     "when": "Na>Nd"
+    },
+    {
+     "type": "formula",
+     "title": "Einstein relation (electrons)",
+     "tex": "\\frac{D_n}{\\mu_n}=\\frac{kT}{e}",
+     "eq": "Dn/mun=kB*T/q",
+     "vars": [
+      [
+       "Dn",
+       "electron diffusion coefficient",
+       "m²/s",
+       "",
+       "Dn"
+      ],
+      [
+       "mun",
+       "electron mobility",
+       "m²/(V·s)",
+       "",
+       "mun"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Einstein relation (holes)",
+     "tex": "\\frac{D_p}{\\mu_p}=\\frac{kT}{e}",
+     "eq": "Dp/mup=kB*T/q",
+     "vars": [
+      [
+       "Dp",
+       "hole diffusion coefficient",
+       "m²/s",
+       "",
+       "Dp"
+      ],
+      [
+       "mup",
+       "hole mobility",
+       "m²/(V·s)",
+       "",
+       "mup"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Drift current density",
+     "tex": "J_{drf}=e(\\mu_nn+\\mu_pp)E",
+     "eq": "J=q*(mun*n0+mup*p0)*E",
+     "vars": [
+      [
+       "J",
+       "drift current density",
+       "A/m²",
+       "",
+       "Jdrf"
+      ],
+      [
+       "mun",
+       "electron mobility",
+       "m²/(V·s)",
+       "",
+       "mun"
+      ],
+      [
+       "n0",
+       "electron density",
+       "1/m³",
+       "",
+       "n0"
+      ],
+      [
+       "mup",
+       "hole mobility",
+       "m²/(V·s)",
+       "",
+       "mup"
+      ],
+      [
+       "p0",
+       "hole density",
+       "1/m³",
+       "",
+       "p0"
+      ],
+      [
+       "E",
+       "electric field",
+       "V/m",
+       "",
+       "Efield"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Generation rate from absorbed light",
+     "tex": "G_L=\\alpha\\frac{I}{E_{phot}}",
+     "eq": "GL=a*I/Eph",
+     "vars": [
+      [
+       "GL",
+       "generation rate",
+       "1/(m³·s)",
+       "",
+       "GL"
+      ],
+      [
+       "a",
+       "absorption coefficient",
+       "1/m",
+       "",
+       "alpha"
+      ],
+      [
+       "I",
+       "intensity",
+       "W/m²",
+       "",
+       "I"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Excess carriers under steady generation",
+     "tex": "\\delta n=\\delta p=G_L\\tau",
+     "eq": "dn=GL*tau",
+     "vars": [
+      [
+       "dn",
+       "excess carrier density",
+       "1/m³",
+       "",
+       "dnex"
+      ],
+      [
+       "GL",
+       "generation rate",
+       "1/(m³·s)",
+       "",
+       "GL"
+      ],
+      [
+       "tau",
+       "excess-carrier lifetime",
+       "s",
+       "",
+       "tauc"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Photoconductivity",
+     "tex": "\\Delta\\sigma=e\\,\\delta p(\\mu_n+\\mu_p)",
+     "eq": "dsig=q*dn*(mun+mup)",
+     "vars": [
+      [
+       "dsig",
+       "photoconductivity Δσ",
+       "S/m",
+       "",
+       "dsig"
+      ],
+      [
+       "dn",
+       "excess carrier density",
+       "1/m³",
+       "",
+       "dnex"
+      ],
+      [
+       "mun",
+       "electron mobility",
+       "m²/(V·s)",
+       "",
+       "mun"
+      ],
+      [
+       "mup",
+       "hole mobility",
+       "m²/(V·s)",
+       "",
+       "mup"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Electron transit time",
+     "tex": "t_n=\\frac{L}{\\mu_nE}",
+     "eq": "tn=L/(mun*E)",
+     "vars": [
+      [
+       "tn",
+       "electron transit time",
+       "s",
+       "",
+       "tn"
+      ],
+      [
+       "L",
+       "length between the contacts",
+       "m"
+      ],
+      [
+       "mun",
+       "electron mobility",
+       "m²/(V·s)",
+       "",
+       "mun"
+      ],
+      [
+       "E",
+       "electric field",
+       "V/m",
+       "",
+       "Efield"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    },
+    {
+     "type": "formula",
+     "title": "Electron mobility from the scattering time",
+     "tex": "\\mu_n=\\frac{e\\tau_{cn}}{m_{cn}^*}",
+     "eq": "mun=q*tcn/mcn",
+     "vars": [
+      [
+       "mun",
+       "electron mobility",
+       "m²/(V·s)",
+       "",
+       "mun"
+      ],
+      [
+       "tcn",
+       "electron mean time between collisions",
+       "s"
+      ],
+      [
+       "mcn",
+       "electron conductivity effective mass",
+       "kg"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Hole mobility from the scattering time",
+     "tex": "\\mu_p=\\frac{e\\tau_{cp}}{m_{cp}^*}",
+     "eq": "mup=q*tcp/mcp",
+     "vars": [
+      [
+       "mup",
+       "hole mobility",
+       "m²/(V·s)",
+       "",
+       "mup"
+      ],
+      [
+       "tcp",
+       "hole mean time between collisions",
+       "s"
+      ],
+      [
+       "mcp",
+       "hole conductivity effective mass",
+       "kg"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Current density from conductivity",
+     "tex": "J=\\sigma E=\\frac{E}{\\rho}",
+     "eq": "J=sig*E",
+     "vars": [
+      [
+       "J",
+       "drift current density",
+       "A/m²",
+       "",
+       "Jdrf"
+      ],
+      [
+       "sig",
+       "conductivity",
+       "S/m",
+       "",
+       "sigc"
+      ],
+      [
+       "E",
+       "electric field",
+       "V/m",
+       "",
+       "Efield"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Penetration (1/e) depth",
+     "tex": "d_{1/e}=\\frac{1}{\\alpha}",
+     "eq": "d=1/a",
+     "vars": [
+      [
+       "d",
+       "1/e penetration depth",
+       "m",
+       "",
+       "dpen"
+      ],
+      [
+       "a",
+       "absorption coefficient",
+       "1/m",
+       "",
+       "alpha"
+      ]
+     ],
+     "note": "Saleh & Teich, Fundamentals of Photonics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Reflectance with absorption",
+     "tex": "R=\\frac{(n-1)^2+\\kappa^2}{(n+1)^2+\\kappa^2}",
+     "eq": "R=((n-1)^2+kap^2)/((n+1)^2+kap^2)",
+     "vars": [
+      [
+       "R",
+       "reflectance",
+       "",
+       "",
+       "R"
+      ],
+      [
+       "n",
+       "index",
+       "",
+       "",
+       "n"
+      ],
+      [
+       "kap",
+       "extinction coefficient κ",
+       "",
+       "",
+       "ext"
+      ]
+     ],
+     "note": "Saleh & Teich, Fundamentals of Photonics, ch. 5. Normal incidence, from air."
     }
    ]
   },
@@ -10549,6 +11067,496 @@
       ]
      ],
      "note": "Neamen, Semiconductor Physics and Devices, ch. 15."
+    },
+    {
+     "type": "formula",
+     "title": "Electron diffusion length",
+     "tex": "L_n=\\sqrt{D_n\\tau_{n0}}",
+     "eq": "Ln=sqrt(Dn*taun)",
+     "vars": [
+      [
+       "Ln",
+       "electron diffusion length",
+       "m",
+       "",
+       "Ln"
+      ],
+      [
+       "Dn",
+       "electron diffusion coefficient",
+       "m²/s",
+       "",
+       "Dn"
+      ],
+      [
+       "taun",
+       "electron (minority) lifetime τ_n0",
+       "s",
+       "",
+       "taun"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 6. Minority electrons in the p side."
+    },
+    {
+     "type": "formula",
+     "title": "Hole diffusion length",
+     "tex": "L_p=\\sqrt{D_p\\tau_{p0}}",
+     "eq": "Lp=sqrt(Dp*taup)",
+     "vars": [
+      [
+       "Lp",
+       "hole diffusion length",
+       "m",
+       "",
+       "Lp"
+      ],
+      [
+       "Dp",
+       "hole diffusion coefficient",
+       "m²/s",
+       "",
+       "Dp"
+      ],
+      [
+       "taup",
+       "hole (minority) lifetime τ_p0",
+       "s",
+       "",
+       "taup"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 6. Minority holes in the n side."
+    },
+    {
+     "type": "formula",
+     "title": "Ideal diode (current density)",
+     "tex": "J=J_s\\left(e^{eV_a/kT}-1\\right)",
+     "eq": "J=Js*(exp(q*Va/(kB*T))-1)",
+     "vars": [
+      [
+       "J",
+       "diode current density",
+       "A/m²",
+       "",
+       "Jd"
+      ],
+      [
+       "Js",
+       "saturation current density",
+       "A/m²",
+       "",
+       "Js"
+      ],
+      [
+       "Va",
+       "applied voltage",
+       "V",
+       "",
+       "Va"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 8."
+    },
+    {
+     "type": "formula",
+     "title": "Photon flux density",
+     "tex": "\\phi=\\frac{I_0}{E_{phot}}",
+     "eq": "phi=I0/Eph",
+     "vars": [
+      [
+       "phi",
+       "photon flux density",
+       "1/(m²·s)",
+       "",
+       "phiph"
+      ],
+      [
+       "I0",
+       "incident irradiance",
+       "W/m²",
+       "",
+       "I0"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    },
+    {
+     "type": "formula",
+     "title": "Short-circuit current density (every photon collected)",
+     "tex": "J_L=e\\phi=\\frac{eI_0}{E_{phot}}",
+     "eq": "JL=q*phi",
+     "vars": [
+      [
+       "JL",
+       "photocurrent (short-circuit) density",
+       "A/m²",
+       "",
+       "JL"
+      ],
+      [
+       "phi",
+       "photon flux density",
+       "1/(m²·s)",
+       "",
+       "phiph"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14. Every incident photon absorbed in the depletion region and collected."
+    },
+    {
+     "type": "formula",
+     "title": "Photocurrent density with quantum efficiency",
+     "tex": "J_L=\\eta_e\\frac{eI_0}{E_{phot}}",
+     "eq": "JL=eta*q*I0/Eph",
+     "vars": [
+      [
+       "JL",
+       "photocurrent density",
+       "A/m²",
+       "",
+       "JL"
+      ],
+      [
+       "eta",
+       "external quantum efficiency",
+       "",
+       "",
+       "etaq"
+      ],
+      [
+       "I0",
+       "incident irradiance",
+       "W/m²",
+       "",
+       "I0"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    },
+    {
+     "type": "formula",
+     "title": "Solar cell open-circuit voltage (densities)",
+     "tex": "V_{oc}=\\frac{kT}{e}\\ln\\left(1+\\frac{J_L}{J_s}\\right)",
+     "eq": "Voc=kB*T/q*ln(1+JL/Js)",
+     "vars": [
+      [
+       "Voc",
+       "open-circuit voltage",
+       "V",
+       "",
+       "Voc"
+      ],
+      [
+       "JL",
+       "photocurrent density",
+       "A/m²",
+       "",
+       "JL"
+      ],
+      [
+       "Js",
+       "saturation current density",
+       "A/m²",
+       "",
+       "Js"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    },
+    {
+     "type": "formula",
+     "title": "Heat from thermal relaxation (thermalization)",
+     "tex": "Q_{th}=I_0\\left(1-\\frac{E_g}{E_{phot}}\\right)",
+     "eq": "Qth=I0*(1-Eg/Eph)",
+     "vars": [
+      [
+       "Qth",
+       "heat per area from thermalization",
+       "W/m²",
+       "",
+       "Qth"
+      ],
+      [
+       "I0",
+       "incident irradiance",
+       "W/m²",
+       "",
+       "I0"
+      ],
+      [
+       "Eg",
+       "bandgap",
+       "J",
+       "",
+       "Eg"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14. Every photon absorbed; each pair relaxes to the band edges."
+    },
+    {
+     "type": "formula",
+     "title": "Charge neutrality of the depletion region",
+     "tex": "x_pN_a=x_nN_d",
+     "eq": "xp*Na=xn*Nd",
+     "vars": [
+      [
+       "xp",
+       "depletion width into the p side",
+       "m",
+       "",
+       "xp"
+      ],
+      [
+       "Na",
+       "acceptor density",
+       "1/m³",
+       "",
+       "Na"
+      ],
+      [
+       "xn",
+       "depletion width into the n side",
+       "m",
+       "",
+       "xn"
+      ],
+      [
+       "Nd",
+       "donor density",
+       "1/m³",
+       "",
+       "Nd"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Depletion width into the n side",
+     "tex": "x_n=\\sqrt{\\frac{2\\epsilon_s}{e}\\frac{N_a/N_d}{N_a+N_d}(V_{bi}+V_R)}",
+     "eq": "xn=sqrt(2*es/q*(Na/Nd)/(Na+Nd)*(Vbi+VR))",
+     "vars": [
+      [
+       "xn",
+       "depletion width into the n side",
+       "m",
+       "",
+       "xn"
+      ],
+      [
+       "es",
+       "semiconductor permittivity εₛ",
+       "F/m",
+       "1.0359e-10"
+      ],
+      [
+       "Na",
+       "acceptor density",
+       "1/m³",
+       "",
+       "Na"
+      ],
+      [
+       "Nd",
+       "donor density",
+       "1/m³",
+       "",
+       "Nd"
+      ],
+      [
+       "Vbi",
+       "built-in potential",
+       "V",
+       "",
+       "Vbi"
+      ],
+      [
+       "VR",
+       "reverse bias",
+       "V",
+       "0",
+       "VR"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Peak field in the depletion region",
+     "tex": "|E_{max}|=\\frac{2(V_{bi}+V_R)}{W}",
+     "eq": "Emax=2*(Vbi+VR)/W",
+     "vars": [
+      [
+       "Emax",
+       "peak electric field",
+       "V/m",
+       "",
+       "Emax"
+      ],
+      [
+       "Vbi",
+       "built-in potential",
+       "V",
+       "",
+       "Vbi"
+      ],
+      [
+       "VR",
+       "reverse bias",
+       "V",
+       "0",
+       "VR"
+      ],
+      [
+       "W",
+       "depletion width",
+       "m",
+       "",
+       "Wdep"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Maximum responsivity",
+     "tex": "\\mathcal{R}_{max}=\\frac{e}{E_{phot}}",
+     "eq": "Rmax=q/Eph",
+     "vars": [
+      [
+       "Rmax",
+       "maximum responsivity (η = 1)",
+       "A/W",
+       "",
+       "Rmax"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    },
+    {
+     "type": "formula",
+     "title": "Responsivity and quantum efficiency",
+     "tex": "\\mathcal{R}=\\eta_e\\frac{e}{E_{phot}}",
+     "eq": "Resp=eta*q/Eph",
+     "vars": [
+      [
+       "Resp",
+       "responsivity",
+       "A/W",
+       "",
+       "Resp"
+      ],
+      [
+       "eta",
+       "external quantum efficiency",
+       "",
+       "",
+       "etaq"
+      ],
+      [
+       "Eph",
+       "photon energy",
+       "J",
+       "",
+       "Eph"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ]
+     ],
+     "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
     }
    ]
   },
