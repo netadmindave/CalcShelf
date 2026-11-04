@@ -186,6 +186,7 @@
         case 'lfloor': { const s = this.seq(() => this.isCmd(this.peek(), 'rfloor')); this.next(); return { k: 'call', f: 'floor', args: [s] }; }
         case 'lceil': { const s = this.seq(() => this.isCmd(this.peek(), 'rceil')); this.next(); return { k: 'call', f: 'ceil', args: [s] }; }
         case 'cdot': case 'times': case 'ast': return { k: 'op', v: '*' };
+        case 'star': return { k: 'op', v: '^' };                                              // ** typed on a keyboard (MathLive shows ⋆): a power, as in Python
         case 'div': return { k: 'op', v: '/' };
         case 'pm': return { k: 'op', v: '+' };
         case 'le': case 'leq': case 'leqslant': return { k: 'op', v: '<=' };
@@ -629,6 +630,8 @@
   const EE = '(?:\\\\mathrm\\{ᴇ\\}|\\\\text\\{ᴇ\\}|ᴇ)';
   const EXP = '\\s*(?:\\\\left\\(\\s*)?\\{?([-−+]|\\\\minus\\s*)?\\}?\\s*(\\d+)(?:\\s*\\\\right\\))?';
   function eeToPow(tex) {
+    // 6.02e23 or 1.5e-3 typed on a keyboard: the same as the EE key (a lone e after a number stays Euler's number: 2e)
+    tex = tex.replace(/(^|[^\\A-Za-z\d.])(\d+\.?\d*|\.\d+)e(?:\{?([-−+])\}?)?(\d+)(?![\d.])/g, (m, pre, a, sg, e) => pre + a + 'ᴇ' + (sg === '-' || sg === '−' ? '-' : '') + e);
     if (!/ᴇ/.test(tex)) return tex;
     const sign = (sg) => (sg && sg.trim() !== '+' ? '-' : '');
     tex = tex.replace(new RegExp('(\\d+\\.?\\d*|\\.\\d+)\\s*' + EE + EXP, 'g'), (m, a, sg, e) => '\\left(' + a + '\\times10^{' + sign(sg) + e + '}\\right)');
@@ -649,6 +652,8 @@
     let define = false;
     if (seq[0] && seq[0].k === 'id' && /^Define$/i.test(seq[0].v)) { define = true; seq.shift(); }
     let s = emitSeq(seq, ctx);
+    const dangling = /([*\/^+]|[^-]-)\s*$/.exec(s);
+    if (dangling && !/[=:]\s*$/.test(s)) throw new TexError('Something is missing after the last ' + ({ '*': '×', '/': '÷', '^': '^', '+': '+' }[dangling[1]] || '−'));
     if (define) s = s.replace(/(^|[^<>!:=])=(?!=)/, '$1:=');
     return s;
   }
