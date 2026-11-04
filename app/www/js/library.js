@@ -331,10 +331,11 @@
       const tries = ['solve(exact(' + sub + '),' + U + ')', 'solve(' + sub + ',' + U + ')', ...[...mags].slice(0, 10).map((g) => 'fsolve(' + sub + ',' + U + '=' + g + ')')];
       const res = await app.cas.batch(tries);
       const all = [];
-      for (const r of res) for (const x of this.parseSolutions(r, U)) if (!all.some((y) => Math.abs(Number(y) - Number(x)) <= 1e-9 * Math.max(Math.abs(Number(x)), Math.abs(Number(y))) || Number(y) === Number(x))) all.push(x);
+      const exact = new Set();   // roots from solve() itself are right; only fsolve's need checking (a side that is 0 leaves no scale to compare with)
+      res.forEach((r, k) => { for (const x of this.parseSolutions(r, U)) { if (!all.some((y) => Math.abs(Number(y) - Number(x)) <= 1e-9 * Math.max(Math.abs(Number(x)), Math.abs(Number(y))) || Number(y) === Number(x))) all.push(x); if (k < 2) exact.add(Number(x)); } });
       // check each candidate really satisfies the equation (fsolve can stop at a non-root)
       const chk = await app.cas.batch(all.flatMap((x) => ['evalf(subst(left(' + sub + '),' + U + ',' + x + '))', 'evalf(subst(right(' + sub + '),' + U + ',' + x + '))']));
-      const good = all.filter((x, i) => { const L = Number(chk[2 * i]), R = Number(chk[2 * i + 1]); if (!isFinite(L) || !isFinite(R)) return false; return Math.abs(L - R) <= 1e-7 * (Math.abs(L) + Math.abs(R)) + 1e-300; });
+      const good = all.filter((x, i) => { const L = Number(chk[2 * i]), R = Number(chk[2 * i + 1]); if (!isFinite(L) || !isFinite(R)) return false; if (exact.has(Number(x))) return true; return Math.abs(L - R) <= 1e-7 * (Math.abs(L) + Math.abs(R)) + 1e-300; });
       return good.sort((p, q) => (Number(q) >= 0) - (Number(p) >= 0) || Math.abs(p) - Math.abs(q)).slice(0, 6);
     },
     parseSolutions(res, U) {

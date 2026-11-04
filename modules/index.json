@@ -4,16 +4,16 @@
   {
    "id": "optics",
    "name": "Optics",
-   "version": "1.2.0",
+   "version": "1.3.0",
    "file": "optics.json",
-   "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Every formula solves for any of its variables."
+   "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Version 1.3 adds laser design (Svelto’s Principles of Lasers), classical optics (Hecht’s Optics), fiber links and receivers (Agrawal’s Fiber-Optic Communication Systems), nonlinear fiber optics (Agrawal) and ultrafast pulses (Rullière’s Femtosecond Laser Pulses). Every formula solves for any of its variables."
   },
   {
    "id": "machinist",
    "name": "Machinist",
-   "version": "1.1.0",
+   "version": "1.2.0",
    "file": "machinist.json",
-   "description": "Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, and a G-code and M-code reference."
+   "description": "Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, a G-code and M-code reference, and precision-mechanism design: stiffness, flexures, Hertz contact and dynamics (following Soemers, Design Principles for Precision Mechanisms)."
   },
   {
    "id": "periodic",

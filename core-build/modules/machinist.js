@@ -102,9 +102,9 @@ module.exports = function machinist() {
 
   return {
     format: 'calcshelf-module', formatVersion: 1,
-    id: 'machinist', name: 'Machinist', tab: 'Machinist', version: '1.1.0', icon: 'machinist',
+    id: 'machinist', name: 'Machinist', tab: 'Machinist', version: '1.2.0', icon: 'machinist',
     author: 'CalcShelf', license: 'GPL-3.0-or-later', homepage: 'https://github.com/netadmindave/CalcShelf/tree/main/modules',
-    description: 'Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, and a G-code and M-code reference.',
+    description: 'Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, a G-code and M-code reference, and precision-mechanism design: stiffness, flexures, Hertz contact and dynamics (following Soemers, Design Principles for Precision Mechanisms).',
     // the shop quantities, for the Variable Solver (its formulas are in the Formulas section)
     variables: [
       { id: 'mN', symbol: 'N', name: 'Spindle speed', description: 'Revolutions per minute of the spindle.', unit: 'rpm', also: 'RPM' },
@@ -271,6 +271,7 @@ module.exports = function machinist() {
           '```', '%', 'O1001 (PART NAME)', 'G20 G17 G40 G49 G80 G90   (safe start: inch, XY, cancel comp and cycles, absolute)', 'T1 M06                    (tool 1)', 'G54 G00 X0 Y0             (work offset, rapid to start)', 'S2000 M03                 (spindle on)', 'G43 H01 Z1.0 M08          (length offset, coolant)', '...', 'M09', 'G91 G28 Z0                (home Z)', 'M30', '%', '```',
           'An example only: check the safe-start line and the homing moves for your control.'].join('\n') },
       ] },
+      ...require('./precision')(),
       { title: 'Formulas', items: [
         { type: 'formula', title: 'Spindle speed (inch)', tex: 'N=\\frac{12\\,V_c}{\\pi D}', eq: 'N=12*Vc/(pi*D)', vars: [['N', 'spindle speed', 'rpm', '', 'mN'], ['Vc', 'surface speed', 'ft/min', '', 'mVc'], ['D', 'diameter', 'in', '', 'mD']], note: 'Machinery’s Handbook. The same speed in metric is N = 1000V_c/(πD) with V_c in m/min and D in mm.' },
         { type: 'formula', title: 'Milling feed rate', tex: 'F=N\\,f_z\\,z', eq: 'F=N*fz*z', vars: [['F', 'feed rate', 'in/min', '', 'mF'], ['N', 'spindle speed', 'rpm', '', 'mN'], ['fz', 'chip load', 'in', '', 'mfz'], ['z', 'flutes', '', '', 'mz']] },

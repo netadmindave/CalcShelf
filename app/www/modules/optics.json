@@ -4,12 +4,12 @@
  "id": "optics",
  "name": "Optics",
  "tab": "Optics",
- "version": "1.2.0",
+ "version": "1.3.0",
  "icon": "optics",
  "author": "CalcShelf",
  "license": "GPL-3.0-or-later",
  "homepage": "https://github.com/netadmindave/CalcShelf/tree/main/modules",
- "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Every formula solves for any of its variables.",
+ "description": "Optics and photonics: light and photons, geometric optics, diffraction, Gaussian beams, cavities and etalons, fibers, frequency combs, detection and materials, with the optics tools and material data. Version 1.1 adds formulas following Saleh & Teich’s Fundamentals of Photonics (rays to ultrafast optics) and Neamen’s Semiconductor Physics and Devices (carriers, junctions, transistors, optical devices). Version 1.3 adds laser design (Svelto’s Principles of Lasers), classical optics (Hecht’s Optics), fiber links and receivers (Agrawal’s Fiber-Optic Communication Systems), nonlinear fiber optics (Agrawal) and ultrafast pulses (Rullière’s Femtosecond Laser Pulses). Every formula solves for any of its variables.",
  "sections": [
   {
    "title": "Light & photons",
@@ -4930,7 +4930,7 @@
       ],
       [
        "d",
-       "mirror spacing",
+       "separation of the two waveguide mirrors",
        "m"
       ],
       [
@@ -11557,6 +11557,2948 @@
       ]
      ],
      "note": "Neamen, Semiconductor Physics and Devices, ch. 14."
+    }
+   ]
+  },
+  {
+   "title": "Laser design",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Logarithmic mirror loss",
+     "tex": "\\gamma=-\\ln R",
+     "eq": "gam=-ln(R)",
+     "vars": [
+      [
+       "gam",
+       "logarithmic loss γ",
+       ""
+      ],
+      [
+       "R",
+       "mirror reflectance (or 1 − loss)",
+       "",
+       "0.95"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 1. For small losses γ ≈ 1 − R."
+    },
+    {
+     "type": "formula",
+     "title": "Total single-pass loss",
+     "tex": "\\gamma=\\gamma_i+\\frac{\\gamma_1+\\gamma_2}{2}",
+     "eq": "gam=gi+(g1+g2)/2",
+     "vars": [
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ],
+      [
+       "gi",
+       "internal loss γᵢ",
+       "",
+       "0"
+      ],
+      [
+       "g1",
+       "mirror 1 loss γ₁ = −ln R₁",
+       "",
+       "0"
+      ],
+      [
+       "g2",
+       "output-coupler loss γ₂ = −ln R₂",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Effective cavity length",
+     "tex": "L_e=L+(n-1)l",
+     "eq": "Le=L+(n-1)*l",
+     "vars": [
+      [
+       "Le",
+       "effective (optical) length",
+       "m"
+      ],
+      [
+       "L",
+       "mirror spacing",
+       "m"
+      ],
+      [
+       "n",
+       "index of the active medium",
+       "",
+       "1.82"
+      ],
+      [
+       "l",
+       "length of the active medium",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Cavity photon lifetime",
+     "tex": "\\tau_c=\\frac{L_e}{c\\,\\gamma}",
+     "eq": "tc=Le/(c*gam)",
+     "vars": [
+      [
+       "tc",
+       "photon lifetime",
+       "s"
+      ],
+      [
+       "Le",
+       "effective cavity length",
+       "m"
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ],
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 5. and ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Critical inversion",
+     "tex": "N_c=\\frac{\\gamma}{\\sigma_e l}",
+     "eq": "Nc=gam/(sig*l)",
+     "vars": [
+      [
+       "Nc",
+       "critical (threshold) inversion",
+       "1/m³"
+      ],
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ],
+      [
+       "sig",
+       "stimulated-emission cross section",
+       "m²"
+      ],
+      [
+       "l",
+       "length of the active medium",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Threshold pump rate (four-level)",
+     "tex": "R_{cp}=\\frac{N_c}{\\tau}",
+     "eq": "Rcp=Nc/tau",
+     "vars": [
+      [
+       "Rcp",
+       "critical pump rate",
+       "1/(m³·s)"
+      ],
+      [
+       "Nc",
+       "critical inversion",
+       "1/m³"
+      ],
+      [
+       "tau",
+       "upper-level lifetime",
+       "s"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Threshold pump power (longitudinal diode pumping)",
+     "tex": "P_{th}=\\frac{\\gamma}{\\eta_p}\\frac{h\\nu_p}{\\tau}\\frac{\\pi(w_0^2+w_p^2)}{2\\sigma_e}",
+     "eq": "Pth=gam/etap*h*nup/tau*pi*(w0^2+wp^2)/(2*sig)",
+     "vars": [
+      [
+       "Pth",
+       "threshold pump power",
+       "W"
+      ],
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ],
+      [
+       "etap",
+       "pump efficiency",
+       "",
+       "0.8"
+      ],
+      [
+       "h",
+       "Planck constant h",
+       "J·s",
+       "6.62607015e-34"
+      ],
+      [
+       "nup",
+       "pump frequency",
+       "Hz"
+      ],
+      [
+       "tau",
+       "upper-level lifetime",
+       "s"
+      ],
+      [
+       "w0",
+       "laser mode spot size",
+       "m"
+      ],
+      [
+       "wp",
+       "pump spot size",
+       "m"
+      ],
+      [
+       "sig",
+       "stimulated-emission cross section",
+       "m²"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 6. Gaussian pump and mode, four-level medium."
+    },
+    {
+     "type": "formula",
+     "title": "Laser output power above threshold",
+     "tex": "P_{out}=A_bI_s\\frac{\\gamma_2}{2}\\left(\\frac{P_p}{P_{th}}-1\\right)",
+     "eq": "Pout=Ab*Is*g2/2*(Pp/Pth-1)",
+     "vars": [
+      [
+       "Pout",
+       "output power",
+       "W"
+      ],
+      [
+       "Ab",
+       "mode cross-section area",
+       "m²"
+      ],
+      [
+       "Is",
+       "saturation intensity hν/(στ)",
+       "W/m²"
+      ],
+      [
+       "g2",
+       "output-coupler loss γ₂",
+       ""
+      ],
+      [
+       "Pp",
+       "pump power",
+       "W"
+      ],
+      [
+       "Pth",
+       "threshold pump power",
+       "W"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7. Four-level laser, mirror 1 fully reflecting (Rigrod)."
+    },
+    {
+     "type": "formula",
+     "title": "Laser slope efficiency",
+     "tex": "\\eta_s=\\eta_p\\,\\eta_c\\,\\eta_q\\,\\eta_t",
+     "eq": "etas=etap*etac*etaq*etat",
+     "vars": [
+      [
+       "etas",
+       "slope efficiency",
+       ""
+      ],
+      [
+       "etap",
+       "pump efficiency",
+       ""
+      ],
+      [
+       "etac",
+       "output-coupling efficiency γ₂/2γ",
+       ""
+      ],
+      [
+       "etaq",
+       "quantum efficiency hν/hν_p",
+       ""
+      ],
+      [
+       "etat",
+       "transverse efficiency",
+       "",
+       "1"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Output-coupling efficiency",
+     "tex": "\\eta_c=\\frac{\\gamma_2}{2\\gamma}",
+     "eq": "etac=g2/(2*gam)",
+     "vars": [
+      [
+       "etac",
+       "output-coupling efficiency",
+       ""
+      ],
+      [
+       "g2",
+       "output-coupler loss γ₂",
+       ""
+      ],
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Quantum efficiency of the pump",
+     "tex": "\\eta_q=\\frac{h\\nu}{h\\nu_p}=\\frac{\\lambda_p}{\\lambda}",
+     "eq": "etaq=lamp/lam",
+     "vars": [
+      [
+       "etaq",
+       "quantum (Stokes) efficiency",
+       ""
+      ],
+      [
+       "lamp",
+       "pump wavelength",
+       "m"
+      ],
+      [
+       "lam",
+       "laser wavelength",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Pump absorption efficiency",
+     "tex": "\\eta_a=1-e^{-\\alpha_pl}",
+     "eq": "etaa=1-exp(-ap*l)",
+     "vars": [
+      [
+       "etaa",
+       "absorbed fraction of the pump",
+       ""
+      ],
+      [
+       "ap",
+       "absorption coefficient at the pump wavelength",
+       "1/m"
+      ],
+      [
+       "l",
+       "crystal length",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 6. Single pass."
+    },
+    {
+     "type": "formula",
+     "title": "Optimum output coupling",
+     "tex": "\\left(\\gamma_2\\right)_{op}=2\\gamma_i\\left(\\sqrt{x_m}-1\\right)",
+     "eq": "g2op=2*gi*(sqrt(xm)-1)",
+     "vars": [
+      [
+       "g2op",
+       "optimum output-coupler loss γ₂",
+       ""
+      ],
+      [
+       "gi",
+       "internal loss γᵢ",
+       ""
+      ],
+      [
+       "xm",
+       "pump power over the minimum threshold (γ₂ = 0)",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Relaxation oscillation frequency",
+     "tex": "\\omega_R=\\sqrt{\\frac{x-1}{\\tau_c\\,\\tau}}",
+     "eq": "omR=sqrt((x-1)/(tc*tau))",
+     "vars": [
+      [
+       "omR",
+       "angular frequency of the spiking",
+       "rad/s"
+      ],
+      [
+       "x",
+       "pump rate over threshold",
+       "",
+       "2"
+      ],
+      [
+       "tc",
+       "photon lifetime",
+       "s"
+      ],
+      [
+       "tau",
+       "upper-level lifetime",
+       "s"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 8."
+    },
+    {
+     "type": "formula",
+     "title": "Relaxation oscillation damping time",
+     "tex": "t_0=\\frac{2\\tau}{x}",
+     "eq": "t0=2*tau/x",
+     "vars": [
+      [
+       "t0",
+       "damping time",
+       "s"
+      ],
+      [
+       "tau",
+       "upper-level lifetime",
+       "s"
+      ],
+      [
+       "x",
+       "pump rate over threshold",
+       "",
+       "2"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 8."
+    },
+    {
+     "type": "formula",
+     "title": "Q-switch energy utilization",
+     "tex": "\\frac{N_i}{N_p}\\eta_E=-\\ln(1-\\eta_E)",
+     "eq": "r=-ln(1-etaE)/etaE",
+     "vars": [
+      [
+       "etaE",
+       "energy utilization factor η_E",
+       ""
+      ],
+      [
+       "r",
+       "initial inversion over threshold Nᵢ/N_p",
+       "",
+       "2"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 8. Solve for η_E (between 0 and 1)."
+    },
+    {
+     "type": "formula",
+     "title": "Q-switched pulse energy",
+     "tex": "E=\\frac{\\gamma_2}{2\\gamma}\\eta_EN_iA\\,l\\,h\\nu",
+     "eq": "E=g2/(2*gam)*etaE*Ni*A*l*h*nu",
+     "vars": [
+      [
+       "E",
+       "output pulse energy",
+       "J"
+      ],
+      [
+       "g2",
+       "output-coupler loss γ₂",
+       ""
+      ],
+      [
+       "gam",
+       "total single-pass loss γ",
+       ""
+      ],
+      [
+       "etaE",
+       "energy utilization",
+       ""
+      ],
+      [
+       "Ni",
+       "initial inversion",
+       "1/m³"
+      ],
+      [
+       "A",
+       "mode area",
+       "m²"
+      ],
+      [
+       "l",
+       "length of the active medium",
+       "m"
+      ],
+      [
+       "h",
+       "Planck constant h",
+       "J·s",
+       "6.62607015e-34"
+      ],
+      [
+       "nu",
+       "laser frequency",
+       "Hz"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 8. Four-level laser."
+    },
+    {
+     "type": "formula",
+     "title": "Q-switched pulse duration",
+     "tex": "\\Delta\\tau_p=\\tau_c\\frac{(N_i/N_p)\\,\\eta_E}{N_i/N_p-\\ln(N_i/N_p)-1}",
+     "eq": "dtp=tc*r*etaE/(r-ln(r)-1)",
+     "vars": [
+      [
+       "dtp",
+       "pulse width (FWHM, approximately)",
+       "s"
+      ],
+      [
+       "tc",
+       "photon lifetime",
+       "s"
+      ],
+      [
+       "r",
+       "Nᵢ/N_p",
+       "",
+       "2"
+      ],
+      [
+       "etaE",
+       "energy utilization",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 8."
+    },
+    {
+     "type": "formula",
+     "title": "Frequency pulling",
+     "tex": "\\nu_{osc}=\\frac{\\nu_c\\Delta\\nu_0+\\nu_0\\Delta\\nu_c}{\\Delta\\nu_0+\\Delta\\nu_c}",
+     "eq": "nuo=(nuc*dnu0+nu0*dnuc)/(dnu0+dnuc)",
+     "vars": [
+      [
+       "nuo",
+       "oscillation frequency",
+       "Hz"
+      ],
+      [
+       "nuc",
+       "cavity-mode frequency",
+       "Hz"
+      ],
+      [
+       "dnu0",
+       "gain linewidth",
+       "Hz"
+      ],
+      [
+       "nu0",
+       "line-centre frequency",
+       "Hz"
+      ],
+      [
+       "dnuc",
+       "cavity linewidth",
+       "Hz"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 7. Homogeneous line."
+    },
+    {
+     "type": "formula",
+     "title": "Collision (pressure) broadening",
+     "tex": "\\Delta\\nu_c=\\frac{1}{\\pi\\tau_c}",
+     "eq": "dnuc=1/(pi*tauc)",
+     "vars": [
+      [
+       "dnuc",
+       "collision linewidth (FWHM)",
+       "Hz"
+      ],
+      [
+       "tauc",
+       "mean time between collisions",
+       "s"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Fluorescence quantum yield",
+     "tex": "\\phi=\\frac{\\tau}{\\tau_r}",
+     "eq": "phi=tau/taur",
+     "vars": [
+      [
+       "phi",
+       "quantum yield",
+       ""
+      ],
+      [
+       "tau",
+       "measured lifetime",
+       "s"
+      ],
+      [
+       "taur",
+       "radiative lifetime",
+       "s"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Saturation fluence (amplifier)",
+     "tex": "\\Gamma_s=\\frac{h\\nu}{\\sigma}",
+     "eq": "Gs=h*nu/sig",
+     "vars": [
+      [
+       "Gs",
+       "saturation fluence",
+       "J/m²"
+      ],
+      [
+       "h",
+       "Planck constant h",
+       "J·s",
+       "6.62607015e-34"
+      ],
+      [
+       "nu",
+       "frequency",
+       "Hz"
+      ],
+      [
+       "sig",
+       "transition cross section",
+       "m²"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 12. Four-level medium, pulse shorter than the lifetime."
+    },
+    {
+     "type": "formula",
+     "title": "Pulsed amplifier gain (Frantz–Nodvik)",
+     "tex": "G=\\frac{\\Gamma_s}{\\Gamma_{in}}\\ln\\left\\{1+G_0\\left[e^{\\Gamma_{in}/\\Gamma_s}-1\\right]\\right\\}",
+     "eq": "G=Gs/Gin*ln(1+G0*(exp(Gin/Gs)-1))",
+     "vars": [
+      [
+       "G",
+       "energy gain",
+       ""
+      ],
+      [
+       "Gs",
+       "saturation fluence",
+       "J/m²"
+      ],
+      [
+       "Gin",
+       "input fluence",
+       "J/m²"
+      ],
+      [
+       "G0",
+       "small-signal gain",
+       ""
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 12."
+    },
+    {
+     "type": "formula",
+     "title": "Unstable resonator output coupling",
+     "tex": "\\gamma_{out}=1-\\frac{1}{M^2}",
+     "eq": "gout=1-1/M^2",
+     "vars": [
+      [
+       "gout",
+       "fraction coupled out per round trip",
+       ""
+      ],
+      [
+       "M",
+       "round-trip magnification",
+       "",
+       "2"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 5. Two-dimensional (spherical) mirrors; 1 − 1/M for cylindrical."
+    },
+    {
+     "type": "formula",
+     "title": "Divergence of a real beam (M²)",
+     "tex": "\\theta=M^2\\frac{\\lambda}{\\pi w_0}",
+     "eq": "th=M2*lam/(pi*w0)",
+     "vars": [
+      [
+       "th",
+       "far-field half-angle divergence",
+       "rad"
+      ],
+      [
+       "M2",
+       "beam quality factor M²",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ],
+      [
+       "w0",
+       "waist radius",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 11. M² = 1 for a TEM₀₀ Gaussian beam."
+    },
+    {
+     "type": "formula",
+     "title": "Beam parameter product",
+     "tex": "\\mathrm{BPP}=w_0\\theta=M^2\\frac{\\lambda}{\\pi}",
+     "eq": "BPP=M2*lam/pi",
+     "vars": [
+      [
+       "BPP",
+       "beam parameter product",
+       "m·rad"
+      ],
+      [
+       "M2",
+       "M²",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 11."
+    },
+    {
+     "type": "formula",
+     "title": "Rayleigh range of a real beam",
+     "tex": "z_R=\\frac{\\pi w_0^2}{M^2\\lambda}",
+     "eq": "zR=pi*w0^2/(M2*lam)",
+     "vars": [
+      [
+       "zR",
+       "Rayleigh range",
+       "m"
+      ],
+      [
+       "w0",
+       "waist radius",
+       "m"
+      ],
+      [
+       "M2",
+       "M²",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 11."
+    },
+    {
+     "type": "formula",
+     "title": "Brightness of a beam",
+     "tex": "B=\\frac{P}{(\\pi w_0\\theta)^2}\\approx\\frac{P}{(M^2\\lambda)^2}",
+     "eq": "B=P/(M2*lam)^2",
+     "vars": [
+      [
+       "B",
+       "brightness (radiance)",
+       "W/(m²·sr)"
+      ],
+      [
+       "P",
+       "power",
+       "W"
+      ],
+      [
+       "M2",
+       "M²",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 11."
+    },
+    {
+     "type": "formula",
+     "title": "Speckle grain size",
+     "tex": "d_{sp}\\approx\\frac{\\lambda z}{D}",
+     "eq": "dsp=lam*z/D",
+     "vars": [
+      [
+       "dsp",
+       "speckle size",
+       "m"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ],
+      [
+       "z",
+       "distance from the illuminated spot",
+       "m"
+      ],
+      [
+       "D",
+       "diameter of the illuminated spot",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 11."
+    },
+    {
+     "type": "formula",
+     "title": "Thermal lens of an end-pumped rod",
+     "tex": "f_{th}=\\frac{\\pi Kw_p^2}{P_h\\,(dn/dT)}\\frac{1}{1-e^{-\\alpha l}}",
+     "eq": "fth=pi*K*wp^2/(Ph*dndT)/(1-exp(-ap*l))",
+     "vars": [
+      [
+       "fth",
+       "thermal focal length",
+       "m"
+      ],
+      [
+       "K",
+       "thermal conductivity",
+       "W/(m·K)"
+      ],
+      [
+       "wp",
+       "pump spot radius",
+       "m"
+      ],
+      [
+       "Ph",
+       "heat deposited",
+       "W"
+      ],
+      [
+       "dndT",
+       "dn/dT",
+       "1/K"
+      ],
+      [
+       "ap",
+       "pump absorption coefficient",
+       "1/m"
+      ],
+      [
+       "l",
+       "rod length",
+       "m"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 6. Innocenzi’s estimate; end-face bulging adds to it."
+    },
+    {
+     "type": "formula",
+     "title": "SHG phase-matching angle (type I, negative uniaxial)",
+     "tex": "\\sin^2\\theta_m=\\frac{n_o^{-2}(\\omega)-n_o^{-2}(2\\omega)}{n_e^{-2}(2\\omega)-n_o^{-2}(2\\omega)}",
+     "eq": "sin(thm)^2=(no1^(-2)-no2^(-2))/(ne2^(-2)-no2^(-2))",
+     "vars": [
+      [
+       "thm",
+       "phase-matching angle to the optic axis",
+       "rad"
+      ],
+      [
+       "no1",
+       "ordinary index at ω",
+       "",
+       "1.6551"
+      ],
+      [
+       "no2",
+       "ordinary index at 2ω",
+       "",
+       "1.6749"
+      ],
+      [
+       "ne2",
+       "extraordinary index at 2ω",
+       "",
+       "1.5555"
+      ]
+     ],
+     "note": "Svelto, Principles of Lasers, ch. 12. Defaults: β-BBO for 1064 → 532 nm (about 22.8°)."
+    }
+   ]
+  },
+  {
+   "title": "Classical optics",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Fresnel amplitude reflection, s (TE)",
+     "tex": "r_s=\\frac{n_i\\cos\\theta_i-n_t\\cos\\theta_t}{n_i\\cos\\theta_i+n_t\\cos\\theta_t}",
+     "eq": "rs=(ni*cos(thi)-nt*cos(tht))/(ni*cos(thi)+nt*cos(tht))",
+     "vars": [
+      [
+       "rs",
+       "amplitude reflection coefficient r⊥",
+       ""
+      ],
+      [
+       "ni",
+       "incident index",
+       "",
+       "1"
+      ],
+      [
+       "thi",
+       "angle of incidence",
+       "rad"
+      ],
+      [
+       "nt",
+       "transmitted index",
+       "",
+       "1.5"
+      ],
+      [
+       "tht",
+       "angle of refraction (Snell)",
+       "rad"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Fresnel amplitude reflection, p (TM)",
+     "tex": "r_p=\\frac{n_t\\cos\\theta_i-n_i\\cos\\theta_t}{n_i\\cos\\theta_t+n_t\\cos\\theta_i}",
+     "eq": "rp=(nt*cos(thi)-ni*cos(tht))/(ni*cos(tht)+nt*cos(thi))",
+     "vars": [
+      [
+       "rp",
+       "amplitude reflection coefficient r∥",
+       ""
+      ],
+      [
+       "ni",
+       "incident index",
+       "",
+       "1"
+      ],
+      [
+       "thi",
+       "angle of incidence",
+       "rad"
+      ],
+      [
+       "nt",
+       "transmitted index",
+       "",
+       "1.5"
+      ],
+      [
+       "tht",
+       "angle of refraction",
+       "rad"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 4. Hecht’s sign convention; r∥ = 0 at Brewster’s angle."
+    },
+    {
+     "type": "formula",
+     "title": "Fresnel amplitude transmission, s (TE)",
+     "tex": "t_s=\\frac{2n_i\\cos\\theta_i}{n_i\\cos\\theta_i+n_t\\cos\\theta_t}",
+     "eq": "ts=2*ni*cos(thi)/(ni*cos(thi)+nt*cos(tht))",
+     "vars": [
+      [
+       "ts",
+       "amplitude transmission coefficient t⊥",
+       ""
+      ],
+      [
+       "ni",
+       "incident index",
+       "",
+       "1"
+      ],
+      [
+       "thi",
+       "angle of incidence",
+       "rad"
+      ],
+      [
+       "nt",
+       "transmitted index",
+       "",
+       "1.5"
+      ],
+      [
+       "tht",
+       "angle of refraction",
+       "rad"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Fresnel amplitude transmission, p (TM)",
+     "tex": "t_p=\\frac{2n_i\\cos\\theta_i}{n_i\\cos\\theta_t+n_t\\cos\\theta_i}",
+     "eq": "tp=2*ni*cos(thi)/(ni*cos(tht)+nt*cos(thi))",
+     "vars": [
+      [
+       "tp",
+       "amplitude transmission coefficient t∥",
+       ""
+      ],
+      [
+       "ni",
+       "incident index",
+       "",
+       "1"
+      ],
+      [
+       "thi",
+       "angle of incidence",
+       "rad"
+      ],
+      [
+       "nt",
+       "transmitted index",
+       "",
+       "1.5"
+      ],
+      [
+       "tht",
+       "angle of refraction",
+       "rad"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Transmittance from the amplitude coefficient",
+     "tex": "T=\\frac{n_t\\cos\\theta_t}{n_i\\cos\\theta_i}t^2",
+     "eq": "T=nt*cos(tht)/(ni*cos(thi))*t^2",
+     "vars": [
+      [
+       "T",
+       "transmittance (power)",
+       ""
+      ],
+      [
+       "nt",
+       "transmitted index",
+       "",
+       "1.5"
+      ],
+      [
+       "tht",
+       "angle of refraction",
+       "rad"
+      ],
+      [
+       "ni",
+       "incident index",
+       "",
+       "1"
+      ],
+      [
+       "thi",
+       "angle of incidence",
+       "rad"
+      ],
+      [
+       "t",
+       "amplitude transmission coefficient",
+       ""
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 4. R = r² and R + T = 1 without absorption."
+    },
+    {
+     "type": "formula",
+     "title": "Lorentz dispersion equation",
+     "tex": "n^2=1+\\frac{Nq_e^2}{\\varepsilon_0m_e}\\frac{1}{\\omega_0^2-\\omega^2}",
+     "eq": "n^2=1+N*q^2/(eps0*m0*(w0^2-w^2))",
+     "vars": [
+      [
+       "n",
+       "refractive index",
+       ""
+      ],
+      [
+       "N",
+       "oscillators per volume",
+       "1/m³"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ],
+      [
+       "eps0",
+       "vacuum permittivity ε₀",
+       "F/m",
+       "8.8541878128e-12"
+      ],
+      [
+       "m0",
+       "electron mass",
+       "kg",
+       "9.1093837015e-31"
+      ],
+      [
+       "w0",
+       "resonance angular frequency",
+       "rad/s"
+      ],
+      [
+       "w",
+       "angular frequency",
+       "rad/s"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 3. One undamped resonance."
+    },
+    {
+     "type": "formula",
+     "title": "Newton’s rings",
+     "tex": "r_m=\\sqrt{m\\lambda R}",
+     "eq": "rm=sqrt(m*lam*R)",
+     "vars": [
+      [
+       "rm",
+       "radius of the m-th dark ring",
+       "m"
+      ],
+      [
+       "m",
+       "ring order (0 at the centre)",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength in the gap",
+       "m"
+      ],
+      [
+       "R",
+       "lens radius of curvature",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 9. Reflected light, air gap."
+    },
+    {
+     "type": "formula",
+     "title": "Thin-film reflection maxima",
+     "tex": "2n_fd\\cos\\theta_t=\\left(m+\\tfrac12\\right)\\lambda_0",
+     "eq": "2*nf*d*cos(tht)=(m+1/2)*lam0",
+     "vars": [
+      [
+       "d",
+       "film thickness",
+       "m"
+      ],
+      [
+       "nf",
+       "film index",
+       "",
+       "1.38"
+      ],
+      [
+       "tht",
+       "angle inside the film",
+       "rad",
+       "0"
+      ],
+      [
+       "m",
+       "order",
+       "",
+       "0"
+      ],
+      [
+       "lam0",
+       "vacuum wavelength",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 9. One reflection with a π phase change (film between lower-index and higher-index media, or the reverse); with zero or two, the maxima are at mλ₀."
+    },
+    {
+     "type": "formula",
+     "title": "Coefficient of finesse",
+     "tex": "F=\\frac{4R}{(1-R)^2}",
+     "eq": "F=4*R/(1-R)^2",
+     "vars": [
+      [
+       "F",
+       "coefficient of finesse",
+       ""
+      ],
+      [
+       "R",
+       "mirror reflectance",
+       "",
+       "0.9"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 9. Finesse 𝓕 = π√F/2."
+    },
+    {
+     "type": "formula",
+     "title": "Fabry–Pérot resolving power",
+     "tex": "\\frac{\\lambda}{\\Delta\\lambda}=m\\mathcal F",
+     "eq": "RP=m*Fin",
+     "vars": [
+      [
+       "RP",
+       "resolving power λ/Δλ",
+       ""
+      ],
+      [
+       "m",
+       "interference order 2nd/λ",
+       ""
+      ],
+      [
+       "Fin",
+       "finesse 𝓕",
+       ""
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 9."
+    },
+    {
+     "type": "formula",
+     "title": "Grating angular dispersion",
+     "tex": "\\mathcal D=\\frac{d\\theta}{d\\lambda}=\\frac{m}{a\\cos\\theta_m}",
+     "eq": "Dg=m/(a*cos(thm))",
+     "vars": [
+      [
+       "Dg",
+       "angular dispersion",
+       "rad/m"
+      ],
+      [
+       "m",
+       "order",
+       "",
+       "1"
+      ],
+      [
+       "a",
+       "groove spacing",
+       "m"
+      ],
+      [
+       "thm",
+       "diffraction angle",
+       "rad"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 10."
+    },
+    {
+     "type": "formula",
+     "title": "Fresnel zone radius",
+     "tex": "R_m=\\sqrt{m\\lambda r_0}",
+     "eq": "Rm=sqrt(m*lam*r0)",
+     "vars": [
+      [
+       "Rm",
+       "outer radius of zone m",
+       "m"
+      ],
+      [
+       "m",
+       "zone number",
+       "",
+       "1"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ],
+      [
+       "r0",
+       "distance to the observation point",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 10. Plane-wave illumination."
+    },
+    {
+     "type": "formula",
+     "title": "Zone plate focal length",
+     "tex": "f_1=\\frac{R_1^2}{\\lambda}",
+     "eq": "f=R1^2/lam",
+     "vars": [
+      [
+       "f",
+       "primary focal length",
+       "m"
+      ],
+      [
+       "R1",
+       "radius of the first zone",
+       "m"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 10."
+    },
+    {
+     "type": "formula",
+     "title": "Newtonian lens equation",
+     "tex": "x_ox_i=f^2",
+     "eq": "xo*xi=f^2",
+     "vars": [
+      [
+       "xo",
+       "object distance from the front focal point",
+       "m"
+      ],
+      [
+       "xi",
+       "image distance from the back focal point",
+       "m"
+      ],
+      [
+       "f",
+       "focal length",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Longitudinal magnification",
+     "tex": "M_L=-M_T^2",
+     "eq": "ML=-MT^2",
+     "vars": [
+      [
+       "ML",
+       "longitudinal magnification",
+       ""
+      ],
+      [
+       "MT",
+       "transverse magnification",
+       ""
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5. Thin lens."
+    },
+    {
+     "type": "formula",
+     "title": "Magnifying power of a magnifier",
+     "tex": "MP=\\frac{d_o}{f}",
+     "eq": "MP=d0/f",
+     "vars": [
+      [
+       "MP",
+       "magnifying power",
+       ""
+      ],
+      [
+       "d0",
+       "near-point distance",
+       "m",
+       "0.254"
+      ],
+      [
+       "f",
+       "focal length",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5. Image at infinity; add 1 with the image at the near point."
+    },
+    {
+     "type": "formula",
+     "title": "Compound microscope magnification",
+     "tex": "MP=-\\frac{L}{f_o}\\frac{d_o}{f_e}",
+     "eq": "MP=-L/fo*d0/fe",
+     "vars": [
+      [
+       "MP",
+       "magnifying power",
+       ""
+      ],
+      [
+       "L",
+       "tube length (focal points apart)",
+       "m",
+       "0.16"
+      ],
+      [
+       "fo",
+       "objective focal length",
+       "m"
+      ],
+      [
+       "d0",
+       "near-point distance",
+       "m",
+       "0.254"
+      ],
+      [
+       "fe",
+       "eyepiece focal length",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Telescope angular magnification",
+     "tex": "MP=-\\frac{f_o}{f_e}",
+     "eq": "MP=-fo/fe",
+     "vars": [
+      [
+       "MP",
+       "magnifying power",
+       ""
+      ],
+      [
+       "fo",
+       "objective focal length",
+       "m"
+      ],
+      [
+       "fe",
+       "eyepiece focal length",
+       "m"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Telescope exit pupil",
+     "tex": "D_{ex}=\\frac{D_o}{|MP|}",
+     "eq": "Dex=Dob/abs(MP)",
+     "vars": [
+      [
+       "Dex",
+       "exit-pupil diameter",
+       "m"
+      ],
+      [
+       "Dob",
+       "objective diameter",
+       "m"
+      ],
+      [
+       "MP",
+       "magnifying power",
+       ""
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Sagnac phase shift",
+     "tex": "\\Delta\\varphi=\\frac{8\\pi A\\Omega}{\\lambda c}",
+     "eq": "dph=8*pi*A*Om/(lam*c)",
+     "vars": [
+      [
+       "dph",
+       "phase difference",
+       "rad"
+      ],
+      [
+       "A",
+       "enclosed area (times the number of turns)",
+       "m²"
+      ],
+      [
+       "Om",
+       "rotation rate",
+       "rad/s"
+      ],
+      [
+       "lam",
+       "vacuum wavelength",
+       "m"
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 9."
+    },
+    {
+     "type": "formula",
+     "title": "Relativistic Doppler shift",
+     "tex": "f=f_0\\sqrt{\\frac{1+\\beta}{1-\\beta}}",
+     "eq": "f=f0*sqrt((1+bet)/(1-bet))",
+     "vars": [
+      [
+       "f",
+       "observed frequency",
+       "Hz"
+      ],
+      [
+       "f0",
+       "source frequency",
+       "Hz"
+      ],
+      [
+       "bet",
+       "v/c (positive approaching)",
+       ""
+      ]
+     ],
+     "note": "Hecht, Optics, ch. 3."
+    }
+   ]
+  },
+  {
+   "title": "Fiber links & receivers",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Splice loss from a lateral offset",
+     "tex": "T=\\exp\\left(-\\frac{d^2}{w^2}\\right)",
+     "eq": "T=exp(-d^2/w^2)",
+     "vars": [
+      [
+       "T",
+       "coupling efficiency",
+       ""
+      ],
+      [
+       "d",
+       "core offset",
+       "m"
+      ],
+      [
+       "w",
+       "mode-field radius",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 2. Gaussian modes of equal size."
+    },
+    {
+     "type": "formula",
+     "title": "Splice loss from an angular tilt",
+     "tex": "T=\\exp\\left[-\\left(\\frac{\\pi nw\\theta}{\\lambda}\\right)^2\\right]",
+     "eq": "T=exp(-(pi*n*w*th/lam)^2)",
+     "vars": [
+      [
+       "T",
+       "coupling efficiency",
+       ""
+      ],
+      [
+       "n",
+       "index of the gap",
+       "",
+       "1"
+      ],
+      [
+       "w",
+       "mode-field radius",
+       "m"
+      ],
+      [
+       "th",
+       "tilt angle",
+       "rad"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Splice loss from mode-size mismatch",
+     "tex": "T=\\left(\\frac{2w_1w_2}{w_1^2+w_2^2}\\right)^2",
+     "eq": "T=(2*w1*w2/(w1^2+w2^2))^2",
+     "vars": [
+      [
+       "T",
+       "coupling efficiency",
+       ""
+      ],
+      [
+       "w1",
+       "mode-field radius 1",
+       "m"
+      ],
+      [
+       "w2",
+       "mode-field radius 2",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "ASE spectral density",
+     "tex": "S_{sp}=n_{sp}h\\nu(G-1)",
+     "eq": "Ssp=nsp*h*nu*(G-1)",
+     "vars": [
+      [
+       "Ssp",
+       "ASE power per hertz, one polarization",
+       "W/Hz"
+      ],
+      [
+       "nsp",
+       "spontaneous-emission factor",
+       "",
+       "1.5"
+      ],
+      [
+       "h",
+       "Planck constant h",
+       "J·s",
+       "6.62607015e-34"
+      ],
+      [
+       "nu",
+       "frequency",
+       "Hz"
+      ],
+      [
+       "G",
+       "amplifier gain (linear)",
+       ""
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Amplifier noise figure",
+     "tex": "F_n=2n_{sp}\\frac{G-1}{G}",
+     "eq": "Fn=2*nsp*(G-1)/G",
+     "vars": [
+      [
+       "Fn",
+       "noise figure (linear)",
+       ""
+      ],
+      [
+       "nsp",
+       "spontaneous-emission factor",
+       ""
+      ],
+      [
+       "G",
+       "gain (linear)",
+       ""
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 7. Signal–spontaneous beat noise; 3 dB is the high-gain limit with full inversion."
+    },
+    {
+     "type": "formula",
+     "title": "OSNR of an amplified link",
+     "tex": "\\mathrm{OSNR}=\\frac{P_{ch}}{2N_An_{sp}h\\nu(G-1)\\Delta\\nu_o}",
+     "eq": "OSNR=Pch/(2*NA*nsp*h*nu*(G-1)*dnuo)",
+     "vars": [
+      [
+       "OSNR",
+       "optical SNR (linear)",
+       ""
+      ],
+      [
+       "Pch",
+       "channel power at each amplifier",
+       "W"
+      ],
+      [
+       "NA",
+       "number of amplifiers",
+       "",
+       "1"
+      ],
+      [
+       "nsp",
+       "spontaneous-emission factor",
+       "",
+       "1.5"
+      ],
+      [
+       "h",
+       "Planck constant h",
+       "J·s",
+       "6.62607015e-34"
+      ],
+      [
+       "nu",
+       "frequency",
+       "Hz",
+       "193.4e12"
+      ],
+      [
+       "G",
+       "gain of each amplifier (span loss)",
+       ""
+      ],
+      [
+       "dnuo",
+       "reference bandwidth (12.5 GHz = 0.1 nm)",
+       "Hz",
+       "12.5e9"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 7. Both polarizations of ASE."
+    },
+    {
+     "type": "formula",
+     "title": "OSNR rule of thumb (dB, 0.1 nm)",
+     "tex": "\\mathrm{OSNR}_{dB}=58+P_{dBm}-NF_{dB}-L_{dB}-10\\log_{10}N_A",
+     "eq": "OSNR=58+P-NF-Lsp-10*log10(NA)",
+     "vars": [
+      [
+       "OSNR",
+       "OSNR in 0.1 nm",
+       "dB"
+      ],
+      [
+       "P",
+       "launch power per channel",
+       "dBm"
+      ],
+      [
+       "NF",
+       "amplifier noise figure",
+       "dB",
+       "5"
+      ],
+      [
+       "Lsp",
+       "span loss",
+       "dB"
+      ],
+      [
+       "NA",
+       "number of spans",
+       "",
+       "1"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 7. Identical spans at 1550 nm; 58 dB = −10 log₁₀(hν·12.5 GHz/1 mW)."
+    },
+    {
+     "type": "formula",
+     "title": "Thermal noise current",
+     "tex": "\\sigma_T^2=\\frac{4k_BT}{R_L}F_n\\Delta f",
+     "eq": "sT2=4*kB*T*Fn*df/RL",
+     "vars": [
+      [
+       "sT2",
+       "noise current variance",
+       "A²"
+      ],
+      [
+       "kB",
+       "Boltzmann constant k",
+       "J/K",
+       "1.380649e-23"
+      ],
+      [
+       "T",
+       "temperature",
+       "K",
+       "300"
+      ],
+      [
+       "Fn",
+       "amplifier noise figure (linear)",
+       "",
+       "1"
+      ],
+      [
+       "df",
+       "receiver bandwidth",
+       "Hz"
+      ],
+      [
+       "RL",
+       "load resistance",
+       "Ω"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Extinction-ratio power penalty",
+     "tex": "\\delta_{ex}=10\\log_{10}\\frac{1+r_{ex}}{1-r_{ex}}",
+     "eq": "dex=10*log10((1+rex)/(1-rex))",
+     "vars": [
+      [
+       "dex",
+       "penalty",
+       "dB"
+      ],
+      [
+       "rex",
+       "extinction ratio P₀/P₁ (linear)",
+       "",
+       "0.1"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "GVD-limited bit rate (narrow source)",
+     "tex": "B\\sqrt{|\\beta_2|L}=\\frac14",
+     "eq": "B*sqrt(abs(b2)*L)=1/4",
+     "vars": [
+      [
+       "B",
+       "bit rate",
+       "1/s"
+      ],
+      [
+       "b2",
+       "GVD β₂",
+       "s²/m"
+      ],
+      [
+       "L",
+       "fiber length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 2. Gaussian pulses; a source much narrower than the signal bandwidth."
+    },
+    {
+     "type": "formula",
+     "title": "Dispersion compensation",
+     "tex": "D_1L_1+D_2L_2=0",
+     "eq": "D1*L1+D2*L2=0",
+     "vars": [
+      [
+       "L2",
+       "compensating fiber length",
+       "m"
+      ],
+      [
+       "D1",
+       "dispersion of the line fiber",
+       "s/m²"
+      ],
+      [
+       "L1",
+       "line fiber length",
+       "m"
+      ],
+      [
+       "D2",
+       "dispersion of the compensating fiber",
+       "s/m²"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 8."
+    },
+    {
+     "type": "formula",
+     "title": "Spectral efficiency",
+     "tex": "\\eta_s=\\frac{B}{\\Delta\\nu_{ch}}",
+     "eq": "etas=B/dnuch",
+     "vars": [
+      [
+       "etas",
+       "spectral efficiency",
+       "bit/(s·Hz)"
+      ],
+      [
+       "B",
+       "bit rate per channel",
+       "1/s"
+      ],
+      [
+       "dnuch",
+       "channel spacing",
+       "Hz"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Heterodyne beat current",
+     "tex": "I_p=2R\\sqrt{P_sP_{LO}}\\cos(\\omega_{IF}t+\\phi)",
+     "eq": "Ip=2*R*sqrt(Ps*PLO)",
+     "vars": [
+      [
+       "Ip",
+       "beat amplitude",
+       "A"
+      ],
+      [
+       "R",
+       "responsivity",
+       "A/W"
+      ],
+      [
+       "Ps",
+       "signal power",
+       "W"
+      ],
+      [
+       "PLO",
+       "local-oscillator power",
+       "W"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 10. Matched polarizations; ω_IF = ω₀ − ω_LO."
+    },
+    {
+     "type": "formula",
+     "title": "Shot-noise-limited heterodyne SNR",
+     "tex": "\\mathrm{SNR}=\\frac{RP_s}{q\\,\\Delta f}",
+     "eq": "SNR=R*Ps/(q*df)",
+     "vars": [
+      [
+       "SNR",
+       "signal-to-noise ratio",
+       ""
+      ],
+      [
+       "R",
+       "responsivity",
+       "A/W"
+      ],
+      [
+       "Ps",
+       "signal power",
+       "W"
+      ],
+      [
+       "q",
+       "elementary charge e",
+       "C",
+       "1.602176634e-19"
+      ],
+      [
+       "df",
+       "receiver bandwidth",
+       "Hz"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 10. Strong local oscillator; homodyne detection gives twice this."
+    },
+    {
+     "type": "formula",
+     "title": "Laser diode photon lifetime",
+     "tex": "\\tau_p^{-1}=v_g(\\alpha_{int}+\\alpha_{mir})",
+     "eq": "1/tp=vg*(aint+amir)",
+     "vars": [
+      [
+       "tp",
+       "photon lifetime",
+       "s"
+      ],
+      [
+       "vg",
+       "group velocity",
+       "m/s"
+      ],
+      [
+       "aint",
+       "internal loss",
+       "1/m"
+      ],
+      [
+       "amir",
+       "mirror loss",
+       "1/m"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 3."
+    },
+    {
+     "type": "formula",
+     "title": "Modulation bandwidth of a laser diode",
+     "tex": "f_{3dB}\\approx\\sqrt3\\,f_R",
+     "eq": "f3=sqrt(3)*fR",
+     "vars": [
+      [
+       "f3",
+       "3-dB modulation bandwidth",
+       "Hz"
+      ],
+      [
+       "fR",
+       "relaxation-oscillation frequency",
+       "Hz"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 3. Weak damping."
+    },
+    {
+     "type": "formula",
+     "title": "Laser linewidth with the enhancement factor",
+     "tex": "\\Delta\\nu=\\Delta\\nu_{ST}(1+\\beta_c^2)",
+     "eq": "dnu=dnuST*(1+bc^2)",
+     "vars": [
+      [
+       "dnu",
+       "linewidth",
+       "Hz"
+      ],
+      [
+       "dnuST",
+       "Schawlow–Townes linewidth",
+       "Hz"
+      ],
+      [
+       "bc",
+       "linewidth enhancement factor β_c (α)",
+       "",
+       "5"
+      ]
+     ],
+     "note": "Agrawal, Fiber-Optic Communication Systems, ch. 3."
+    }
+   ]
+  },
+  {
+   "title": "Nonlinear fiber optics",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Effective length",
+     "tex": "L_{eff}=\\frac{1-e^{-\\alpha L}}{\\alpha}",
+     "eq": "Leff=(1-exp(-a*L))/a",
+     "vars": [
+      [
+       "Leff",
+       "effective length",
+       "m"
+      ],
+      [
+       "a",
+       "loss coefficient α (dB/km ÷ 4.343)",
+       "1/m"
+      ],
+      [
+       "L",
+       "fiber length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Effective mode area (Gaussian)",
+     "tex": "A_{eff}=\\pi w^2",
+     "eq": "Aeff=pi*w^2",
+     "vars": [
+      [
+       "Aeff",
+       "effective area",
+       "m²"
+      ],
+      [
+       "w",
+       "mode-field radius",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Nonlinear length",
+     "tex": "L_{NL}=\\frac{1}{\\gamma P_0}",
+     "eq": "LNL=1/(gam*P0)",
+     "vars": [
+      [
+       "LNL",
+       "nonlinear length",
+       "m"
+      ],
+      [
+       "gam",
+       "nonlinear coefficient γ",
+       "1/(W·m)"
+      ],
+      [
+       "P0",
+       "peak power",
+       "W"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 3."
+    },
+    {
+     "type": "formula",
+     "title": "Soliton order",
+     "tex": "N^2=\\frac{\\gamma P_0T_0^2}{|\\beta_2|}",
+     "eq": "N^2=gam*P0*T0^2/abs(b2)",
+     "vars": [
+      [
+       "N",
+       "soliton order",
+       ""
+      ],
+      [
+       "gam",
+       "nonlinear coefficient γ",
+       "1/(W·m)"
+      ],
+      [
+       "P0",
+       "peak power",
+       "W"
+      ],
+      [
+       "T0",
+       "pulse half-width (1/e intensity); FWHM = 1.763 T₀ for sech²",
+       "s"
+      ],
+      [
+       "b2",
+       "GVD β₂",
+       "s²/m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Soliton period",
+     "tex": "z_0=\\frac{\\pi}{2}L_D=\\frac{\\pi}{2}\\frac{T_0^2}{|\\beta_2|}",
+     "eq": "z0=pi/2*T0^2/abs(b2)",
+     "vars": [
+      [
+       "z0",
+       "soliton period",
+       "m"
+      ],
+      [
+       "T0",
+       "pulse half-width T₀",
+       "s"
+      ],
+      [
+       "b2",
+       "GVD β₂",
+       "s²/m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 5."
+    },
+    {
+     "type": "formula",
+     "title": "Maximum SPM phase shift",
+     "tex": "\\phi_{max}=\\gamma P_0L_{eff}",
+     "eq": "phim=gam*P0*Leff",
+     "vars": [
+      [
+       "phim",
+       "peak nonlinear phase",
+       "rad"
+      ],
+      [
+       "gam",
+       "nonlinear coefficient γ",
+       "1/(W·m)"
+      ],
+      [
+       "P0",
+       "peak power",
+       "W"
+      ],
+      [
+       "Leff",
+       "effective length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "SPM spectral broadening (Gaussian pulse)",
+     "tex": "\\delta\\omega_{max}=0.86\\,\\frac{\\phi_{max}}{T_0}",
+     "eq": "dwm=0.86*phim/T0",
+     "vars": [
+      [
+       "dwm",
+       "maximum frequency chirp",
+       "rad/s"
+      ],
+      [
+       "phim",
+       "peak nonlinear phase",
+       "rad"
+      ],
+      [
+       "T0",
+       "pulse half-width (1/e intensity)",
+       "s"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 4. Unchirped Gaussian; dispersion neglected."
+    },
+    {
+     "type": "formula",
+     "title": "Number of SPM spectral peaks",
+     "tex": "M\\approx\\frac{\\phi_{max}}{\\pi}+\\frac12",
+     "eq": "M=phim/pi+1/2",
+     "vars": [
+      [
+       "M",
+       "number of peaks",
+       ""
+      ],
+      [
+       "phim",
+       "peak nonlinear phase",
+       "rad"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 4."
+    },
+    {
+     "type": "formula",
+     "title": "Modulation instability peak frequency",
+     "tex": "\\Omega_{max}=\\sqrt{\\frac{2\\gamma P_0}{|\\beta_2|}}",
+     "eq": "Om=sqrt(2*gam*P0/abs(b2))",
+     "vars": [
+      [
+       "Om",
+       "angular frequency of peak gain (from the pump)",
+       "rad/s"
+      ],
+      [
+       "gam",
+       "nonlinear coefficient γ",
+       "1/(W·m)"
+      ],
+      [
+       "P0",
+       "CW power",
+       "W"
+      ],
+      [
+       "b2",
+       "GVD β₂ (anomalous)",
+       "s²/m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 5. Peak power gain 2γP₀."
+    },
+    {
+     "type": "formula",
+     "title": "Raman threshold",
+     "tex": "P_{cr}\\approx\\frac{16A_{eff}}{g_RL_{eff}}",
+     "eq": "Pcr=16*Aeff/(gR*Leff)",
+     "vars": [
+      [
+       "Pcr",
+       "critical pump power",
+       "W"
+      ],
+      [
+       "Aeff",
+       "effective area",
+       "m²"
+      ],
+      [
+       "gR",
+       "peak Raman gain (about 1e-13 m/W at 1 µm)",
+       "m/W"
+      ],
+      [
+       "Leff",
+       "effective length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 8. Forward Stokes; peak shift about 13.2 THz in silica."
+    },
+    {
+     "type": "formula",
+     "title": "Brillouin threshold",
+     "tex": "P_{cr}\\approx\\frac{21A_{eff}}{g_BL_{eff}}",
+     "eq": "Pcr=21*Aeff/(gB*Leff)",
+     "vars": [
+      [
+       "Pcr",
+       "critical pump power",
+       "W"
+      ],
+      [
+       "Aeff",
+       "effective area",
+       "m²"
+      ],
+      [
+       "gB",
+       "peak Brillouin gain (about 5e-11 m/W)",
+       "m/W"
+      ],
+      [
+       "Leff",
+       "effective length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 9. A CW pump narrower than the Brillouin linewidth."
+    },
+    {
+     "type": "formula",
+     "title": "Walk-off length",
+     "tex": "L_W=\\frac{T_0}{|d_{12}|},\\ d_{12}=v_{g1}^{-1}-v_{g2}^{-1}",
+     "eq": "LW=T0/abs(d12)",
+     "vars": [
+      [
+       "LW",
+       "walk-off length",
+       "m"
+      ],
+      [
+       "T0",
+       "pulse half-width",
+       "s"
+      ],
+      [
+       "d12",
+       "group-velocity mismatch",
+       "s/m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 1. and ch. 7."
+    },
+    {
+     "type": "formula",
+     "title": "Third-order dispersion length",
+     "tex": "L_D^\\prime=\\frac{T_0^3}{|\\beta_3|}",
+     "eq": "LD3=T0^3/abs(b3)",
+     "vars": [
+      [
+       "LD3",
+       "TOD length",
+       "m"
+      ],
+      [
+       "T0",
+       "pulse half-width",
+       "s"
+      ],
+      [
+       "b3",
+       "TOD β₃",
+       "s³/m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 3."
+    },
+    {
+     "type": "formula",
+     "title": "XPM phase shift",
+     "tex": "\\phi_{XPM}=2\\gamma P_2L_{eff}",
+     "eq": "phX=2*gam*P2*Leff",
+     "vars": [
+      [
+       "phX",
+       "cross-phase shift on wave 1",
+       "rad"
+      ],
+      [
+       "gam",
+       "nonlinear coefficient γ",
+       "1/(W·m)"
+      ],
+      [
+       "P2",
+       "power of the other wave",
+       "W"
+      ],
+      [
+       "Leff",
+       "effective length",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 7. Same polarization; twice the SPM of an equal power."
+    },
+    {
+     "type": "formula",
+     "title": "Chirped Gaussian pulse broadening",
+     "tex": "\\frac{T_1}{T_0}=\\sqrt{\\left(1+\\frac{C\\beta_2z}{T_0^2}\\right)^2+\\left(\\frac{\\beta_2z}{T_0^2}\\right)^2}",
+     "eq": "T1/T0=sqrt((1+C0*b2*z/T0^2)^2+(b2*z/T0^2)^2)",
+     "vars": [
+      [
+       "T1",
+       "width after z",
+       "s"
+      ],
+      [
+       "T0",
+       "input half-width",
+       "s"
+      ],
+      [
+       "C0",
+       "chirp parameter C",
+       "",
+       "0"
+      ],
+      [
+       "b2",
+       "GVD β₂",
+       "s²/m"
+      ],
+      [
+       "z",
+       "distance",
+       "m"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 3. A pulse with Cβ₂ < 0 first compresses."
+    },
+    {
+     "type": "formula",
+     "title": "Soliton self-frequency shift",
+     "tex": "\\frac{d\\Omega_p}{dz}=-\\frac{8T_R|\\beta_2|}{15T_0^4}",
+     "eq": "dOm=-8*TR*abs(b2)/(15*T0^4)",
+     "vars": [
+      [
+       "dOm",
+       "rate of the shift",
+       "rad/(s·m)"
+      ],
+      [
+       "TR",
+       "Raman response parameter (about 3 fs)",
+       "s",
+       "3e-15"
+      ],
+      [
+       "b2",
+       "GVD β₂",
+       "s²/m"
+      ],
+      [
+       "T0",
+       "soliton half-width",
+       "s"
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 5. Fundamental soliton."
+    },
+    {
+     "type": "formula",
+     "title": "Soliton-effect compression factor",
+     "tex": "F_c\\approx4.1N",
+     "eq": "Fc=4.1*N",
+     "vars": [
+      [
+       "Fc",
+       "compression factor",
+       ""
+      ],
+      [
+       "N",
+       "soliton order",
+       ""
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 6. At the optimum length z_opt ≈ z₀(0.32/N + 1.1/N²)."
+    },
+    {
+     "type": "formula",
+     "title": "Optimum fiber length for soliton compression",
+     "tex": "z_{opt}\\approx z_0\\left(\\frac{0.32}{N}+\\frac{1.1}{N^2}\\right)",
+     "eq": "zopt=z0*(0.32/N+1.1/N^2)",
+     "vars": [
+      [
+       "zopt",
+       "optimum length",
+       "m"
+      ],
+      [
+       "z0",
+       "soliton period",
+       "m"
+      ],
+      [
+       "N",
+       "soliton order",
+       ""
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 6."
+    },
+    {
+     "type": "formula",
+     "title": "Soliton fission length",
+     "tex": "L_{fiss}\\approx\\frac{L_D}{N}",
+     "eq": "Lfis=LD/N",
+     "vars": [
+      [
+       "Lfis",
+       "fission length",
+       "m"
+      ],
+      [
+       "LD",
+       "dispersion length T₀²/|β₂|",
+       "m"
+      ],
+      [
+       "N",
+       "soliton order",
+       ""
+      ]
+     ],
+     "note": "Agrawal, Nonlinear Fiber Optics, ch. 13. Onset of supercontinuum from a higher-order soliton."
+    }
+   ]
+  },
+  {
+   "title": "Ultrafast pulses",
+   "items": [
+    {
+     "type": "formula",
+     "title": "Gaussian pulse FWHM",
+     "tex": "\\tau_{FWHM}=2\\sqrt{\\ln2}\\,T_0\\approx1.665\\,T_0",
+     "eq": "tau=2*sqrt(ln(2))*T0",
+     "vars": [
+      [
+       "tau",
+       "intensity FWHM",
+       "s"
+      ],
+      [
+       "T0",
+       "1/e half-width of the intensity",
+       "s"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "sech² pulse FWHM",
+     "tex": "\\tau_{FWHM}=2\\ln(1+\\sqrt2)\\,T_0\\approx1.763\\,T_0",
+     "eq": "tau=2*ln(1+sqrt(2))*T0",
+     "vars": [
+      [
+       "tau",
+       "intensity FWHM",
+       "s"
+      ],
+      [
+       "T0",
+       "sech² width parameter",
+       "s"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Time–bandwidth product (sech²)",
+     "tex": "\\Delta\\nu\\,\\tau=0.315",
+     "eq": "dnu*tau=0.315",
+     "vars": [
+      [
+       "dnu",
+       "spectral FWHM",
+       "Hz"
+      ],
+      [
+       "tau",
+       "pulse FWHM",
+       "s"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 8. Transform-limited; 0.441 for a Gaussian."
+    },
+    {
+     "type": "formula",
+     "title": "Spectral width in wavelength",
+     "tex": "\\Delta\\lambda=\\frac{\\lambda^2}{c}\\Delta\\nu",
+     "eq": "dlam=lam^2*dnu/c",
+     "vars": [
+      [
+       "dlam",
+       "spectral width",
+       "m"
+      ],
+      [
+       "lam",
+       "centre wavelength",
+       "m"
+      ],
+      [
+       "dnu",
+       "spectral width",
+       "Hz"
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Group delay dispersion of a material",
+     "tex": "\\mathrm{GDD}=\\frac{\\lambda^3L}{2\\pi c^2}\\frac{d^2n}{d\\lambda^2}",
+     "eq": "GDD=lam^3*L/(2*pi*c^2)*d2n",
+     "vars": [
+      [
+       "GDD",
+       "group delay dispersion",
+       "s²"
+      ],
+      [
+       "lam",
+       "vacuum wavelength",
+       "m"
+      ],
+      [
+       "L",
+       "thickness",
+       "m"
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ],
+      [
+       "d2n",
+       "d²n/dλ²",
+       "1/m²"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2. Fused silica at 800 nm: about 36 fs²/mm."
+    },
+    {
+     "type": "formula",
+     "title": "Gaussian pulse after GDD",
+     "tex": "\\tau_{out}=\\tau_{in}\\sqrt{1+\\left(\\frac{4\\ln2\\,\\mathrm{GDD}}{\\tau_{in}^2}\\right)^2}",
+     "eq": "tout=tin*sqrt(1+(4*ln(2)*GDD/tin^2)^2)",
+     "vars": [
+      [
+       "tout",
+       "output FWHM",
+       "s"
+      ],
+      [
+       "tin",
+       "input FWHM (transform-limited)",
+       "s"
+      ],
+      [
+       "GDD",
+       "group delay dispersion",
+       "s²"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "Stretched pulse duration (large GDD)",
+     "tex": "\\tau_{out}\\approx\\frac{4\\ln2\\,|\\mathrm{GDD}|}{\\tau_{in}}",
+     "eq": "tout=4*ln(2)*abs(GDD)/tin",
+     "vars": [
+      [
+       "tout",
+       "output FWHM",
+       "s"
+      ],
+      [
+       "GDD",
+       "group delay dispersion",
+       "s²"
+      ],
+      [
+       "tin",
+       "input FWHM",
+       "s"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 6. Gaussian pulse in a CPA stretcher."
+    },
+    {
+     "type": "formula",
+     "title": "Grating-pair GDD",
+     "tex": "\\mathrm{GDD}=-\\frac{\\lambda^3b}{2\\pi c^2d^2}\\left[1-\\left(\\frac{\\lambda}{d}-\\sin\\gamma\\right)^2\\right]^{-1}",
+     "eq": "GDD=-lam^3*b/(2*pi*c^2*dg^2)/(1-(lam/dg-sin(gi))^2)",
+     "vars": [
+      [
+       "GDD",
+       "group delay dispersion (single pass)",
+       "s²"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ],
+      [
+       "b",
+       "slant distance between the gratings",
+       "m"
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ],
+      [
+       "dg",
+       "groove spacing",
+       "m"
+      ],
+      [
+       "gi",
+       "angle of incidence γ",
+       "rad"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2. Double it for the usual double pass."
+    },
+    {
+     "type": "formula",
+     "title": "Peak intensity of a Gaussian pulse and beam",
+     "tex": "I_0=\\frac{0.94\\,E}{\\tau}\\frac{2}{\\pi w_0^2}",
+     "eq": "I0=0.94*E/tau*2/(pi*w0^2)",
+     "vars": [
+      [
+       "I0",
+       "peak intensity",
+       "W/m²"
+      ],
+      [
+       "E",
+       "pulse energy",
+       "J"
+      ],
+      [
+       "tau",
+       "pulse FWHM",
+       "s"
+      ],
+      [
+       "w0",
+       "beam radius (1/e²)",
+       "m"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2. 0.94 for a Gaussian pulse, 0.88 for sech²."
+    },
+    {
+     "type": "formula",
+     "title": "Peak fluence of a Gaussian beam",
+     "tex": "F_0=\\frac{2E}{\\pi w_0^2}",
+     "eq": "F0=2*E/(pi*w0^2)",
+     "vars": [
+      [
+       "F0",
+       "peak fluence",
+       "J/m²"
+      ],
+      [
+       "E",
+       "pulse energy",
+       "J"
+      ],
+      [
+       "w0",
+       "beam radius (1/e²)",
+       "m"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 2."
+    },
+    {
+     "type": "formula",
+     "title": "B-integral",
+     "tex": "B=\\frac{2\\pi}{\\lambda}n_2I_0L",
+     "eq": "B=2*pi/lam*n2*I0*L",
+     "vars": [
+      [
+       "B",
+       "accumulated nonlinear phase",
+       "rad"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ],
+      [
+       "n2",
+       "nonlinear index n₂",
+       "m²/W"
+      ],
+      [
+       "I0",
+       "peak intensity",
+       "W/m²"
+      ],
+      [
+       "L",
+       "length",
+       "m"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 6. Keep below about 3–5 rad in amplifiers."
+    },
+    {
+     "type": "formula",
+     "title": "Optical cycles in a pulse",
+     "tex": "N_c=\\frac{c\\,\\tau}{\\lambda}",
+     "eq": "Nc=c*tau/lam",
+     "vars": [
+      [
+       "Nc",
+       "cycles within the FWHM",
+       ""
+      ],
+      [
+       "c",
+       "speed of light c",
+       "m/s",
+       "299792458"
+      ],
+      [
+       "tau",
+       "pulse FWHM",
+       "s"
+      ],
+      [
+       "lam",
+       "wavelength",
+       "m"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 1."
+    },
+    {
+     "type": "formula",
+     "title": "Carrier–envelope offset frequency",
+     "tex": "f_0=\\frac{\\Delta\\phi_{CE}}{2\\pi}f_{rep}",
+     "eq": "f0=dphi/(2*pi)*frep",
+     "vars": [
+      [
+       "f0",
+       "offset frequency",
+       "Hz"
+      ],
+      [
+       "dphi",
+       "CE phase slip per round trip (mod 2π)",
+       "rad"
+      ],
+      [
+       "frep",
+       "repetition rate",
+       "Hz"
+      ]
+     ],
+     "note": "Rullière (ed.), Femtosecond Laser Pulses, ch. 4."
     }
    ]
   },

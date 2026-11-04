@@ -85,7 +85,7 @@ module.exports = function opticsBooks() {
 
   /* ---------------------------------------------------------------- S&T 8, 9: waveguides and fibers */
   sections.push({ title: 'Waveguides', items: [
-    F('Modes of a planar-mirror waveguide', 'M\\approx\\frac{2d}{\\lambda}', 'M=2*d/lam', [['M', 'number of TE modes', ''], ['d', 'mirror spacing', 'm'], ['lam', 'wavelength in the medium', 'm']], ST(8) + ' Round down.'),
+    F('Modes of a planar-mirror waveguide', 'M\\approx\\frac{2d}{\\lambda}', 'M=2*d/lam', [['M', 'number of TE modes', ''], ['d', 'separation of the two waveguide mirrors', 'm'], ['lam', 'wavelength in the medium', 'm']], ST(8) + ' Round down.'),
     F('Slab waveguide V number', 'V=\\frac{\\pi d}{\\lambda_0}NA', 'V=pi*d/lam0*NA', [['V', 'V parameter', ''], ['d', 'slab thickness', 'm'], ['lam0', 'vacuum wavelength', 'm'], ['NA', 'NA = √(n₁² − n₂²)', '']], ST(8) + ' Single-mode (one TE mode) when V < π/2 in this definition; number of TE modes ≈ 2d·NA/λ₀ = 2V/π.'),
     F('Number of TE modes of a slab', 'M\\approx\\frac{2d}{\\lambda_0}NA', 'M=2*d/lam0*NA', [['M', 'number of TE modes', ''], ['d', 'slab thickness', 'm'], ['lam0', 'vacuum wavelength', 'm'], ['NA', 'numerical aperture', '']], ST(8) + ' Round up to the next integer.'),
     F('Directional coupler power transfer', 'P_2=P_1(0)\\sin^2(\\mathcal C z)', 'P2=P1*sin(Cc*z)^2', [['P2', 'power coupled to guide 2', 'W'], ['P1', 'power launched into guide 1', 'W'], ['Cc', 'coupling coefficient', '1/m'], ['z', 'length', 'm']], ST(8) + ' Phase-matched guides.'),
