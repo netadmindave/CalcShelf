@@ -118,36 +118,75 @@
 
   /* TI-style editing shared by the CAS and TI-36X pages:
      · an operator pressed on an empty line starts from the previous answer (ans+, ans², ans→ …)
-     · ( always inserts a pair; ) leaves the enclosing ( ), or, with none open, wraps what is before the cursor */
+     · ( at the end inserts a pair, elsewhere just a (; ) at the end closes the last open ( at its own level */
   const Edit = {
     empty(mf) { return !String(mf.value || '').replace(/\\placeholder\{\}/g, '').trim(); },
     put(mf, tex, sel) { mf.executeCommand(['insert', tex, { format: 'latex', insertionMode: 'replaceSelection', selectionMode: sel || 'placeholder', focus: true }]); },
     autoAns(mf, ansTex) { if (!ansTex || !Edit.empty(mf)) return false; mf.value = ''; Edit.put(mf, ansTex, 'after'); return true; },
-    open(mf) { Edit.put(mf, '\\left(#0\\right)'); },
+    /** the cursor is at the end of the field (nothing after it on the line) */
+    atEnd(mf) { return mf.position >= mf.lastOffset; },
+    /** the cursor is at the end of the group it is in (a fraction part, an exponent, the inside of ( ) …) */
+    atGroupEnd(mf) { const p = mf.position; mf.executeCommand('moveToGroupEnd'); const q = mf.position; mf.position = p; return q === p; },
+    /** ( : on an empty line or at the end, a pair with the cursor inside; anywhere else, just the ( */
+    open(mf) {
+      if (Edit.empty(mf) || Edit.atEnd(mf)) { Edit.put(mf, '\\left(#0\\right)'); return; }
+      Edit.plain(mf, '(');
+    },
+    /** a lone ( or ) as typed: MathLive's smart fence would otherwise pair it with a hidden ) to the end of the line */
+    plain(mf, ch) { const sf = mf.smartFence; try { mf.smartFence = false; Edit.put(mf, ch, 'after'); } finally { mf.smartFence = sf; } },
+    /** ) : inside ( ) at its end, step out; in the middle of a line, just the ); at the end of the line, close the
+     *  last ( left open anywhere in the line, at that ('s own level, as one matching pair */
     close(mf) {
-      const pos0 = mf.position;
-      for (let k = 0; k < 16; k++) {
+      if (!Edit.empty(mf) && Edit.atGroupEnd(mf) && !Edit.atEnd(mf)) {
         const p = mf.position; mf.executeCommand('moveAfterParent');
-        if (mf.position === p) break;
-        const before = mf.getValue(0, mf.position, 'latex');
-        if (/\\right\)$/.test(before)) return;                                    // stepped out of a ( … )
-        if (/\\left\(/.test(before) && /\\right\.$/.test(before)) {                 // a ( whose ) was deleted: close it again
-          const at = mf.position, after = mf.getValue(at, mf.lastOffset, 'latex');
-          mf.value = before.slice(0, -7) + '\\right)' + after; mf.position = at; return;
+        if (mf.position !== p && /\\right[).]$/.test(mf.getValue(0, mf.position, 'latex'))) {
+          const before = mf.getValue(0, mf.position, 'latex');
+          if (/\\right\.$/.test(before)) { const at = mf.position, after = mf.getValue(at, mf.lastOffset, 'latex'); mf.value = before.slice(0, -7) + '\\right)' + after; mf.position = at; }
+          return;
         }
+        mf.position = p;
       }
-      mf.position = pos0;
       if (Edit.empty(mf)) { Edit.open(mf); return; }
-      // a plain ( still open before the cursor (typed or pasted): just add its )
-      const bare = mf.getValue(0, pos0, 'latex').replace(/\\(left|right|big|Big|bigg|Bigg)[lr]?\s*[()]/g, '');
-      if ((bare.match(/\(/g) || []).length > (bare.match(/\)/g) || []).length) { Edit.put(mf, ')', 'after'); return; }
-      mf.executeCommand('extendToGroupStart');                                      // no ( open: wrap from the start
+      if (!Edit.atEnd(mf)) { Edit.plain(mf, ')'); return; }
+      const fixed = Edit.closeLast(mf.value);
+      if (fixed != null) { mf.value = fixed; mf.position = mf.lastOffset; return; }
+      mf.executeCommand('extendToGroupStart');                                      // nothing open: wrap from the start
       Edit.put(mf, '\\left(#0\\right)', 'after');
+    },
+    /** LaTeX with the last unclosed ( (a plain one, or a \left( whose ) was deleted) turned into a \left( … \right)
+     *  that ends where its own group ends; null when every ( is closed */
+    closeLast(tex) {
+      const frames = [{ opens: [] }];
+      const unmatched = [];
+      const tok = /\\left\s*\(|\\left\s*\\?[^\s\\]|\\right\s*\.|\\right\s*\\?[^\s\\]|\\[A-Za-z]+|\\.|[{}()]/g;
+      let m;
+      while ((m = tok.exec(tex))) {
+        const t = m[0], at = m.index;
+        if (/^\\left\s*\($/.test(t)) frames.push({ opens: [], fence: at, len: t.length });
+        else if (/^\\left/.test(t)) frames.push({ opens: [] });
+        else if (/^\\right/.test(t) || t === '}') {
+          const f = frames.pop() || { opens: [] };
+          for (const o of f.opens) unmatched.push({ at: o.at, len: o.len, end: at });
+          if (f.fence != null && /^\\right\s*\.$/.test(t)) unmatched.push({ at: f.fence, len: f.len, end: at, endLen: t.length });
+          if (!frames.length) frames.push({ opens: [] });
+        }
+        else if (t === '{') frames.push({ opens: [] });
+        else if (t === '(') frames[frames.length - 1].opens.push({ at, len: 1 });
+        else if (t === ')') frames[frames.length - 1].opens.pop();
+      }
+      for (const f of frames) for (const o of f.opens) unmatched.push({ at: o.at, len: o.len, end: tex.length });
+      if (!unmatched.length) return null;
+      const u = unmatched.sort((a, b) => b.at - a.at)[0];
+      return tex.slice(0, u.at) + '\\left(' + tex.slice(u.at + u.len, u.end) + '\\right)' + tex.slice(u.end + (u.endLen || 0));
     },
     /** the same rules for a hardware or phone keyboard; getAns() returns the answer's LaTeX or null */
     bind(mf, getAns) {
       // capture phase on the host runs before MathLive's own key handling (which turns * into \cdot)
-      mf.addEventListener('keydown', (e) => { if (!e.ctrlKey && !e.metaKey && !e.altKey && '+*/^!'.includes(e.key) && e.key.length === 1) Edit.autoAns(mf, getAns()); }, true);
+      mf.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+        if (e.key === '(' || e.key === ')') { e.preventDefault(); e.stopImmediatePropagation(); if (e.key === '(') Edit.open(mf); else Edit.close(mf); return; }
+        if ('+*/^!'.includes(e.key)) Edit.autoAns(mf, getAns());
+      }, true);
       mf.addEventListener('beforeinput', (e) => {
         if (e.inputType !== 'insertText' || !e.data) return;
         if (e.data === '(') { e.preventDefault(); Edit.open(mf); }

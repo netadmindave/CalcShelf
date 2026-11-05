@@ -86,7 +86,7 @@
       if (k.t === 'num') { this.i++; return [{ k: 'num', v: k.v[0] }].concat(k.v.length > 1 ? (this.t.splice(this.i, 0, { t: 'num', v: k.v.slice(1) }), []) : []); }
       return [this.atom()];
     }
-    expectCh(c) { const k = this.next(); if (!k || !(k.t === 'ch' && k.v === c)) throw new TexError('Unbalanced ' + c); }
+    expectCh(c) { const k = this.next(); if (!k || !(k.t === 'ch' && k.v === c)) throw new TexError(c === ')' ? 'A ( is not closed: add its )' : 'Unbalanced ' + c); }
     expectCmd(c) { const k = this.next(); if (!k || !(k.t === 'cmd' && k.v === c)) throw new TexError('Expected \\' + c); }
 
     // sequence of nodes until stop()
@@ -296,8 +296,8 @@
       let open = o.t === 'cmd' ? o.v : o.v;
       const closeMap = { '(': ')', '[': ']', lbrack: 'rbrack', lbrace: 'rbrace', '{': '}', '|': '|', vert: 'vert', lvert: 'rvert', lfloor: 'rfloor', lceil: 'rceil', langle: 'rangle', '.': null };
       const s = this.seq(() => this.isCmd(this.peek(), 'right'));
-      this.expectCmd('right');
-      this.next();   // closing delimiter
+      // a ( whose \right went missing (edited away) closes where its group ends
+      if (this.isCmd(this.peek(), 'right')) { this.next(); this.next(); }
       if (open === '(') return { k: 'grp', o: '(', s };
       if (open === '[' || open === 'lbrack') return { k: 'grp', o: '[', s };
       if (open === 'lbrace' || open === '{') return { k: 'grp', o: '{', s };
@@ -631,7 +631,8 @@
   const EXP = '\\s*(?:\\\\left\\(\\s*)?\\{?([-−+]|\\\\minus\\s*)?\\}?\\s*(\\d+)(?:\\s*\\\\right\\))?';
   function eeToPow(tex) {
     // 6.02e23 or 1.5e-3 typed on a keyboard: the same as the EE key (a lone e after a number stays Euler's number: 2e)
-    tex = tex.replace(/(^|[^\\A-Za-z\d.])(\d+\.?\d*|\.\d+)e(?:\{?([-−+])\}?)?(\d+)(?![\d.])/g, (m, pre, a, sg, e) => pre + a + 'ᴇ' + (sg === '-' || sg === '−' ? '-' : '') + e);
+    // (commands and names are matched first and kept, so x1e3 and \sec2 stay as they are)
+    tex = tex.replace(/(\\[A-Za-z]+|[A-Za-z]\w*)|(\d+\.?\d*|\.\d+)e(?:\{?([-−+])\}?)?(\d+)(?![\d.])/g, (m, word, a, sg, e) => (word ? m : a + 'ᴇ' + (sg === '-' || sg === '−' ? '-' : '') + e));
     if (!/ᴇ/.test(tex)) return tex;
     const sign = (sg) => (sg && sg.trim() !== '+' ? '-' : '');
     tex = tex.replace(new RegExp('(\\d+\\.?\\d*|\\.\\d+)\\s*' + EE + EXP, 'g'), (m, a, sg, e) => '\\left(' + a + '\\times10^{' + sign(sg) + e + '}\\right)');
@@ -652,6 +653,7 @@
     let define = false;
     if (seq[0] && seq[0].k === 'id' && /^Define$/i.test(seq[0].v)) { define = true; seq.shift(); }
     let s = emitSeq(seq, ctx);
+    { let depth = 0; for (const ch of s.replace(/"[^"]*"/g, '')) { if (ch === '(') depth++; else if (ch === ')' && --depth < 0) throw new TexError('A ) has no ( before it'); } }
     const dangling = /([*\/^+]|[^-]-)\s*$/.exec(s);
     if (dangling && !/[=:]\s*$/.test(s)) throw new TexError('Something is missing after the last ' + ({ '*': '×', '/': '÷', '^': '^', '+': '+' }[dangling[1]] || '−'));
     if (define) s = s.replace(/(^|[^<>!:=])=(?!=)/, '$1:=');
