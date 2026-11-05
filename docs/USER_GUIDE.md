@@ -202,6 +202,7 @@ Add these from **+**.
 - **Variable Solver.** Every formula in CalcShelf, from the library and from each module, in one list, solved from the values you know.
   - **The variables:** each formula's variables are matched to named quantities (vacuum wavelength λ₀, refractive index n, temperature T, donor density N_d …), so a value you enter feeds every formula that uses it. Each variable has a short description, and other names it goes by (N_a is also p₀ in p-type material).
   - **Enter what you know** in any unit (pick it from the menu, or type `1550 nm`). Every formula left with one unknown is solved, and its result feeds more formulas, until nothing more follows. **Your values** stay at the top, then **Calculated**.
+  - **Unit menus on results:** each calculated value and constant has a unit menu, so a transfer time can show in s, min or h, or a density in cm⁻³ or m⁻³. **auto** picks a prefix that keeps the number readable. The choice is kept, and it is also the unit you type in if that value later becomes one you enter.
   - **How** on a calculated value shows the formula it came from, rearranged for that value, and the same with your numbers in it. **In terms of your values** follows the chain back to one formula in what you entered.
   - **One more value calculates more** lists the variables that would solve the most further formulas.
   - **⚠** marks a value two formulas disagree on: usually an input is off, or a formula doesn't apply here.

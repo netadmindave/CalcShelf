@@ -242,6 +242,19 @@
     }
     /** an SI value in the unit the row's menu shows */
     inUnit(q, si) { const u = this.S.units[q.id] || q.unit; let x = si / q.ui.f; if (q.ui.ok && u !== q.unit) { try { x = Units.convert(x, q.unit, u); } catch (e) { /* keep */ } } return x; }
+    /** a calculated or constant value's unit menu: the same quantity in another unit (auto picks a prefix) */
+    unitMenu(q) {
+      if (!q.ui.ok || !q.unit) return null;
+      let alts; try { alts = Units.alternatives(q.unit, 1).slice(0, 30); } catch (e) { alts = []; }
+      if (!alts.includes(q.unit)) alts.unshift(q.unit);
+      if (alts.length < 2) return null;
+      const cur = this.S.units[q.id];
+      const sel = el('select', { class: 'vs-unit vs-unit-out', 'aria-label': 'Show ' + q.name + ' in' },
+        el('option', { value: '', text: 'auto' }), alts.map((a) => el('option', { value: a, text: a })));
+      sel.value = cur && alts.includes(cur) ? cur : '';
+      sel.onchange = () => { if (sel.value) this.S.units[q.id] = sel.value; else delete this.S.units[q.id]; this.app.saveSoon(); this.render(); };
+      return sel;
+    }
     valTex(q, si) { const s = this.shown(q, si); return Units.fmt(s.x, 'sci', 6).tex + (s.u ? '\\,' + Units.unitTex(s.u) : ''); }
     setUser(q, raw, unitSel) {
       raw = String(raw || '').trim();
@@ -386,7 +399,7 @@
         const tog = el('button', { class: 'chip', text: this.open.has(q.id) ? 'Hide' : 'How' });
         tog.onclick = () => { if (this.open.has(q.id)) this.open.delete(q.id); else this.open.add(q.id); this.render(); };
         top.append(more);
-        R.append(el('div', { class: 'vs-line' }, v, tog));
+        R.append(el('div', { class: 'vs-line' }, v, this.unitMenu(q), tog));
         if (conf) R.append(el('div', { class: 'vs-warn', text: '⚠ ' + conf.map((c) => '“' + c.f.title + '” gives ' + Units.fmt(this.shown(q, c.v).x, 'eng', 5).text + ' ' + this.shown(q, c.v).u).join('; ') }));
         if (this.open.has(q.id)) R.append(this.how(q, k));
         return R;
@@ -394,7 +407,7 @@
       if (k && k.src === 'const') {
         const v = el('div', { class: 'vs-val' }); renderTex(v, '=' + this.valTex(q, k.v));
         top.append(more);
-        R.append(el('div', { class: 'vs-line' }, v, el('button', { class: 'chip', text: 'Change', onclick: () => { this.S.user[q.id] = { v: k.v, raw: Units.num(k.v / q.ui.f, 12) }; this.solve(); } })));
+        R.append(el('div', { class: 'vs-line' }, v, this.unitMenu(q), el('button', { class: 'chip', text: 'Change', onclick: () => { this.S.user[q.id] = { v: k.v, raw: Units.num(k.v / q.ui.f, 12) }; this.solve(); } })));
         return R;
       }
       // a value to type: the CAS keypad, with a unit menu

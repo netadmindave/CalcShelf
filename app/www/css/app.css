@@ -519,3 +519,4 @@ textarea.nc-in { resize: vertical; min-height: 84px; }
 .fw-state .fw-ok, .fw-state .fw-no { margin-left: 0; }
 .mi.emu-pick { flex-direction: column; align-items: flex-start; gap: 3px; }
 .mi.emu-pick .sub { text-align: left; margin-left: 0; }
+.vs-unit-out { margin-left: auto; max-width: 34%; padding: 5px 4px; font-size: 13px; }
