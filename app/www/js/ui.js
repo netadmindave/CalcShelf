@@ -137,21 +137,15 @@
     /** ) : at the end of a ( ) pair's contents, step out of it; otherwise close the last ( before the cursor that
      *  nothing closes, at that ('s own level, as one matching pair; with none open, just a ) */
     close(mf) {
-      if (!Edit.empty(mf) && Edit.atGroupEnd(mf) && !Edit.atEnd(mf)) {
-        const p = mf.position; mf.executeCommand('moveAfterParent');
-        if (mf.position !== p && /\\right[).]$/.test(mf.getValue(0, mf.position, 'latex'))) {
-          const before = mf.getValue(0, mf.position, 'latex');
-          if (/\\right\.$/.test(before)) { const at = mf.position, after = mf.getValue(at, mf.lastOffset, 'latex'); mf.value = before.slice(0, -7) + '\\right)' + after; mf.position = at; }
-          return;
-        }
-        mf.position = p;
-      }
       if (Edit.empty(mf)) { Edit.plain(mf, ')'); return; }
       // find the cursor in the LaTeX with a marker, close the last open ( before it, and put the cursor after the )
       const MK = '\\mathrm{QQ}';
       Edit.plain(mf, MK);
       const withMk = mf.value, cur = withMk.indexOf(MK);
       const tex = withMk.slice(0, cur) + withMk.slice(cur + MK.length);
+      // at the end of a ( ) pair's contents (also from inside a fraction or power that ends it): step out of the pair
+      const out = /^(?:\s*\})*\s*\\right\)/.exec(tex.slice(cur));
+      if (cur >= 0 && out) { const at = cur + out[0].length; mf.value = tex.slice(0, at) + MK + tex.slice(at); Edit.caret(mf, mf.value, MK, tex); return; }
       const r = cur >= 0 ? Edit.closeLast(tex, cur) : null;
       if (!r) { mf.value = tex; Edit.caret(mf, withMk, MK); Edit.plain(mf, ')'); return; }
       mf.value = r.tex.slice(0, r.caret) + MK + r.tex.slice(r.caret);

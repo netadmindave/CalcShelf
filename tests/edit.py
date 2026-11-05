@@ -15,7 +15,7 @@ async def main():
         val = lambda: E("(__app.page.t36||__app.page).mf.value")
         out = lambda: E("[...document.querySelectorAll('.page:not([hidden]) .out')].pop()?.innerText.replace(/\\s+/g,'')")
         async def ent():
-            await tap('enter'); await pg.wait_for_timeout(1300)
+            await E('__app.page.enter()'); await pg.wait_for_timeout(1300)
         print('-- CAS')
         print('empty + before any answer:', end=' '); await tap('+'); print(await val()); await E("(__app.page.t36||__app.page).mf.value=''")
         await tap('2','+','3'); await ent(); print('2+3 =', await out())

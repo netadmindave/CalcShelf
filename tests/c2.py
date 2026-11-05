@@ -11,7 +11,9 @@ async def main():
         E=lambda js: pg.evaluate(js)
         await pg.tap('#btn-addpage'); await pg.wait_for_timeout(400)
         await pg.screenshot(path='out/c2_add.png')
-        await pg.locator('#sheet-body .mi', has_text='TI-85').tap(); await pg.wait_for_timeout(2500)
+        await pg.locator('#sheet-body .mi', has_text='Emulated calculator').tap(); await pg.wait_for_timeout(400)
+        await pg.locator('#sheet-body [data-emu="z80:5"]').tap(); await pg.wait_for_timeout(300)
+        await pg.locator('#sheet-body [data-act="Open the TI-85"]').tap(); await pg.wait_for_timeout(2500)
         fr = [f for f in pg.frames if 'classic' in f.url][0]
         await fr.set_input_files('#file-os', T+'t85.rom'); await pg.wait_for_timeout(1500)
         await pg.screenshot(path='out/c2_85.png')

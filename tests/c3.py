@@ -13,7 +13,7 @@ async def main():
         await pg.screenshot(path='out/p_add.png')
         await pg.locator('#sheet-body .mi', has_text='Emulated calculator').tap(); await pg.wait_for_timeout(400)
         await pg.locator('#sheet-body [data-emu="z80:5"]').tap(); await pg.wait_for_timeout(300)
-        await pg.locator('#sheet-body .mi', has_text='Switch to the TI-85').tap(); await pg.wait_for_timeout(2500)
+        await pg.locator('#sheet-body [data-act="Open the TI-85"], #sheet-body [data-act="Switch to the TI-85"]').first.tap(); await pg.wait_for_timeout(2500)
         fr = [f for f in pg.frames if 'classic' in f.url][0]
         await fr.set_input_files('#file-os', T+'t85.rom'); await pg.wait_for_timeout(1500)
         await pg.screenshot(path='out/p_85.png')

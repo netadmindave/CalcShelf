@@ -9,7 +9,7 @@ async def main():
         await pg.goto("http://localhost:8091/index.html"); await pg.wait_for_function("window.__app && __app.page"); await pg.wait_for_timeout(2000)
         # real taps on keys: 2 x ^2 + 1 ... use frac template: tap frac, 1, tab, 3, enter
         async def tap(sel): await pg.tap(sel); await pg.wait_for_timeout(120)
-        keys=lambda label: f'.kpage[data-id="num"] .key:text-is("{label}")'
+        keys=lambda label: f'.kpage[data-id="num"] .key:has(.kf:text-is("{label}"))'
         await tap('.kpage[data-id="num"] .key:nth-child(3)')  # fraction
         await tap(keys('1')); await tap('#strip [data-a="tab"]'); await tap(keys('3')); await tap(keys('+')); await tap(keys('2'))
         await pg.screenshot(path='out/b_typing.png')

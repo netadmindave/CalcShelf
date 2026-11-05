@@ -29,6 +29,9 @@ A backup restores tabs, history, variables and definitions. They are calculator 
 ## Checked for 2.7.6
 
 - **Modules:** a module with an assignment, a blocked command, HTML or a non-https link is refused, or the HTML and link are left out (tests/modules276.py).
+- **Module tools:** the new IPv4/IPv6 subnet calculators and number-base converter run as the app's own code; a module can only name them, not change them (tests/compsci276.py).
+- **Web version:** the service worker caches only the site's own files and never registers inside the Android app (tests/web276.py).
+- **Firmware:** the Android app and the web version contain no TI firmware; tests that need it read your own files from `CALC_FW`, outside the repository.
 
 ## Checked for 2.7.5
 
