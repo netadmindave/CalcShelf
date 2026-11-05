@@ -92,9 +92,8 @@ The **≈** keys (bottom right of the 123 page, and beside **enter**) give a dec
 - **Division is always a fraction.** ÷ (and typing `/`) makes a stacked fraction from the term before the cursor.
 - **Parentheses come in pairs.**
   - **(** at the end of the line (or on an empty line) inserts **( )** with the cursor inside. Anywhere else it inserts just the **(**, so you can go back and bracket part of what you typed.
-  - **)** in the middle of the line inserts just the **)**. At the end of a **( )** pair's contents it steps out of the pair.
-  - **)** at the end of the line closes the last **(** still open anywhere in the line, at that **(**'s own level, as one matching pair that grows with what it holds. A **(** typed before a fraction is closed after the whole fraction, not inside it. If you deleted a **)**, this puts it back.
-  - With nothing open, **)** at the end wraps everything before it: `2+3)` becomes `(2+3)`.
+  - **)** anywhere closes the last **(** before the cursor that has no **)**, as one matching pair that grows with what it holds. It closes at that **(**'s own level: at the cursor when both are in the same part of the line, and after the whole fraction or power when the cursor is inside one. If you deleted a **)**, this puts it back.
+  - **)** with no open **(** before it inserts just the **)**. At the end of a **( )** pair's contents, **)** steps out of the pair, so typing `2*(3+4)+1` straight through works.
   - A **)** with no **(** before it, or a **(** that is never closed, is reported when you press enter.
 - **A new line starts from ans.** On an empty line, pressing + − × ÷ ^ x² ! % or sto▸ inserts **ans** first, as on a TI calculator. (−) still starts a negative number. Turn this off with **Settings → New line starts from ans**.
 - **Variables and functions:**

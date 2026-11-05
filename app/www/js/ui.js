@@ -134,8 +134,8 @@
     },
     /** a lone ( or ) as typed: MathLive's smart fence would otherwise pair it with a hidden ) to the end of the line */
     plain(mf, ch) { const sf = mf.smartFence; try { mf.smartFence = false; Edit.put(mf, ch, 'after'); } finally { mf.smartFence = sf; } },
-    /** ) : inside ( ) at its end, step out; in the middle of a line, just the ); at the end of the line, close the
-     *  last ( left open anywhere in the line, at that ('s own level, as one matching pair */
+    /** ) : at the end of a ( ) pair's contents, step out of it; otherwise close the last ( before the cursor that
+     *  nothing closes, at that ('s own level, as one matching pair; with none open, just a ) */
     close(mf) {
       if (!Edit.empty(mf) && Edit.atGroupEnd(mf) && !Edit.atEnd(mf)) {
         const p = mf.position; mf.executeCommand('moveAfterParent');
@@ -146,38 +146,79 @@
         }
         mf.position = p;
       }
-      if (Edit.empty(mf)) { Edit.open(mf); return; }
-      if (!Edit.atEnd(mf)) { Edit.plain(mf, ')'); return; }
-      const fixed = Edit.closeLast(mf.value);
-      if (fixed != null) { mf.value = fixed; mf.position = mf.lastOffset; return; }
-      mf.executeCommand('extendToGroupStart');                                      // nothing open: wrap from the start
-      Edit.put(mf, '\\left(#0\\right)', 'after');
+      if (Edit.empty(mf)) { Edit.plain(mf, ')'); return; }
+      // find the cursor in the LaTeX with a marker, close the last open ( before it, and put the cursor after the )
+      const MK = '\\mathrm{QQ}';
+      Edit.plain(mf, MK);
+      const withMk = mf.value, cur = withMk.indexOf(MK);
+      const tex = withMk.slice(0, cur) + withMk.slice(cur + MK.length);
+      const r = cur >= 0 ? Edit.closeLast(tex, cur) : null;
+      if (!r) { mf.value = tex; Edit.caret(mf, withMk, MK); Edit.plain(mf, ')'); return; }
+      mf.value = r.tex.slice(0, r.caret) + MK + r.tex.slice(r.caret);
+      Edit.caret(mf, mf.value, MK, r.tex);
     },
-    /** LaTeX with the last unclosed ( (a plain one, or a \left( whose ) was deleted) turned into a \left( … \right)
-     *  that ends where its own group ends; null when every ( is closed */
-    closeLast(tex) {
-      const frames = [{ opens: [] }];
-      const unmatched = [];
+    /** put the cursor where MK is in `marked`, then show `clean` (or `marked` without MK) */
+    caret(mf, marked, MK, clean) {
+      if (mf.value !== marked) mf.value = marked;
+      let at = 0;
+      for (let p = 0; p <= mf.lastOffset; p++) { if (mf.getValue(0, p, 'latex').includes('Q')) { at = p; break; } }
+      mf.value = clean != null ? clean : marked.replace(MK, '');
+      mf.position = Math.max(0, Math.min(mf.lastOffset, at - 1));
+    },
+    /** the last ( before `cur` (a LaTeX index) that nothing closes, closed as one \left( … \right) pair at that ('s own
+     *  level: at the cursor when it is in the same group, after the structure that holds the cursor when it is deeper,
+     *  or where the ('s group ends when that is before the cursor. Returns { tex, caret } or null. */
+    closeLast(tex, cur) {
+      if (cur == null) cur = tex.length;
       const tok = /\\left\s*\(|\\left\s*\\?[^\s\\]|\\right\s*\.|\\right\s*\\?[^\s\\]|\\[A-Za-z]+|\\.|[{}()]/g;
-      let m;
-      while ((m = tok.exec(tex))) {
-        const t = m[0], at = m.index;
-        if (/^\\left\s*\($/.test(t)) frames.push({ opens: [], fence: at, len: t.length });
-        else if (/^\\left/.test(t)) frames.push({ opens: [] });
-        else if (/^\\right/.test(t) || t === '}') {
-          const f = frames.pop() || { opens: [] };
-          for (const o of f.opens) unmatched.push({ at: o.at, len: o.len, end: at });
-          if (f.fence != null && /^\\right\s*\.$/.test(t)) unmatched.push({ at: f.fence, len: f.len, end: at, endLen: t.length });
-          if (!frames.length) frames.push({ opens: [] });
+      const toks = []; let m;
+      while ((m = tok.exec(tex))) toks.push({ t: m[0], at: m.index, end: m.index + m[0].length });
+      const isOpen = (t) => t === '{' || /^\\left/.test(t), isClose = (t) => t === '}' || /^\\right/.test(t);
+      const root = { opens: [], parent: null, end: tex.length };
+      let fr = root, chainAtCur = null;
+      const unmatched = [];
+      for (const k of toks) {
+        if (!chainAtCur && k.at >= cur) chainAtCur = fr;
+        if (isOpen(k.t)) { const f = { opens: [], parent: fr, start: k.end, fence: /^\\left\s*\($/.test(k.t) ? k : null }; fr = f; }
+        else if (isClose(k.t)) {
+          fr.end = k.at;
+          for (const o of fr.opens) unmatched.push(Object.assign(o, { frame: fr }));
+          if (fr.fence && /^\\right\s*\.$/.test(k.t) && fr.fence.at < cur) unmatched.push({ at: fr.fence.at, len: fr.fence.t.length, frame: fr, repair: k });
+          fr = fr.parent || root;
         }
-        else if (t === '{') frames.push({ opens: [] });
-        else if (t === '(') frames[frames.length - 1].opens.push({ at, len: 1 });
-        else if (t === ')') frames[frames.length - 1].opens.pop();
+        else if (k.t === '(') fr.opens.push({ at: k.at, len: 1 });
+        else if (k.t === ')') fr.opens.pop();
       }
-      for (const f of frames) for (const o of f.opens) unmatched.push({ at: o.at, len: o.len, end: tex.length });
-      if (!unmatched.length) return null;
-      const u = unmatched.sort((a, b) => b.at - a.at)[0];
-      return tex.slice(0, u.at) + '\\left(' + tex.slice(u.at + u.len, u.end) + '\\right)' + tex.slice(u.end + (u.endLen || 0));
+      if (!chainAtCur) chainAtCur = fr;
+      for (let f = fr; f; f = f.parent) for (const o of f.opens) unmatched.push(Object.assign(o, { frame: f }));
+      const cand = unmatched.filter((o) => o.at < cur).sort((a, b) => b.at - a.at)[0];
+      if (!cand) return null;
+      if (cand.repair) {                                                // a \left( whose ) was deleted: put it back
+        const out = tex.slice(0, cand.repair.at) + '\\right)' + tex.slice(cand.repair.end);
+        return { tex: out, caret: cur };
+      }
+      // where the ) goes
+      let ins;
+      const chain = []; for (let f = chainAtCur; f; f = f.parent) chain.push(f);
+      const depth = chain.indexOf(cand.frame);
+      if (depth < 0) ins = cand.frame.end;                              // its group ended before the cursor
+      else if (depth === 0) ins = cur;                                  // same group as the cursor
+      else {                                                            // the cursor is deeper: after the structure holding it
+        let d = depth; ins = tex.length;
+        for (const k of toks) {
+          if (k.at < cur) continue;
+          if (isOpen(k.t)) d++;
+          else if (isClose(k.t)) {
+            d--;
+            if (d < 0) { ins = k.at; break; }
+            if (d === 0) { const rest = tex.slice(k.end).replace(/^\s+/, ''); if (!/^[{[^_]/.test(rest)) { ins = k.end; break; } }
+          }
+        }
+      }
+      const a = cand.at, L = cand.len;
+      const out = tex.slice(0, a) + '\\left(' + tex.slice(a + L, ins) + '\\right)' + tex.slice(ins);
+      // the cursor goes after the new ), or stays where it was when the ) went into an earlier group
+      return { tex: out, caret: ins <= cur && depth < 0 ? cur + (6 - L) + 7 : ins + (6 - L) + 7 };
     },
     /** the same rules for a hardware or phone keyboard; getAns() returns the answer's LaTeX or null */
     bind(mf, getAns) {
