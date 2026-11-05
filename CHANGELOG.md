@@ -2,6 +2,10 @@
 
 CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.x), a TI-89 Titanium emulator with a modern touch UI. Versions 2.0 and 2.1 added the Nspire-style CAS, the classic TI calculators, the conversion tool and constants in alternative units.
 
+## Unreleased
+
+- **Uncertainty with units:** `10 ± 0.001 mm × 1550.1 ± 0.001 nm` gives (15501.0 ± 1.6) mm·nm instead of an error. A unit after the uncertainty applies to both numbers; with a unit on each (`10 mm ± 1 nm`), the uncertainty is converted to the value's unit. Mismatched units say so.
+
 ## 2.7.7
 
 - Installs over 2.7.6 and keeps your tabs, settings and firmware.

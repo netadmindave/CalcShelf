@@ -133,10 +133,22 @@
     const d = Math.max(0, -e);
     return vr.toFixed(d) + '\\pm' + sr.toFixed(d);
   }
+  // a unit after a number, as the units key types it: \mathrm{\_mm}, \mathrm{\_m}^{2}\cdot\mathrm{\_s}^{-1} …
+  const UPART = '\\\\mathrm\\{\\\\_[^{}]+\\}(?:\\^\\{?-?\\d+\\}?)?';
+  const UNITRE = '(?:\\s*\\\\[,;: ])*\\s*(' + UPART + '(?:\\s*(?:\\\\cdot|/)?\\s*' + UPART + ')*)';
+  const unitPlain = (t) => t.replace(/\\mathrm\{\\_([^{}]+)\}/g, '$1').replace(/\^\{?(-?\d+)\}?/g, '^$1').replace(/\s*\\cdot\s*/g, '*').replace(/\s+/g, '');
   async function evaluateUnc(app, tex) {
-    const S = app.settings, terms = []; let k = 0;
-    const re = new RegExp(NUMRE + '\\s*\\\\pm\\s*' + NUMRE, 'g');
-    const rep = tex.replace(re, (m, a, b) => { const name = 'uq' + 'abcdefghijklmnopqrstuvwxyz'[k++]; terms.push({ name, tex: m, v: toNum(a), s: Math.abs(toNum(b)) }); return ' ' + name + ' '; });
+    const S = app.settings, terms = []; let k = 0, bad = '';
+    // value ± σ, each optionally with a unit: 10 ± 0.001 mm (both in mm), 10 mm ± 1 nm (σ converted to mm)
+    const re = new RegExp(NUMRE + '(?:' + UNITRE + ')?\\s*\\\\pm\\s*' + NUMRE + '(?:' + UNITRE + ')?', 'g');
+    const rep = tex.replace(re, (m, a, ua, b, ub) => {
+      const name = 'uq' + 'abcdefghijklmnopqrstuvwxyz'[k++];
+      let s = Math.abs(toNum(b)); const uv = ua || ub, pa = ua && unitPlain(ua), pb = ub && unitPlain(ub);
+      if (pa && pb && pa !== pb) { try { s = Math.abs(Units.convert(s, pb, pa)); } catch (e) { bad = 'The uncertainty ' + pb + ' does not fit the value’s unit ' + pa; } }
+      terms.push({ name, tex: m, v: toNum(a), s, unit: uv ? unitPlain(uv) : '' });
+      return uv ? ' \\left(' + name + uv + '\\right) ' : ' ' + name + ' ';
+    });
+    if (bad) return { ok: false, error: bad };
     if (!terms.length || /\\pm/.test(rep)) return { ok: false, error: 'Write each uncertain value as value ± uncertainty between two numbers, e.g. (5.03 ± 0.02)·(2.1 ± 0.1)' };
     const ctx = { degrees: S.angle === 'deg', userFuncs: app.userFuncs, vars: new Set([...app.vars, ...terms.map((t) => t.name)]), ans: app.lastAns };
     let code; try { code = Tex2Giac.tex2giac(rep, ctx); } catch (e) { return { ok: false, error: e.message || 'Syntax error' }; }
@@ -146,13 +158,18 @@
     const base = terms.map((t) => t.v), pts = [at(base)];
     terms.forEach((t, i) => { t.h = t.s > 0 ? t.s * 1e-3 : Math.max(1e-12, Math.abs(t.v) * 1e-8); const up = base.slice(), dn = base.slice(); up[i] += t.h; dn[i] -= t.h; pts.push(at(up), at(dn)); });
     let r; try { r = await app.cas.batch(pts); } catch (e) { return { ok: false, code, error: 'Error: ' + e.message }; }
-    const nums = r.map(Number);
+    // a result with units (15501.0_(mm*nm)): the numbers in one unit
+    let unit = null;
+    const nums = r.map((x) => { const u = unitOf(x); if (u) { if (unit == null) unit = u.u; return u.u === unit ? u.v : NaN; } return Number(x); });
+    if (r.some((x) => /Incompatible units/i.test(String(x)))) return { ok: false, code, error: 'Error: the units don’t match (only like units can be added or compared)' };
     if (!nums.every(isFinite)) return { ok: false, code, error: 'Error: the expression has to give a real number (got ' + String(r[0]).slice(0, 60) + ')' };
     const v = nums[0]; let s2 = 0;
     terms.forEach((t, i) => { t.d = (nums[1 + 2 * i] - nums[2 + 2 * i]) / (2 * t.h); t.c = (t.d * t.s) ** 2; s2 += t.c; });
     const sg = Math.sqrt(s2);
     app.lastAns = String(v);
-    return { ok: true, code, out: String(v), tex: fmtUnc(v, sg), kind: 'expr', unc: { v, s: sg, code, names: terms.map((t) => t.name), terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
+    let texOut = fmtUnc(v, sg);
+    if (unit) { let ut = unitTexOf(unit); if (/[²³⁴⁻¹]/.test(unit)) { try { ut = Units.unitTex(unit.replace(/\*/g, '·')); } catch (e) { /* keep */ } } texOut = (/^\\left\(/.test(texOut) ? texOut : '\\left(' + texOut + '\\right)') + '\\,' + ut; }
+    return { ok: true, code, out: String(v) + (unit ? '_' + (/[*\/^]/.test(unit) ? '(' + unit + ')' : unit) : ''), tex: texOut, kind: 'expr', unit: unit ? { v, u: unit } : undefined, unc: { v, s: sg, code, names: terms.map((t) => t.name), terms: terms.map((t) => ({ tex: t.tex, v: t.v, s: t.s, d: t.d, pct: s2 ? 100 * t.c / s2 : 0 })) } };
   }
 
   /* ---------------------------------------------------------------- results with units (Giac prints 6.28_ft, 19.62_(kg*m/s^2)) */

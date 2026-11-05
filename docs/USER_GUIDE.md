@@ -127,6 +127,8 @@ Type values as **value ± σ**. The ± key is the long-press option on (−), an
 
 `(5.03 ± 0.02) × (2.1 ± 0.1)` → **10.56 ± 0.50** (relative ± 4.8 %)
 
+- **With units:** put the unit (from the **units** key) after the uncertainty, and it applies to both numbers: `10 ± 0.001 mm × 1550.1 ± 0.001 nm` → **(15501.0 ± 1.6) mm·nm**. You can also give the value and the uncertainty their own units, and the uncertainty is converted to the value's unit: `10 mm ± 1 nm`. Adding values whose units don't match is reported.
+
 - **How it's calculated:** first order, for independent inputs, using numeric partial derivatives. Any function and either angle mode works: `sin(0.5 ± 0.01)`, `(12.0 ± 0.3)/(4.00 ± 0.05)²`, and so on.
 - **The uncertainty budget:** tap the result for a table of each input's sensitivity, contribution and share of the total.
 
