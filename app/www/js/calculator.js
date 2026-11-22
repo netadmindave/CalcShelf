@@ -75,6 +75,11 @@
   }
 
 
+  /** an expression whose value depends on the angle mode: a trig function (or its inverse, or arg) or an angle unit */
+  function angleRelated(tex, code) {
+    return /\b(?:a(?:rc)?)?(?:sin|cos|tan|sec|csc|cot)\(|\batan2\(|\barg\(/.test(String(code || '')) ||
+      /\\degree|°|\^\{?\\circ|\\_(?:deg|rad|grad|arcmin|arcsec)\b|∠|\\angle/.test(String(tex || ''));
+  }
   /** "expr => _unit" (or convert(expr,_unit)) when a unit on either side isn't one Giac reads exactly as we do. */
   const TEMP_ABS = /^\s*\(?\s*(-?\d+(?:\.\d*)?(?:e-?\d+)?)\s*\)?\s*\*?\s*_(°C|°F|°R|K|degC|degF|degR|℃|℉)\s*$/;
   async function convertUnits(app, code) {
@@ -237,6 +242,7 @@
       r.append(a, b);
       // second line: decimal value of an exact answer, relative uncertainty
       if (!h.error && h.dec && S.showDec !== false) { const d = el('div', { class: 'dec' }); renderTex(d, '\\approx ' + (GiacFmt.giacToTex(h.dec, fmtOpts(S)) || h.dec)); r.append(d); }
+      if (!h.error && h.alt && S.showDec !== false) { const d = el('div', { class: 'dec' }); renderTex(d, h.alt); r.append(d); }
       if (!h.error && h.unc) { const d = el('div', { class: 'dec' }); renderTex(d, '\\text{relative } \\pm' + (h.unc.v ? +(100 * h.unc.s / Math.abs(h.unc.v)).toPrecision(2) : 0) + '\\%'); r.append(d); }
       if (!h.error && h.unit && !pinned && h === this.history[this.history.length - 1]) {
         const c = el('div', { class: 'uchips' });
@@ -386,10 +392,33 @@
           try { const d = await this.app.cas.eval('evalf(' + out + ')'); if (/^[-+]?\d*\.\d+(e[-+]?\d+)?$/i.test(d) || /^[-+]?[\d.e]+[-+][\d.e]+\*i$/i.test(d)) r.dec = d; } catch (e) { /* none */ }
         }
       }
+      // trig or angle units: the same input in the other angle mode, like the decimal line under an exact answer
+      if (r.ok && r.kind === 'expr' && !r.unc && !r.done && !r.printed && angleRelated(tex, r.code)) r.alt = await this.otherAngle(tex, approx, r.out);
       this.setBusy(false);
       if (!r.ok && !r.error) return;
-      const h = { tex: shown, code: r.code, out: r.out, outTex: r.tex, error: r.ok ? null : r.error, done: r.done, approx, printed: r.printed, dec: r.dec, unc: r.unc, unit: r.unit || undefined, t: Date.now() };
+      const h = { tex: shown, code: r.code, out: r.out, outTex: r.tex, error: r.ok ? null : r.error, done: r.done, approx, printed: r.printed, dec: r.dec, alt: r.alt, unc: r.unc, unit: r.unit || undefined, t: Date.now() };
       this.push(h);
+    }
+    /** the input worked out in the other angle mode, as TeX: "\text{RAD: } -0.988" under sin(30) in DEG */
+    async otherAngle(tex, approx, mainOut) {
+      const S = this.app.settings, deg = S.angle === 'deg', app = this.app;
+      const ctx = { degrees: !deg, userFuncs: app.userFuncs, vars: app.vars, ans: app.lastAns };
+      let code; try { code = Tex2Giac.tex2giac(tex, ctx); } catch (e) { return null; }
+      if (/:=|=>|\bsolve\(|\bdesolve\(/.test(code)) return null;
+      const other = deg ? 1 : 0, cur = deg ? 0 : 1;
+      try {
+        const r = await app.cas.batch(['angle_radian:=' + other, approx ? 'evalf(' + code + ')' : 'regroup(' + code + ')', 'evalf(' + code + ')', 'angle_radian:=' + cur, 'evalf(' + (mainOut || '0') + ')']);
+        const ex = String(r[1]), dv = String(r[2]);
+        const a = Number(dv), b = Number(r[4]);
+        if (isFinite(a) && isFinite(b) && Math.abs(a - b) <= 1e-12 * Math.max(1, Math.abs(a))) return null;   // the same in both modes
+        if (/ERROR|Error|undef/.test(ex + dv)) return null;
+        const tag = '\\text{' + (deg ? 'RAD' : 'DEG') + ': }';
+        const u = unitOf(dv); if (u) return tag + (GiacFmt.giacToTex(String(+u.v.toPrecision(12)), fmtOpts(S)) || u.v) + '\\,' + unitTexOf(u.u);
+        const et = GiacFmt.giacToTex(ex, fmtOpts(S)) || ex, dt = GiacFmt.giacToTex(dv, fmtOpts(S)) || dv;
+        if (ex.length > 200) return tag + dt;
+        const sameNum = /^[-+]?[\d.]+$/.test(ex.trim()) && Math.abs(Number(ex) - a) <= 1e-12 * Math.max(1, Math.abs(a));
+        return tag + et + (!sameNum && et !== dt && /^[-+]?[\d.]+(e[-+]?\d+)?$/i.test(dv.trim()) ? '\\approx ' + dt : '');
+      } catch (e) { return null; }
     }
     push(h) {
       if (!this.history.length) this.hist.innerHTML = '';

@@ -654,6 +654,7 @@
     if (seq[0] && seq[0].k === 'id' && /^Define$/i.test(seq[0].v)) { define = true; seq.shift(); }
     let s = emitSeq(seq, ctx);
     { let depth = 0; for (const ch of s.replace(/"[^"]*"/g, '')) { if (ch === '(') depth++; else if (ch === ')' && --depth < 0) throw new TexError('A ) has no ( before it'); } }
+    { const inner = /([*\/^+]|[^-(,]-)\s*\)/.exec(s.replace(/"[^"]*"/g, '')); if (inner) throw new TexError('Something is missing after the ' + ({ '*': '×', '/': '÷', '^': '^', '+': '+' }[inner[1]] || '−') + ' (inside an exponent, a fraction or brackets)'); }
     const dangling = /([*\/^+]|[^-]-)\s*$/.exec(s);
     if (dangling && !/[=:]\s*$/.test(s)) throw new TexError('Something is missing after the last ' + ({ '*': '×', '/': '÷', '^': '^', '+': '+' }[dangling[1]] || '−'));
     if (define) s = s.replace(/(^|[^<>!:=])=(?!=)/, '$1:=');

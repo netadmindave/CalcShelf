@@ -124,10 +124,19 @@
     put(mf, tex, sel) { mf.executeCommand(['insert', tex, { format: 'latex', insertionMode: 'replaceSelection', selectionMode: sel || 'placeholder', focus: true }]); },
     autoAns(mf, ansTex) { if (!ansTex || !Edit.empty(mf)) return false; mf.value = ''; Edit.put(mf, ansTex, 'after'); return true; },
     /** the cursor is at the end of the field (nothing after it on the line) */
-    atEnd(mf) { return mf.position >= mf.lastOffset; },
+    atEnd(mf) { return mf.position >= mf.lastOffset || /^(?:\s*(?:\}|\\right[).]))*\s*$/.test(Edit.tail(mf)); },
+    /** the LaTeX after the cursor (found with a marker, then put back as it was) */
+    tail(mf) {
+      const MK = '\\mathrm{QQ}', p = mf.position, v = mf.value;
+      Edit.plain(mf, MK);
+      const w = mf.value, i = w.indexOf(MK);
+      mf.value = v; mf.position = p;
+      return i < 0 ? '' : w.slice(i + MK.length);
+    },
     /** the cursor is at the end of the group it is in (a fraction part, an exponent, the inside of ( ) …) */
     atGroupEnd(mf) { const p = mf.position; mf.executeCommand('moveToGroupEnd'); const q = mf.position; mf.position = p; return q === p; },
-    /** ( : on an empty line or at the end, a pair with the cursor inside; anywhere else, just the ( */
+    /** ( : on an empty line or at the end (nothing after the cursor but the ends of pairs, fractions or powers it is
+     *  in), a pair with the cursor inside; anywhere else, just the ( */
     open(mf) {
       if (Edit.empty(mf) || Edit.atEnd(mf)) { Edit.put(mf, '\\left(#0\\right)'); return; }
       Edit.plain(mf, '(');
@@ -145,11 +154,21 @@
       const tex = withMk.slice(0, cur) + withMk.slice(cur + MK.length);
       // at the end of a ( ) pair's contents (also from inside a fraction or power that ends it): step out of the pair
       const out = /^(?:\s*\})*\s*\\right\)/.exec(tex.slice(cur));
+      // …unless a ( typed inside that pair is still open: that one is closed first
+      const inner = out ? Edit.closeLast(tex, cur) : null;
+      if (inner && inner.at > Edit.pairStart(tex, cur + out[0].length - 7)) { mf.value = inner.tex.slice(0, inner.caret) + MK + inner.tex.slice(inner.caret); Edit.caret(mf, mf.value, MK, inner.tex); return; }
       if (cur >= 0 && out) { const at = cur + out[0].length; mf.value = tex.slice(0, at) + MK + tex.slice(at); Edit.caret(mf, mf.value, MK, tex); return; }
       const r = cur >= 0 ? Edit.closeLast(tex, cur) : null;
       if (!r) { mf.value = tex; Edit.caret(mf, withMk, MK); Edit.plain(mf, ')'); return; }
       mf.value = r.tex.slice(0, r.caret) + MK + r.tex.slice(r.caret);
       Edit.caret(mf, mf.value, MK, r.tex);
+    },
+    /** where the \left( that the \right at `end` closes begins */
+    pairStart(tex, end) {
+      let d = 0; const re = /\\left|\\right/g; const marks = []; let m;
+      while ((m = re.exec(tex)) && m.index < end) marks.push(m);
+      for (let i = marks.length - 1; i >= 0; i--) { if (marks[i][0] === '\\right') d++; else if (d === 0) return marks[i].index; else d--; }
+      return -1;
     },
     /** put the cursor where MK is in `marked`, then show `clean` (or `marked` without MK) */
     caret(mf, marked, MK, clean) {
@@ -189,7 +208,7 @@
       if (!cand) return null;
       if (cand.repair) {                                                // a \left( whose ) was deleted: put it back
         const out = tex.slice(0, cand.repair.at) + '\\right)' + tex.slice(cand.repair.end);
-        return { tex: out, caret: cur };
+        return { tex: out, caret: cur, at: cand.at };
       }
       // where the ) goes
       let ins;
@@ -212,7 +231,7 @@
       const a = cand.at, L = cand.len;
       const out = tex.slice(0, a) + '\\left(' + tex.slice(a + L, ins) + '\\right)' + tex.slice(ins);
       // the cursor goes after the new ), or stays where it was when the ) went into an earlier group
-      return { tex: out, caret: ins <= cur && depth < 0 ? cur + (6 - L) + 7 : ins + (6 - L) + 7 };
+      return { tex: out, caret: ins <= cur && depth < 0 ? cur + (6 - L) + 7 : ins + (6 - L) + 7, at: a };
     },
     /** the same rules for a hardware or phone keyboard; getAns() returns the answer's LaTeX or null */
     bind(mf, getAns) {

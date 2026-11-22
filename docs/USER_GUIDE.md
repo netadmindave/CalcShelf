@@ -91,7 +91,7 @@ The **≈** keys (bottom right of the 123 page, and beside **enter**) give a dec
 - The entry line is a 2D math editor. Fractions stack, exponents rise, and √, ∫ and matrices have boxes to fill in. **tab** moves to the next box.
 - **Division is always a fraction.** ÷ (and typing `/`) makes a stacked fraction from the term before the cursor.
 - **Parentheses come in pairs.**
-  - **(** at the end of the line (or on an empty line) inserts **( )** with the cursor inside. Anywhere else it inserts just the **(**, so you can go back and bracket part of what you typed.
+  - **(** at the end of the line, on an empty line, or with only the ends of pairs, fractions or powers after the cursor inserts **( )** with the cursor inside, so brackets nest as you type them. Anywhere else it inserts just the **(**, so you can go back and bracket part of what you typed.
   - **)** anywhere closes the last **(** before the cursor that has no **)**, as one matching pair that grows with what it holds. It closes at that **(**'s own level: at the cursor when both are in the same part of the line, and after the whole fraction or power when the cursor is inside one. If you deleted a **)**, this puts it back.
   - **)** with no open **(** before it inserts just the **)**. At the end of a **( )** pair's contents, **)** steps out of the pair, so typing `2*(3+4)+1` straight through works.
   - A **)** with no **(** before it, or a **(** that is never closed, is reported when you press enter.
