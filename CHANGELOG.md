@@ -4,6 +4,7 @@ CalcShelf was called **CAS Touch** up to 2.6.1, and began as **TI-89 Touch** (1.
 
 ## Unreleased
 
+- **TI-Nspire solver app** (`core-build/nspire-solver`): the Variable Solver's 433 optics, optoelectronics and semiconductor formulas as a Lua app for the TI-Nspire CX / CX II. Formulas are rearranged by Giac when the app is built, so it runs without a CAS. See its README.
 - An operator left at the end of an exponent, fraction part or bracket (`0.28^{2×}π`, typed as ^ 2 × π without leaving the exponent) now says what is missing instead of giving undef.
 - **The other angle mode under trig results:** an expression with a trig function (sin, cos, tan, their inverses, arg) or an angle unit (°) also shows its value in the other mode on a second line, like the decimal under an exact answer: sin(30) in DEG shows **RAD: sin(30) ≈ −0.988**, asin(0.5) shows **RAD: 0.5236**, and 30° in RAD shows **DEG: 30**. It is left out when both modes give the same value (tan(45°)). It follows the "Show decimal value" setting.
 - **Brackets:** **(** right before the end of a pair (or of a fraction or power the cursor is in) now opens a nested pair, so `( ( 1 + 2 ) × 3 )` on the keypad builds the brackets you typed. **)** closes the innermost **(** still open before it steps out of a pair: `2 × ( ( 3 + 4 )` no longer leaves an unmatched bracket.

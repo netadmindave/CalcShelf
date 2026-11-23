@@ -32,3 +32,5 @@ node_modules/
 app/www/docs/guide.md
 app/www/precache.json
 tests/*.png
+core-build/nspire-solver/luna
+core-build/nspire-solver/out/
