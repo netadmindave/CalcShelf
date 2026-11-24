@@ -101,6 +101,24 @@ function symParts(tex) {
 }
 
 /* ---------------------------------------------------------------- units: display unit, SI factor, alternatives */
+// the unit a value starts in: chosen by what the quantity is (a wavelength in nm, a focal length in mm, a pulse in fs …)
+function firstUnit(name, sym, list) {
+  const has = (u) => list.some((x) => x[0] === u);
+  const pick = (u) => { const i = list.findIndex((x) => x[0] === u); if (i > 0) list.unshift(list.splice(i, 1)[0]); };
+  const n = String(name) + ' ' + String(sym);
+  if (has('nm') && has('mm')) {
+    if (/centre thickness|center thickness|plate thickness|Rayleigh|distance from the waist|depth of focus|confocal/i.test(n)) pick('mm');
+    else if (/wavelength|Δλ|linewidth|well width|barrier width|oxide|plane spacing|^λ|lattice|Bohr|Debye/i.test(n)) pick('nm');
+    else if (/waist|beam radius|beam width|core|mode-field|spot|period|spacing|pitch|slit|groove|depletion|diffusion|channel|base width|emitter|penetration|thickness|width|depth|X_[np]|speckle|fringe|zone|ring|Λ|1\/e|drift|layer|gap|Rayleigh|grating|film/i.test(n)) pick('µm');
+    else if (/screen distance|propagation|far field|dispersion length|transfer length|fib(er|re) length|link|span|distance travelled|nonlinear length|walk-off|coherence length/i.test(n)) pick('m');
+    else pick('mm');
+  } else if (has('fs') && has('ns')) {
+    if (/pulse period|repetition|round-trip time|round trip/i.test(n)) pick('ns');
+    else if (/pulse|duration|delay|width|FWHM|period of|round|cycle|walk|coherence time|τ_p|chirp/i.test(n)) pick('fs');
+    else if (/lifetime|recombination|carrier|transit|rise|fall|response|decay|storage|photon|spontaneous|diffusion|time constant|RC/i.test(n)) pick('ns');
+  }
+  return list;
+}
 function unitList(u) {
   if (!u) return [];
   let alts = [];
@@ -157,7 +175,7 @@ function unitList(u) {
     const q = VS.Q[id];
     let [b, s] = symParts(q.sym);
     if (/^l(max|min)?$/.test(b + s) && /wavelength/i.test(q.name)) { b = 'λ'; s = s || (b + s).slice(1); }
-    const units = unitList(q.ui && q.ui.ok ? q.unit : '');
+    const units = firstUnit(q.name, q.sym, unitList(q.ui && q.ui.ok ? q.unit : ''));
     const disp = units.length ? units[0] : [q.unit || '', 1];
     L.push('{' + [str(b || q.name), str(s), str(q.name), str(plainTex(q.desc || '').slice(0, 300)), str(q.also || ''), str(disp[0]),
       '{' + units.map((u) => '{' + str(u[0]) + ',' + u[1] + '}').join(',') + '}',
@@ -167,21 +185,30 @@ function unitList(u) {
 
   L.push('F={');
   let done = 0;
+  const DATA = { quantities: {}, formulas: [] };   // the same formulas for the TI-89 and TI-84 writers (ti89.js, ti84.js)
+  for (const id of ids) {
+    const q = VS.Q[id]; let [b, s] = symParts(q.sym);
+    if (/^l(max|min)?$/.test(b + s) && /wavelength/i.test(q.name)) { b = 'λ'; s = s || (b + s).slice(1); }
+    const units = firstUnit(q.name, q.sym, unitList(q.ui && q.ui.ok ? q.unit : ''));
+    DATA.quantities[qIndex[id]] = { sym: [b || q.name, s], name: q.name, unit: units.length ? units[0] : ['', 1], value: q.value != null ? q.value : null,
+      input: !!q.input, hintSI: q.hintSI != null ? q.hintSI : null };
+  }
   for (const f of F) {
     const names = {}; f.vars.forEach((v) => { const [b, s] = symParts(VS.Q[v.id].sym); names[v.ph] = b + (s ? '_' + s : ''); });
     const idx = {}; f.vars.forEach((v, k) => { idx[v.ph] = k + 1; });
     let eqAst; try { eqAst = GiacFmt.parse(f.eqp); } catch (e) { stats.skipped++; continue; }
     let resid; try { resid = '(' + toLua(eqAst.a, idx) + ')-(' + toLua(eqAst.b, idx) + ')'; } catch (e) { resid = null; }
-    const sol = [];
+    const sol = [], dsol = [];
     for (const x of f.vars) {
       const q = VS.Q[x.id];
-      if (q.input || (f.solveFor && !f.solveFor.has(x.name))) { sol.push('false'); continue; }
-      let asts = [];
+      if (q.input || (f.solveFor && !f.solveFor.has(x.name))) { sol.push('false'); dsol.push(null); continue; }
+      let asts = []; const okAst = [];
       const ex = VS.explicit(f, x);
       if (ex) asts = [ex];
       else { const r = await solveG('solve(' + f.eqp + ',' + x.ph + ')'); asts = r ? VS.parseSols(r, x.ph) : []; }
       const outs = [];
-      for (const a of asts) { try { outs.push([toLua(a, idx), toText(a, names)]); } catch (e) { /* not in closed form */ } }
+      for (const a of asts) { try { outs.push([toLua(a, idx), toText(a, names)]); okAst.push(a); } catch (e) { /* not in closed form */ } }
+      dsol.push(outs.length ? okAst.splice(0) : (resid ? 'numeric' : null));
       if (outs.length) { stats.closed++; sol.push('{' + outs.map((o) => '{' + str(o[0]) + ',' + str(o[1]) + '}').join(',') + '}'); }
       else if (resid) { stats.numeric++; sol.push('true'); }
       else sol.push('false');
@@ -191,11 +218,14 @@ function unitList(u) {
     L.push('{' + [str(f.title), TOPIC[f.cat], str(f.cat), str(toText(eqAst, names)), '{' + f.vars.map((v) => qIndex[v.id]).join(',') + '}',
       '{' + f.vars.map((v) => v.f).join(',') + '}', '{' + sol.join(',') + '}', resid ? str(resid) : 'nil', f.solveFor ? 'true' : 'false', when, unless,
       str(plainTex(f.note || '').slice(0, 160))].join(',') + '},');
+    DATA.formulas.push({ title: f.title, topic: TOPIC[f.cat], cat: f.cat === 'Optics: materials' ? 'Materials' : f.cat, eq: toText(eqAst, names), eqAst,
+      vars: f.vars.map((v) => ({ q: qIndex[v.id], ph: v.ph, f: v.f })), sols: dsol, approx: !!f.solveFor, note: plainTex(f.note || '').slice(0, 160) });
     if (++done % 100 === 0) process.stderr.write(done + ' formulas\n');
   }
   L.push('}');
   if (worker) await worker.terminate();
   fs.writeFileSync(CACHE, JSON.stringify(cache));
+  fs.writeFileSync(OUT + '/solver-data.json', JSON.stringify(DATA));
   stats.timeouts = timeouts;
   const data = L.join('\n') + '\n';
   const app = fs.readFileSync(__dirname + '/solver.lua', 'utf8');

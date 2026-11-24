@@ -53,6 +53,8 @@ You need Android 7.0 or newer, with a current Android System WebView. The TI-Nsp
 
 The app is about 6 MB. It asks for no permissions and works offline: a content security policy keeps every page to the app's own files, so nothing is fetched from or sent to other sites. Everything stays on the phone, and calculator files you load are kept in the app's private storage. See [SECURITY.md](SECURITY.md).
 
+**On a TI calculator:** the solver's optics, optoelectronics and semiconductor formulas are in [TI-Apps](TI-Apps) for the TI-Nspire CX, the TI-89 / TI-92 Plus / Voyage 200 and the TI-84 Plus / Plus CE.
+
 ## Start here
 
 - **[User guide](docs/USER_GUIDE.md)** covers every tab, key and menu, how to load each calculator's OS, and troubleshooting.

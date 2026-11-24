@@ -32,5 +32,6 @@ node_modules/
 app/www/docs/guide.md
 app/www/precache.json
 tests/*.png
-core-build/nspire-solver/luna
-core-build/nspire-solver/out/
+core-build/ti-apps/luna
+core-build/ti-apps/out/
+!TI-Apps/TI-Nspire/CalcShelf-Solver.tns
