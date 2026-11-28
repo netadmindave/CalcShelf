@@ -421,7 +421,7 @@
           b.append(face);
           if (k.s) b.append(el('span', { class: 'ks', text: k.s.l }));
           if (k.d) b.append(el('span', { class: 'kd', text: k.d.l }));
-          b.setAttribute('aria-label', (k.l.replace(/^\$/, '').replace(/\\[a-z]+/g, '').replace(/[{}^_]/g, '') || k.l) + (k.s ? ', 2nd ' + k.s.l : '') + (k.d ? ', diamond ' + k.d.l : ''));
+          b.setAttribute('aria-label', (k.l.replace(/^\$/, '').replace(/\\[a-z]+/g, '').replace(/[{}^_]/g, '') || k.l) + (k.s || k.d ? ', hold for ' + [k.s, k.d].filter(Boolean).map((x) => x.l).join(' or ') : ''));
           let y0 = 0, lp = null, done = false, rep = null;
           const fire = (spec) => { done = true; b.classList.remove('pressed'); Sheet.keyTap = Date.now(); this.keyPress(spec, b); };
           b.addEventListener('pointerdown', (e) => {
@@ -459,12 +459,12 @@
       this.markKeyPage(id);
     },
     markKeyPage(id) { document.querySelectorAll('#kseg button').forEach((b) => b.classList.toggle('on', b.dataset.id === id)); this.settings.keypage = id; },
-    /** long-press: choose the key's primary, 2nd or ◆ function */
+    /** long-press: choose the key itself or one of its other functions */
     keyPop(b, k) {
       document.querySelectorAll('.kpop').forEach((x) => x.remove());
       const pop = el('div', { class: 'kpop', role: 'menu' });
-      const opt = (spec, cls, tag) => { const o = el('button', { class: 'kpo ' + cls, role: 'menuitem' }, el('small', { text: tag }), el('span', { text: spec.title || spec.l })); if (spec.l[0] === '$') renderTex(o.lastChild, spec.l.slice(1)); o.onclick = () => { pop.remove(); this.keyPress(spec, b); }; pop.append(o); };
-      opt(k, 'p', 'key'); if (k.s) opt(k.s, 's', '2nd'); if (k.d) opt(k.d, 'd', '◆');
+      const opt = (spec, cls) => { const o = el('button', { class: 'kpo ' + cls, role: 'menuitem' }, el('span', { text: spec.title || spec.l })); if (spec.l[0] === '$') renderTex(o.lastChild, spec.l.slice(1)); o.onclick = () => { pop.remove(); this.keyPress(spec, b); }; pop.append(o); };
+      opt(k, 'p'); if (k.s) opt(k.s, 's'); if (k.d) opt(k.d, 'd');
       document.body.append(pop);
       const r = b.getBoundingClientRect(), w = pop.offsetWidth;
       pop.style.left = Math.max(6, Math.min(innerWidth - w - 6, r.left + r.width / 2 - w / 2)) + 'px'; pop.style.top = Math.max(6, r.top - pop.offsetHeight - 6) + 'px';
@@ -660,8 +660,7 @@
         item('Guide & manuals', 'The CalcShelf user guide, and the manuals of the real calculators', () => { Sheet.close(); this.addPage('guide'); });
         item('Modules', 'Optics, Machinist and modules you import', () => Modules.manage(this));
         item('Settings', 'Angle, digits, number format (Normal / Sci / Eng), theme', () => Sheet.push('Settings', (bb) => this.settingsUI(bb)));
-        item('Constants & formulas', 'CODATA constants and solvable formulas', () => { Sheet.close(); Library.open(this, 'const'); });
-        item('Trigonometry & triangle solver', 'Identities, trig formulas, solve any triangle', () => { Sheet.close(); Library.open(this, 'trig'); });
+        item('Constants & formulas', 'CODATA constants; solvable formulas from the app and its modules; triangle solver and trig identities', () => { Sheet.close(); Library.open(this, 'const'); });
         item('Conversion tool', 'Units, optics calculators, number bases, decibels', () => { Sheet.close(); Library.open(this, 'conv'); });
         const emu = this.pages.find((x) => x.kind === 'emu');
         if (this.settings.multiEmu) item('Add an emulated calculator', 'Opens in a new tab; change a tab’s model from its tab menu', () => this.emuChooser(true, null));

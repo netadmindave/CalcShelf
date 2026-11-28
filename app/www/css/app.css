@@ -275,9 +275,8 @@ select.cv-in { font-family: inherit; padding: 10px 10px; appearance: auto; }
 .key.enter .ks, .key.enter .kd { color: color-mix(in srgb, var(--acc-ink) 80%, transparent); }
 .key.div { font-size: clamp(17px, 5vw, 22px); }
 .kpop { position: fixed; z-index: 60; display: flex; gap: 4px; padding: 5px; border-radius: 12px; background: var(--doc, #fff); box-shadow: 0 6px 24px rgba(0,0,0,.28); }
-.kpo { min-width: 58px; padding: 6px 10px; border-radius: 9px; background: var(--k); color: var(--k-ink); display: flex; flex-direction: column; align-items: center; gap: 1px; font-weight: 600; font-size: 16px; }
-.kpo small { font-size: 10px; font-weight: 600; opacity: .7; }
-.kpo.s small { color: var(--k-2nd); opacity: 1; } .kpo.d small { color: var(--k-dia); opacity: 1; }
+.kpo { min-width: 58px; padding: 12px 12px; border-radius: 9px; background: var(--k); color: var(--k-ink); display: flex; flex-direction: column; align-items: center; gap: 1px; font-weight: 600; font-size: 16px; }
+.kpo.s { color: var(--k-2nd); } .kpo.d { color: var(--k-dia); }
 /* CAS history: decimal line, unit chips, pins, swipe-to-delete, uncertainty budget */
 .row .dec { flex-basis: 100%; text-align: right; color: var(--ink2); font-size: 15px; padding: 0 4px; }
 .row .uchips { flex-basis: 100%; display: flex; gap: 6px; justify-content: flex-end; overflow-x: auto; scrollbar-width: none; padding-top: 4px; }
@@ -520,3 +519,9 @@ textarea.nc-in { resize: vertical; min-height: 84px; }
 .mi.emu-pick { flex-direction: column; align-items: flex-start; gap: 3px; }
 .mi.emu-pick .sub { text-align: left; margin-left: 0; }
 .vs-unit-out { margin-left: auto; max-width: 34%; padding: 5px 4px; font-size: 13px; }
+/* tabs, search and chips that stay at the top while a sheet or page scrolls */
+.sheet-sticky { position: sticky; top: 0; z-index: 5; background: var(--sheet); margin: 0 -12px 4px; padding: 2px 12px 0; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 6px 6px -6px rgba(0,0,0,.25); }
+.sheet-sticky .search, .sheet-sticky .chips { margin-bottom: 0; }
+.sheet-sticky > :last-child { margin-bottom: 6px; }
+.sheet-sticky .chips { padding-bottom: 0; }
+.page-sticky { background: var(--doc, var(--sheet)); margin-top: -10px; padding-top: 10px; }

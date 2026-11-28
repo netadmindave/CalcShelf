@@ -1,5 +1,5 @@
 # Units Giac leaves uncombined are worked out in SI base units and shown with a prefix (√(190 cm²/s × 100 ns) = 43.6 µm),
-# and the 123 keypad's new keys: units, eˣ (2nd x⁻¹), and ≈ for a decimal answer.
+# and the 123 keypad: units, eˣ, and ≈ (beside enter) for a decimal answer.
 import asyncio, os, sys
 from playwright.async_api import async_playwright
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8091'
@@ -23,7 +23,7 @@ async def main():
         await E("__app.page.mf.value = ''; __app.page.mf.focus()")
         await key('eˣ'); await key('2'); await pg.wait_for_timeout(200)
         print('eˣ 2 →', await E("__app.page.mf.value"))
-        await key('≈'); await pg.wait_for_timeout(1500)
+        await pg.locator('.kbar .approx').tap(); await pg.wait_for_timeout(1500)
         print('≈ →', await E("JSON.stringify([__app.page.history.at(-1).out, __app.page.history.at(-1).approx])"))
         await key('units'); await pg.wait_for_timeout(500)
         print('units key opens:', await E("document.querySelector('#sheet-title').textContent"))

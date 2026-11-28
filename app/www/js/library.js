@@ -25,18 +25,48 @@
       this.app = app; if (tab) this.tab = tab;
       Sheet.open('Constants, formulas & conversions', (b) => this.build(b));
     },
-    trigSub(sub) { Trig.sub = sub; this.open(root.App, 'trig'); },
+    /** the triangle solver, trig identities and trig formulas now live in Formulas (Trigonometry) */
+    trigSub(sub) {
+      const app = root.App; this.app = app; this.tab = 'form'; this.cat = 'Trigonometry';
+      Sheet.open('Constants, formulas & conversions', (b) => this.build(b));
+      if (sub === 'tri' || sub === 'id') this.trigPage(sub);
+    },
+    trigPage(sub) {
+      const app = this.app;
+      Sheet.push(sub === 'tri' ? 'Triangle solver' : 'Trig identities', (bb) => { Trig.app = app; if (!Trig.unit) Trig.unit = 'deg'; if (sub === 'tri') Trig.triangle(bb); else Trig.identities(bb); });
+    },
+    /** the built-in formulas, then every formula of the installed modules (one that repeats a built-in equation is left out) */
+    allFormulas() {
+      const norm = (e) => String(e || '').replace(/\s+/g, '');
+      const seen = new Set(FORMULAS.map((f) => norm(f.eq)));
+      const out = FORMULAS.slice();
+      for (const e of (root.Modules && Modules.list) || []) {
+        for (const sec of e.m.sections || []) for (const it of sec.items || []) {
+          if (it.type !== 'formula' || !it.eq || !Array.isArray(it.vars) || seen.has(norm(it.eq))) continue;
+          seen.add(norm(it.eq));
+          out.push({ cat: e.m.name, n: it.title, tex: it.tex, eq: it.eq, v: it.vars, note: it.note, sec: sec.title, mod: true });
+        }
+      }
+      return out;
+    },
+    /** the tabs, search and chips stay at the top of the sheet while the list scrolls */
+    sticky(...nodes) { return el('div', { class: 'sheet-sticky' }, ...nodes.filter(Boolean)); },
     build(b) {
-      const seg = el('div', { class: 'seg', style: { marginBottom: '8px' } });
-      for (const [k, l] of [['const', 'Constants'], ['form', 'Formulas'], ['trig', 'Trig'], ['conv', 'Convert'], ['mine', 'Mine']]) { const x = el('button', { text: l, class: this.tab === k ? 'on' : '' }); x.onclick = () => { this.tab = k; this.cat = 'All'; Sheet.render(); }; seg.append(x); }
-      if (this.tab === 'conv') { b.append(seg); Converter.build(b, this.app, { sheet: true }); return; }
-      if (this.tab === 'trig') { b.append(seg); Trig.build(b, this.app); return; }
-      if (this.tab === 'mine') { b.append(seg); this.mine(b); return; }
-      const q = el('input', { class: 'search', type: 'search', value: this.q, placeholder: this.tab === 'const' ? 'Search constants (e.g. Planck, BK7, dn/dT)' : 'Search formulas (e.g. Snell, Rayleigh, hoop)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
-      const cats = this.tab === 'const' ? CONSTANTS.map((c) => c.cat) : [...new Set(FORMULAS.map((f) => f.cat))];
+      const seg = el('div', { class: 'seg' });
+      for (const [k, l] of [['const', 'Constants'], ['form', 'Formulas'], ['conv', 'Convert'], ['mine', 'Mine']]) { const x = el('button', { text: l, class: this.tab === k ? 'on' : '' }); x.onclick = () => { this.tab = k; this.cat = 'All'; Sheet.render(); }; seg.append(x); }
+      if (this.tab === 'trig') this.tab = 'form';
+      if (this.tab === 'conv') { const top = this.sticky(seg); b.append(top); Converter.build(b, this.app, { sheet: true, top }); return; }
+      if (this.tab === 'mine') { b.append(this.sticky(seg)); this.mine(b); return; }
+      const q = el('input', { class: 'search', type: 'search', value: this.q, placeholder: this.tab === 'const' ? 'Search (Planck, BK7, dn/dT)' : 'Search (Snell, triangle, spindle)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
+      const forms = this.tab === 'form' ? this.allFormulas() : [];
+      const cats = this.tab === 'const' ? CONSTANTS.map((c) => c.cat) : [...new Set(forms.map((f) => f.cat))];
+      if (!['All', ...cats].includes(this.cat)) this.cat = 'All';
       const chips = el('div', { class: 'chips' });
       for (const c of ['All', ...cats]) { const x = el('button', { class: 'chip' + (c === this.cat ? ' on' : ''), text: c }); x.onclick = () => { this.cat = c; chips.querySelectorAll('.chip').forEach((y) => y.classList.toggle('on', y === x)); render(); }; chips.append(x); }
       const list = el('ul', { class: 'mlist' });
+      // the maths of a row is drawn when it scrolls into view: there are several hundred formulas
+      const io = 'IntersectionObserver' in root ? new IntersectionObserver((es) => { for (const en of es) if (en.isIntersecting) { const t = en.target; io.unobserve(t); renderTex(t, t.dataset.tex); } }, { root: null, rootMargin: '400px' }) : null;
+      const lazyTex = (tex, style) => { const t = el('div', { style }); if (io) { t.dataset.tex = tex; t.style.minHeight = '24px'; io.observe(t); } else renderTex(t, tex); return t; };
       const render = () => {
         this.q = q.value; const s = q.value.trim().toLowerCase(); list.innerHTML = '';
         let n = 0;
@@ -49,19 +79,27 @@
             for (const it of items) { list.append(this.constRow(it)); n++; }
           }
         } else {
-          for (const f of FORMULAS) {
+          // the triangle solver and the identities sit with the trig formulas
+          if (this.cat === 'All' || this.cat === 'Trigonometry') {
+            for (const [sub, title, sub2, words] of [['tri', 'Triangle solver', 'Any three sides and angles (at least one side): the rest, the area and the circles', 'triangle solver law of sines cosines trigonometry'], ['id', 'Trig identities', 'Pythagorean, sum and difference, double and half angle, exact values', 'trig identities trigonometry unit circle exact values']]) {
+              if (s && !words.includes(s) && !title.toLowerCase().includes(s)) continue;
+              const btn = el('button', { class: 'mi', style: { flexDirection: 'column', alignItems: 'flex-start', gap: '4px' } }, el('span', { class: 'lbl', text: title, style: { fontWeight: '600' } }), el('span', { class: 'sub', text: 'Trigonometry · ' + sub2 }));
+              btn.onclick = () => this.trigPage(sub);
+              list.append(el('li', {}, btn)); n++;
+            }
+          }
+          for (const f of forms) {
             if (this.cat !== 'All' && f.cat !== this.cat) continue;
-            if (s && !(f.n + ' ' + f.cat + ' ' + f.v.map((v) => v[1]).join(' ')).toLowerCase().includes(s)) continue;
-            const btn = el('button', { class: 'mi', style: { flexDirection: 'column', alignItems: 'flex-start', gap: '4px' } }, el('span', { class: 'lbl', text: f.n, style: { fontWeight: '600' } }), el('span', { class: 'sub', text: f.cat }));
-            const t = el('div', { style: { fontSize: '17px', maxWidth: '100%', overflowX: 'auto' } }); renderTex(t, f.tex); btn.insertBefore(t, btn.children[1]);
-            btn.onclick = () => Sheet.push(f.n, (bb) => this.solver(bb, f));
+            if (s && !(f.n + ' ' + f.cat + ' ' + (f.sec || '') + ' ' + f.v.map((v) => v[1]).join(' ')).toLowerCase().includes(s)) continue;
+            const btn = el('button', { class: 'mi', style: { flexDirection: 'column', alignItems: 'flex-start', gap: '4px' } }, el('span', { class: 'lbl', text: f.n, style: { fontWeight: '600' } }), lazyTex(f.tex, { fontSize: '17px', maxWidth: '100%', overflowX: 'auto' }), el('span', { class: 'sub', text: f.sec ? f.cat + ' · ' + f.sec : f.cat }));
+            btn.onclick = () => Sheet.push(f.n, (bb) => this.solver(bb, f, f.mod ? { insert: false } : {}));
             list.append(el('li', {}, btn)); n++;
           }
         }
         if (!n) list.append(el('li', { class: 'desc', style: { padding: '14px 4px' }, text: 'Nothing matches “' + q.value + '”.' }));
       };
       q.oninput = render;
-      b.append(seg, q, chips, list); render();
+      b.append(this.sticky(seg, q, chips), list); render();
     },
     /* ---------------- your own constants and units (kept in the settings, for every document) ---------------- */
     mine(b) {

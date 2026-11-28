@@ -21,12 +21,6 @@ module.exports = function machinist() {
   const fracRows = []; for (let n = 1; n <= 64; n++) fracRows.push([frac(n, 64) + '"', f4(n / 64), mm(n / 64)]);
   const metric = []; for (let x = 3; x <= 100; x++) metric.push(x / 10); for (let x = 10.5; x <= 20; x += 0.5) metric.push(x); for (let x = 21; x <= 32; x++) metric.push(x);
   const metricRows = metric.map((m) => [m.toFixed(m < 10 ? 1 : 1) + ' mm', inch(m), m.toFixed(2)]);
-  const allDrills = [
-    ...NUMBER.map((d, i) => ['Number', '#' + (i + 1), d]),
-    ...Object.entries(LETTER).map(([k, d]) => ['Letter', k, d]),
-    ...fracRows.map((r, i) => ['Fraction', r[0], (i + 1) / 64]),
-    ...metric.map((m) => ['Metric', m.toFixed(1) + ' mm', m / MM]),
-  ].sort((a, b) => a[2] - b[2]).map(([t, s, d]) => [s, t, f4(d), mm(d)]);
 
   /* ---------------- threads */
   const drillIn = (s) => { if (s[0] === '#') return NUMBER[+s.slice(1) - 1]; if (LETTER[s]) return LETTER[s]; const m = s.match(/^(?:(\d+)-)?(\d+)\/(\d+)$/); return m ? (+(m[1] || 0)) + m[2] / m[3] : NaN; };
@@ -60,6 +54,23 @@ module.exports = function machinist() {
   const CLR_MM = [['M1.6', 1.7, 1.8, 2], ['M2', 2.2, 2.4, 2.6], ['M2.5', 2.7, 2.9, 3.1], ['M3', 3.2, 3.4, 3.6], ['M4', 4.3, 4.5, 4.8], ['M5', 5.3, 5.5, 5.8], ['M6', 6.4, 6.6, 7], ['M8', 8.4, 9, 10], ['M10', 10.5, 11, 12],
     ['M12', 13, 13.5, 14.5], ['M14', 15, 15.5, 16.5], ['M16', 17, 17.5, 18.5], ['M20', 21, 22, 24], ['M24', 25, 26, 28], ['M30', 31, 33, 35]];
   const clrMmRows = CLR_MM.map(([s, a, b, c]) => [s, a.toFixed(1), b.toFixed(1), c.toFixed(1)]);
+
+  /* ---------------- every drill, with the threads it taps and the screws it clears */
+  const drillLabel = (d) => (/^\d/.test(d) && !/mm$/.test(d) ? d + '"' : d);    // a fraction in the drill list carries an inch mark
+  const mmLabel = (x) => (metric.some((m) => Math.abs(m - x) < 1e-9) ? x.toFixed(1) + ' mm' : null);   // only a size in the metric drill list
+  const tapFor = {}, clrFor = {};
+  const add = (o, k, v) => { if (k) (o[k] = o[k] || []).push(v); };
+  for (const [sz, tpi, ser, d] of UN) add(tapFor, drillLabel(d), sz + '-' + tpi + ' ' + ser);
+  for (const [sz, p, d] of ISO) add(tapFor, mmLabel(d), sz + '×' + p);
+  for (const [sz, , d] of NPT) add(tapFor, drillLabel(d), sz + ' NPT');
+  for (const [sz, , c, f] of CLR_IN) { add(clrFor, drillLabel(c), sz + ' close'); add(clrFor, drillLabel(f), sz + ' free'); }
+  for (const [sz, a, b, c] of CLR_MM) { add(clrFor, mmLabel(a), sz + ' fine'); add(clrFor, mmLabel(b), sz + ' medium'); add(clrFor, mmLabel(c), sz + ' coarse'); }
+  const allDrills = [
+    ...NUMBER.map((d, i) => ['Number', '#' + (i + 1), d]),
+    ...Object.entries(LETTER).map(([k, d]) => ['Letter', k, d]),
+    ...fracRows.map((r, i) => ['Fraction', r[0], (i + 1) / 64]),
+    ...metric.map((m) => ['Metric', m.toFixed(1) + ' mm', m / MM]),
+  ].sort((a, b) => a[2] - b[2]).map(([t, s, d]) => [s, t, f4(d), mm(d), (tapFor[s] || []).join(', '), (clrFor[s] || []).join(', ')]);
 
   /* ---------------- speeds */
   const SPEEDS = [['Aluminum alloys', 250, 600, 600, 1500], ['Brass, bronze (free-cutting)', 150, 300, 400, 800], ['Copper', 100, 200, 300, 600], ['Gray cast iron', 50, 100, 250, 450], ['Low-carbon steel (1018, 12L14)', 80, 120, 350, 600],
@@ -102,7 +113,7 @@ module.exports = function machinist() {
 
   return {
     format: 'calcshelf-module', formatVersion: 1,
-    id: 'machinist', name: 'Machinist', tab: 'Machinist', version: '1.2.0', icon: 'machinist',
+    id: 'machinist', name: 'Machinist', tab: 'Machinist', version: '1.3.0', icon: 'machinist',
     author: 'CalcShelf', license: 'GPL-3.0-or-later', homepage: 'https://github.com/netadmindave/CalcShelf/tree/main/modules',
     description: 'Shop tools for machinists: speeds and feeds, thread pitch and tap drills, number, letter, fractional and metric drills with their metric and inch sizes, clearance holes, shop calculators, a G-code and M-code reference, and precision-mechanism design: stiffness, flexures, Hertz contact and dynamics (following Soemers, Design Principles for Precision Mechanisms).',
     // the shop quantities, for the Variable Solver (its formulas are in the Formulas section)
@@ -125,6 +136,41 @@ module.exports = function machinist() {
       { id: 'mpitch', symbol: 'p', name: 'Thread pitch', description: 'Distance between threads.', unit: 'mm' },
       { id: 'mRa', symbol: 'R_a', name: 'Surface roughness', description: 'Arithmetic-mean roughness (theoretical, turning).', unit: 'µin' },
       { id: 'mre', symbol: 'r_\\varepsilon', name: 'Nose radius', description: 'Tool nose radius.', unit: 'in' },
+      { id: 'mdrill', symbol: 'd', name: 'Tap drill diameter', description: 'Drill for the hole before tapping.', unit: 'in', also: 'tap drill' },
+      { id: 'mDmaj', symbol: 'D', name: 'Major diameter', description: 'Nominal (major) diameter of the thread.', unit: 'in', also: 'thread size' },
+      { id: 'mpct', symbol: '\\%', name: 'Thread percentage', description: 'Thread depth as a percentage of full thread (75 is usual).', unit: '', also: 'percent thread' },
+      { id: 'mPD', symbol: 'd_2', name: 'Pitch diameter', description: 'Diameter where thread and groove are equally wide.', unit: 'in', also: 'E' },
+      { id: 'mD1', symbol: 'D_1', name: 'Minor diameter (internal)', description: 'Basic minor diameter of a nut thread.', unit: 'in' },
+      { id: 'md3', symbol: 'd_3', name: 'Minor diameter (external)', description: 'Root diameter of a bolt thread (ISO, rounded root).', unit: 'mm' },
+      { id: 'mH', symbol: 'H', name: 'Fundamental triangle height', description: 'Height of the sharp 60° thread triangle.', unit: 'in' },
+      { id: 'mh3', symbol: 'h_3', name: 'Thread height (external)', description: 'Depth of an external thread.', unit: 'in', also: 'thread depth' },
+      { id: 'mWire', symbol: 'W', name: 'Wire diameter', description: 'Diameter of the three wires.', unit: 'in' },
+      { id: 'mMw', symbol: 'M', name: 'Measurement over wires', description: 'Micrometer reading over the three wires.', unit: 'in' },
+      { id: 'mLpt', symbol: 'L_p', name: 'Drill point length', description: 'Length of the drill point (add it to the hole depth).', unit: 'in' },
+      { id: 'mpa', symbol: '\\theta_p', name: 'Point angle', description: 'Included angle of a drill point (118° or 135°).', unit: 'rad' },
+      { id: 'mhcs', symbol: 'h_c', name: 'Countersink depth', description: 'Depth of the countersink.', unit: 'in' },
+      { id: 'mDcs', symbol: 'D_c', name: 'Countersink diameter', description: 'Diameter of the countersink at the surface.', unit: 'in' },
+      { id: 'mdcb', symbol: 'd_c', name: 'Countersink bottom diameter', description: 'Diameter at the bottom of the countersink (0 for a point).', unit: 'in' },
+      { id: 'mcsa', symbol: '\\theta_c', name: 'Countersink angle', description: 'Included angle (82° inch screws, 90° metric, 100° aircraft).', unit: 'rad' },
+      { id: 'mBCD', symbol: 'D_{bc}', name: 'Bolt circle diameter', description: 'Diameter of the circle through the hole centres.', unit: 'in', also: 'PCD' },
+      { id: 'mnh', symbol: 'n_h', name: 'Number of holes', description: 'Holes equally spaced on the bolt circle.', unit: '' },
+      { id: 'mhs', symbol: 's_h', name: 'Hole spacing', description: 'Straight-line distance between neighbouring holes.', unit: 'in' },
+      { id: 'mgb', symbol: 'h_g', name: 'Gauge block stack', description: 'Height of gauge blocks under a sine bar.', unit: 'in' },
+      { id: 'msb', symbol: 'L_s', name: 'Sine bar length', description: 'Distance between the sine bar rolls (5 in or 100 mm).', unit: 'in' },
+      { id: 'msba', symbol: '\\theta_s', name: 'Sine bar angle', description: 'Angle set on the sine bar.', unit: 'rad' },
+      { id: 'mTPF', symbol: '\\mathrm{TPF}', name: 'Taper per foot', description: 'Change in diameter per foot of length.', unit: 'in/ft' },
+      { id: 'mDL', symbol: 'D_L', name: 'Large diameter', description: 'Large end of the taper.', unit: 'in' },
+      { id: 'mDs', symbol: 'D_S', name: 'Small diameter', description: 'Small end of the taper.', unit: 'in' },
+      { id: 'mLt', symbol: 'L_t', name: 'Taper length', description: 'Length of the taper.', unit: 'in' },
+      { id: 'mta', symbol: '\\alpha_t', name: 'Taper included angle', description: 'Included angle of the taper (the compound is set to half of it).', unit: 'rad' },
+      { id: 'mR', symbol: 'R', name: 'Radius', description: 'Radius of the arc.', unit: 'in' },
+      { id: 'mchord', symbol: 'c', name: 'Chord length', description: 'Straight line between the ends of the arc.', unit: 'in' },
+      { id: 'msag', symbol: 's', name: 'Sagitta', description: 'Height of the arc above its chord.', unit: 'in', also: 'arc height' },
+      { id: 'marc', symbol: 'L_a', name: 'Arc length', description: 'Length along the arc.', unit: 'in' },
+      { id: 'mWt', symbol: 'W', name: 'Bar weight', description: 'Weight of the bar stock.', unit: 'lb' },
+      { id: 'mdbar', symbol: 'd_b', name: 'Bar size', description: 'Diameter, across-flats size, or side of the bar.', unit: 'in' },
+      { id: 'mLbar', symbol: 'L_b', name: 'Bar length', description: 'Length of the bar.', unit: 'in' },
+      { id: 'mrho', symbol: '\\rho', name: 'Density', description: 'Steel 0.284, aluminium 0.098, brass 0.307 lb/in³.', unit: 'lb/in^3' },
     ],
     sections: [
       { title: 'Speeds & feeds', items: [
@@ -207,8 +253,8 @@ module.exports = function machinist() {
             { label: 'Smallest and largest wire that work', expr: '[0.505182/t, 1.010363/t]', unit: 'in', format: 'list', digits: 5 }] }),
       ] },
       { title: 'Drills', items: [
-        { type: 'table', title: 'All drills by size', columns: ['Drill', 'Type', 'Inch', 'mm'], rows: allDrills, near: [{ col: 2, label: 'inches' }, { col: 3, label: 'mm' }],
-          note: 'Number, letter, fractional (to 1 in) and metric drills together, smallest first. Type a size to see the nearest drills.' },
+        { type: 'table', title: 'All drills by size', columns: ['Drill', 'Type', 'Inch', 'mm', 'Tap drill for', 'Clearance for'], rows: allDrills, near: [{ col: 2, label: 'inches' }, { col: 3, label: 'mm' }],
+          note: 'Number, letter, fractional (to 1 in) and metric drills together, smallest first. Type a size to see the nearest drills, or a thread or screw (1/4-20, M6) to find its drills. “Tap drill for” lists the threads this drill is the standard tap drill for (about 75 % thread); “Clearance for” lists the screws it clears: inch close and free fit, metric fine, medium and coarse (ISO 273).' },
         { type: 'table', title: 'Number drills', columns: ['Drill', 'Inch', 'mm'], rows: numberRows, near: [{ col: 1, label: 'inches' }, { col: 2, label: 'mm' }] },
         { type: 'table', title: 'Letter drills', columns: ['Drill', 'Inch', 'mm'], rows: letterRows, near: [{ col: 1, label: 'inches' }, { col: 2, label: 'mm' }] },
         { type: 'table', title: 'Fractional drills and decimal equivalents', columns: ['Fraction', 'Inch', 'mm'], rows: fracRows, near: [{ col: 1, label: 'inches' }, { col: 2, label: 'mm' }] },
@@ -281,6 +327,26 @@ module.exports = function machinist() {
         { type: 'formula', title: 'Cutting time', tex: 't=\\frac{L}{F}', eq: 't=L/F', vars: [['t', 'time', 'min', '', 'mt'], ['L', 'length of cut', 'in', '', 'mL'], ['F', 'feed rate', 'in/min', '', 'mF']] },
         { type: 'formula', title: 'Pitch and TPI', tex: 'p=\\frac{25.4}{\\mathrm{TPI}}', eq: 'p=25.4/TPI', vars: [['p', 'pitch', 'mm', '', 'mpitch'], ['TPI', 'threads per inch', '', '', 'mTPI']] },
         { type: 'formula', title: 'Theoretical surface finish (turning)', tex: 'R_a\\approx\\frac{f_r^2}{32\\,r_\\varepsilon}', eq: 'Ra=1000000*fr^2/(32*re)', vars: [['Ra', 'roughness', 'µin', '', 'mRa'], ['fr', 'feed per revolution', 'in', '', 'mfr'], ['re', 'nose radius', 'in', '', 'mre']] },
+        { type: 'formula', title: 'Spindle speed (metric)', tex: 'N=\\frac{1000\\,V_c}{\\pi D}', eq: 'N=1000*Vc/(pi*D)', vars: [['N', 'spindle speed', 'rpm', '', 'mN'], ['Vc', 'surface speed', 'm/min', '', 'mVc'], ['D', 'diameter', 'mm', '', 'mD']] },
+        { type: 'formula', title: 'Tap drill for a thread percentage (inch)', tex: 'd=D-\\frac{0.01299\\,\\%}{\\mathrm{TPI}}', eq: 'd=D-0.01299*pc/TPI', vars: [['d', 'tap drill', 'in', '', 'mdrill'], ['D', 'major diameter', 'in', '', 'mDmaj'], ['pc', 'thread percentage', '', '75', 'mpct'], ['TPI', 'threads per inch', '', '', 'mTPI']], note: 'Machinery’s Handbook. 75 % thread is usual; 50–60 % in tough materials and for deep holes.' },
+        { type: 'formula', title: 'Tap drill for a thread percentage (metric)', tex: 'd=D-\\frac{\\%\\cdot p}{76.98}', eq: 'd=D-pc*p/76.98', vars: [['d', 'tap drill', 'mm', '', 'mdrill'], ['D', 'major diameter', 'mm', '', 'mDmaj'], ['pc', 'thread percentage', '', '75', 'mpct'], ['p', 'pitch', 'mm', '', 'mpitch']], note: 'D − p gives about 77 % thread.' },
+        { type: 'formula', title: 'Pitch diameter (60° thread)', tex: 'd_2=D-0.649519\\,p', eq: 'd2=D-0.649519*p', vars: [['d2', 'pitch diameter', 'mm', '', 'mPD'], ['D', 'major diameter', 'mm', '', 'mDmaj'], ['p', 'pitch', 'mm', '', 'mpitch']], note: 'Basic size, ISO 724 and ASME B1.1. For an inch thread, p = 1/TPI.' },
+        { type: 'formula', title: 'Minor diameter, internal (60° thread)', tex: 'D_1=D-1.082532\\,p', eq: 'D1=D-1.082532*p', vars: [['D1', 'minor diameter', 'mm', '', 'mD1'], ['D', 'major diameter', 'mm', '', 'mDmaj'], ['p', 'pitch', 'mm', '', 'mpitch']] },
+        { type: 'formula', title: 'Minor diameter, external (ISO metric)', tex: 'd_3=D-1.226869\\,p', eq: 'd3=D-1.226869*p', vars: [['d3', 'root diameter', 'mm', '', 'md3'], ['D', 'major diameter', 'mm', '', 'mDmaj'], ['p', 'pitch', 'mm', '', 'mpitch']] },
+        { type: 'formula', title: 'Thread height, external (60° thread)', tex: 'h_3=0.613435\\,p', eq: 'h3=0.613435*p', vars: [['h3', 'thread height', 'mm', '', 'mh3'], ['p', 'pitch', 'mm', '', 'mpitch']], note: 'The fundamental triangle height is H = 0.866025 p.' },
+        { type: 'formula', title: 'Three-wire thread measurement', tex: 'M=d_2+3W-0.866025\\,p', eq: 'M=d2+3*W-0.866025*p', vars: [['M', 'measurement over wires', 'in', '', 'mMw'], ['d2', 'pitch diameter', 'in', '', 'mPD'], ['W', 'wire diameter', 'in', '', 'mWire'], ['p', 'pitch', 'in', '', 'mpitch']], note: 'For 60° threads. The best wire is W = 0.57735 p; wires from 0.505 p to 1.010 p work.' },
+        { type: 'formula', title: 'Best wire size (60° thread)', tex: 'W=0.57735\\,p', eq: 'W=0.57735*p', vars: [['W', 'wire diameter', 'in', '', 'mWire'], ['p', 'pitch', 'in', '', 'mpitch']] },
+        { type: 'formula', title: 'Drill point length', tex: 'L_p=\\frac{D}{2\\tan(\\theta_p/2)}', eq: 'L=D/(2*tan(a/2))', vars: [['L', 'point length', 'in', '', 'mLpt'], ['D', 'drill diameter', 'in', '', 'mD'], ['a', 'point angle', 'rad', '', 'mpa']], note: '118° (general purpose) or 135° (hard materials). Pick ° for the angle.' },
+        { type: 'formula', title: 'Countersink depth', tex: 'h_c=\\frac{D_c-d_c}{2\\tan(\\theta_c/2)}', eq: 'h=(Dc-dc)/(2*tan(a/2))', vars: [['h', 'depth', 'in', '', 'mhcs'], ['Dc', 'diameter at the surface', 'in', '', 'mDcs'], ['dc', 'diameter at the bottom (0 for a point)', 'in', '0', 'mdcb'], ['a', 'countersink angle', 'rad', '', 'mcsa']], note: '82° for inch flat-head screws, 90° metric, 100° aircraft. Pick ° for the angle.' },
+        { type: 'formula', title: 'Bolt circle hole spacing', tex: 's_h=D_{bc}\\sin\\frac{\\pi}{n_h}', eq: 's=D*sin(pi/n)', vars: [['s', 'distance between neighbouring holes', 'in', '', 'mhs'], ['D', 'bolt circle diameter', 'in', '', 'mBCD'], ['n', 'number of holes', '', '', 'mnh']], note: 'The hole positions themselves are in Shop math → Bolt circle.' },
+        { type: 'formula', title: 'Sine bar', tex: 'h_g=L_s\\sin\\theta_s', eq: 'h=L*sin(a)', vars: [['h', 'gauge block stack', 'in', '', 'mgb'], ['L', 'sine bar length', 'in', '5', 'msb'], ['a', 'angle', 'rad', '', 'msba']], note: 'Pick ° for the angle.' },
+        { type: 'formula', title: 'Taper per foot', tex: '\\mathrm{TPF}=\\frac{12\\,(D_L-D_S)}{L_t}', eq: 'TPF=12*(DL-DS)/L', vars: [['TPF', 'taper per foot', 'in/ft', '', 'mTPF'], ['DL', 'large diameter', 'in', '', 'mDL'], ['DS', 'small diameter', 'in', '', 'mDs'], ['L', 'taper length', 'in', '', 'mLt']] },
+        { type: 'formula', title: 'Taper included angle', tex: '\\tan\\frac{\\alpha_t}{2}=\\frac{D_L-D_S}{2L_t}', eq: 'tan(a/2)=(DL-DS)/(2*L)', vars: [['a', 'included angle', 'rad', '', 'mta'], ['DL', 'large diameter', 'in', '', 'mDL'], ['DS', 'small diameter', 'in', '', 'mDs'], ['L', 'taper length', 'in', '', 'mLt']], note: 'Set the compound to half the included angle. Pick ° for the angle.' },
+        { type: 'formula', title: 'Sagitta (arc height)', tex: 's=R-\\sqrt{R^2-\\frac{c^2}{4}}', eq: 's=R-sqrt(R^2-c^2/4)', vars: [['s', 'sagitta', 'in', '', 'msag'], ['R', 'radius', 'in', '', 'mR'], ['c', 'chord length', 'in', '', 'mchord']] },
+        { type: 'formula', title: 'Arc length from chord and radius', tex: 'L_a=2R\\arcsin\\frac{c}{2R}', eq: 'La=2*R*asin(c/(2*R))', vars: [['La', 'arc length', 'in', '', 'marc'], ['R', 'radius', 'in', '', 'mR'], ['c', 'chord length', 'in', '', 'mchord']] },
+        { type: 'formula', title: 'Bar stock weight, round', tex: 'W=\\frac{\\pi}{4}d_b^2L_b\\rho', eq: 'W=pi/4*d^2*L*rho', vars: [['W', 'weight', 'lb', '', 'mWt'], ['d', 'diameter', 'in', '', 'mdbar'], ['L', 'length', 'in', '', 'mLbar'], ['rho', 'density', 'lb/in^3', '0.284', 'mrho']], note: 'Density: steel 0.284, stainless 0.289, aluminium 0.098, brass 0.307, copper 0.323 lb/in³.' },
+        { type: 'formula', title: 'Bar stock weight, hexagon', tex: 'W=0.866\\,d_b^2L_b\\rho', eq: 'W=0.866025*d^2*L*rho', vars: [['W', 'weight', 'lb', '', 'mWt'], ['d', 'size across flats', 'in', '', 'mdbar'], ['L', 'length', 'in', '', 'mLbar'], ['rho', 'density', 'lb/in^3', '0.284', 'mrho']] },
+        { type: 'formula', title: 'Bar stock weight, square', tex: 'W=d_b^2L_b\\rho', eq: 'W=d^2*L*rho', vars: [['W', 'weight', 'lb', '', 'mWt'], ['d', 'side', 'in', '', 'mdbar'], ['L', 'length', 'in', '', 'mLbar'], ['rho', 'density', 'lb/in^3', '0.284', 'mrho']] },
       ] },
     ],
   };

@@ -33,8 +33,7 @@ This guide covers every part of CalcShelf: the CAS, the TI-36X Pro recreation, t
 **Main menu (☰, top left).**
 
 - **Settings**
-- **Constants & formulas**
-- **Trigonometry & triangle solver**
+- **Constants & formulas** (with the triangle solver and trig identities)
 - **Conversion tool**
 - **Modules:** install, open and remove modules
 - **Add an emulated calculator** (or **Replace OS or change calculator**)
@@ -80,9 +79,13 @@ The top row of the **123** page has **√** (long-press for ⁿ√), **π** (lon
 - **∫Σ:** calculus and sums.
 - **abc:** letters.
 
-The **≈** keys (bottom right of the 123 page, and beside **enter**) give a decimal instead of an exact answer. **enter** evaluates exactly.
+**≈** (beside **enter**) gives a decimal instead of an exact answer. **enter** evaluates exactly. **entry** (bottom right of the 123 page) brings back the last line you entered.
 
-**Second functions.** Keys show a blue **2nd** legend and a green **◆** legend, as on the TI-89. **Long-press a key** to choose one of them.
+**More on each key.** Many keys have one or two small legends, blue on the left and green on the right. **Long-press a key** to choose the key itself or one of them. Nothing is in two places: a legend never repeats another key or the toolbar, and the f(x) and ∫Σ pages hold only what the 123 page doesn't.
+
+- **On the 123 page:** ⁿ√ (√), e (π), x³ (x²), 10ˣ and log base □ (eˣ), |x| and n! (units), ln and log (x), sin, cos, tan and their inverses (y, z, t), θ (^), ′ and ≠ (=), the brackets { } [ ] (( ) , ÷), ° (|), ∫ (7), d/d□ (8), ; (9), Π product (×), ∠ (EE), := (4), nCr and nPr (5), clear a–z (6), Var-Link (−), Rcl (sto▸), "text" (1), x⁻¹ (2), mod (3), Σ sum (+), i and ∞ (ans), < ≤ (0), > ≥ (.), ± ((−)).
+- **f(x):** hyperbolic functions and their inverses, sec, csc, cot, floor, ceil, round, sign, iPart, fPart, gcd, lcm, isPrime, the real and imaginary parts, conjugate and argument, max, min, mean, median, stdDev, rand and randInt.
+- **∫Σ:** the second derivative, the indefinite integral, limits, solve, factor, expand, zeros, nSolve, cSolve, deSolve, taylor, simplify, matrices (+row, +col, det, transpose, rref, eigenvalues, dot and cross products, norm), piecewise cases, subscripts, Define, approx, exact, propFrac and comDenom.
 
 **Hardware keyboards** work: type normally, and Enter evaluates.
 
@@ -242,21 +245,20 @@ Add these from **+**.
 
 ## Constants, formulas, trig and conversions
 
-Open this from **const** on the toolbar, or from the main menu. It has four tabs.
+Open this from **const** on the toolbar, or from the main menu. It has four tabs: Constants, Formulas, Convert and Mine. The tabs, the search box and the category chips stay at the top while the list scrolls.
 
 - **Constants:**
   - The CODATA physical constants, plus material and optical data (refractive indices, dn/dT, and so on).
   - Each one can be shown in several units.
   - Search by name, for example *Planck*, *BK7* or *dn/dT*.
   - Tap a constant to insert it, or to open it in the conversion tool.
-- **Formulas:** solvable formulas by category. Pick the unknown, fill in the other variables, and tap **Solve**.
+- **Formulas:** solvable formulas by category, with every formula from your installed modules (a chip for each: Optics, Machinist, Computer Science, Periodic Table; a module formula that repeats a built-in one appears once). Pick the unknown, fill in the other variables, and tap **Solve**.
   - Each variable with a unit has a unit menu. It starts on **units**, which uses your numbers as you type them, so keep them consistent (all SI, for example).
   - Pick a unit, such as **mm** or **in**, and CalcShelf converts that value. Pick one for the unknown to get the answer in that unit.
   - Angles start in the calculator's angle mode; pick **°** or **rad** to override it.
-- **Trig:**
-  - **Triangle solver:** SSS, SAS, ASA, AAS, and the ambiguous SSA case, which shows both triangles. It gives the area, perimeter, heights and the circumradius and inradius, with a scaled drawing.
-  - **Identities:** about 40 identities and an exact-value table. Insert any one, or have the CAS verify it.
-  - **Trig formulas.**
+  - **Trigonometry** (a chip in Formulas) starts with:
+    - **Triangle solver:** SSS, SAS, ASA, AAS, and the ambiguous SSA case, which shows both triangles. It gives the area, perimeter, heights and the circumradius and inradius, with a scaled drawing.
+    - **Trig identities:** about 40 identities and an exact-value table. Insert any one, or have the CAS verify it.
 - **Convert:** the same tool as the Unit Converter tab.
 
 <p><img src="img/trig.png" width="240" alt="Triangle solver"></p>
@@ -271,11 +273,11 @@ A module is a tab for one subject: formulas, calculators, tables, constants and 
 - **Machinist:**
   - **Speeds & feeds:** spindle speed, surface speed, feed rate, chip load, removal rate and cutting time, with a cutting-speed table.
   - **Threads:** unified, metric and NPT tap drills, pitch ↔ TPI, tap drills for a thread percentage, thread dimensions and three-wire measurement.
-  - **Drills:** every number, letter, fractional and metric drill with its inch and mm size, plus clearance holes, drill point length and countersink depth.
+  - **Drills:** every number, letter, fractional and metric drill with its inch and mm size, the threads it is the tap drill for and the screws it is a clearance hole for (search *1/4-20* or *M6* to find them), plus clearance-hole tables, drill point length and countersink depth.
   - **Shop math:** decimal to fraction, inch ↔ mm, bolt circles, sine bar, taper, chord and sagitta, bar stock weight and surface finish.
   - **G & M codes:** G codes, M codes, address letters and canned-cycle formats.
   - **Stiffness & flexures** and **Contact & dynamics** (following Soemers, *Design Principles for Precision Mechanisms*): stiffness through a transmission, series and parallel springs, bars, cantilevers, shafts and tubes in torsion, leaf-spring parallel guides (stiffness, shortening, stress, buckling, reinforced springs), cross and folded sheet flexures, notch hinges, Hertz contact of spheres and cylinders with the contact stiffness, natural frequency, impact force, dynamic position errors, inertia match, gravity balance with a zero-length spring, Abbe and cosine errors and thermal expansion.
-  - **Formulas:** spindle speed, feed rate, removal rate, spindle power, cutting time, pitch and TPI and surface finish, for the Variable Solver: enter a surface speed, tool diameter, flutes and chip load, and it gives the rpm, feed rate and removal rate.
+  - **Formulas:** spindle speed (inch and metric), feed rate, removal rate, spindle power, cutting time, pitch and TPI, surface finish, tap drill for a thread percentage (inch and metric), pitch and minor diameters, thread height, three-wire measurement and best wire, drill point length, countersink depth, bolt-circle hole spacing, sine bar, taper per foot and taper angle, sagitta and arc length, and round, hex and square bar weight. They are in Formulas (const) and the Variable Solver: enter a surface speed, tool diameter, flutes and chip load, and it gives the rpm, feed rate and removal rate.
 - **Periodic Table:** opens on the periodic table, in landscape.
   - **Colour by** category, block, state, electronegativity, atomic radius, ionization energy, electron affinity, melting or boiling point, density, atomic mass or heat capacity (with a scale).
   - **Tap an element** for its mass, electron configuration and shells, oxidation states, electronegativity, radii, all its ionization energies, electron affinity, state, melting and boiling points, density, heat capacity, discovery, and its isotopes with their masses and natural abundances. **Insert molar mass** puts it in the CAS tab.

@@ -75,14 +75,18 @@
     tab: 'units', qty: 'Length', from: 'nm', to: 'µm', val: '1550',
     build(b, app, opts = {}) {
       this.app = app; this.sheet = !!opts.sheet;
-      const seg = el('div', { class: 'seg', style: { marginBottom: '10px' } });
+      const seg = el('div', { class: 'seg' });
+      // in the sheet, the tabs (and the unit search) stay at the top while the rest scrolls
+      this.topExtra = opts.top ? el('div') : null;
       for (const [k, l] of [['units', 'Units'], ['photon', 'Optics'], ['base', 'Number base'], ['db', 'Decibels']]) {
         const x = el('button', { text: l, class: this.tab === k ? 'on' : '' });
-        x.onclick = () => { this.tab = k; seg.querySelectorAll('button').forEach((y) => y.classList.toggle('on', y === x)); body.innerHTML = ''; this[k](body); };
+        x.onclick = () => { this.tab = k; seg.querySelectorAll('button').forEach((y) => y.classList.toggle('on', y === x)); body.innerHTML = ''; if (this.topExtra) this.topExtra.innerHTML = ''; this[k](body); };
         seg.append(x);
       }
       const body = el('div');
-      b.append(seg, body);
+      const top = opts.top || el('div', { class: 'sheet-sticky page-sticky' });
+      if (!opts.top) { this.topExtra = el('div'); b.append(top); }
+      top.append(seg, this.topExtra); b.append(body);
       this[this.tab](body);
     },
 
@@ -90,7 +94,7 @@
     units(b) {
       const app = this.app;
       const OTHER = '…other';
-      const q = el('input', { class: 'search', type: 'search', placeholder: 'Find a quantity or unit (e.g. psi, viscosity, kWh)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
+      const q = el('input', { class: 'search', type: 'search', placeholder: 'Find a quantity or unit (psi, kWh)', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
       const chips = el('div', { class: 'chips' });
       const valI = el('input', { class: 'search cv-in', value: this.val, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Value', 'data-units': '1' });
       const fromS = el('select', { class: 'search cv-in', 'aria-label': 'From unit' });
@@ -168,7 +172,8 @@
         I.addEventListener('change', () => { fill(); calc(); });
       }
       q.oninput = drawChips;
-      b.append(q, chips, fmtSeg(app, calc), lab('Value', valI), el('div', { class: 'cv-stack' }, lab('From', fromS, fromI), el('div', { class: 'cv-swap' }, swap), lab('To', toS, toI)), unitHelp, out, all);
+      if (this.topExtra) this.topExtra.append(q, chips); else b.append(q, chips);
+      b.append(fmtSeg(app, calc), lab('Value', valI), el('div', { class: 'cv-stack' }, lab('From', fromS, fromI), el('div', { class: 'cv-swap' }, swap), lab('To', toS, toI)), unitHelp, out, all);
       fill(); drawChips(); calc();
     },
 
